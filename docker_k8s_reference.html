@@ -1,0 +1,1708 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Docker & Kubernetes Kapsamlı Başvuru Rehberi</title>
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 1. DOCKER BLUE PALETİ & TIPOGRAFİ DEĞİŞKENLERİ */
+        :root {
+            --bg: #0B0E14;
+            --bg2: #101520;
+            --bg3: #171E2C;
+            --bg4: #1E2738;
+            --border: #26324A;
+            --border2: #3A4B6E;
+            --accent: #2496ED; /* Docker Blue */
+            --accent2: #1D84C5;
+            --cyan: #326CE5;   /* Kubernetes Cyan */
+            
+            --text-main: #E2E8F0;
+            --text-muted: #94A3B8;
+            --search-hl-bg: rgba(234, 179, 8, 0.3);
+            --search-hl-text: #FDE047;
+            --sidebar-width: 320px;
+        }
+
+        body.light-mode {
+            --bg: #F8FAFC;
+            --bg2: #F1F5F9;
+            --bg3: #E2E8F0;
+            --bg4: #CBD5E1;
+            --border: #E2E8F0;
+            --border2: #CBD5E1;
+            --accent: #1D84C5;
+            --accent2: #2496ED;
+            --cyan: #326CE5;
+            
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --search-hl-bg: rgba(234, 179, 8, 0.4);
+            --search-hl-text: #854D0E;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            transition: background-color 0.3s, color 0.3s;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+
+        code, pre {
+            font-family: 'JetBrains Mono', monospace;
+        }
+
+        /* Ana Düzen */
+        .app-container {
+            display: flex;
+            min-height: 100vh;
+        }
+
+        /* 3. DİNAMİK YAN MENÜ (Sidebar) */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg2);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            overflow: hidden;
+            padding: 1.5rem 1rem;
+            z-index: 100;
+            transition: background-color 0.3s, border-color 0.3s;
+        }
+
+        .sidebar-header {
+            margin-bottom: 1rem;
+            padding: 0 0.5rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 1rem;
+            line-height: 1.4;
+        }
+
+        /* 4. Arama Kutusu Cmd+K */
+        .search-container {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+
+        .search-input {
+            width: 100%;
+            background-color: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.75rem 1rem 0.75rem 2.5rem;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(36, 150, 237, 0.2);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-muted);
+            pointer-events: none;
+        }
+
+        .search-shortcut {
+            position: absolute;
+            right: 0.5rem;
+            top: 50%;
+            transform: translateY(-50%);
+            background-color: var(--bg4);
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            pointer-events: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+
+        /* İçindekiler Listesi (TOC) */
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.25rem;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.82rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
+
+        .toc-item:hover {
+            background-color: var(--bg3);
+            color: var(--text-main);
+        }
+
+        .toc-num {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent);
+            opacity: 1;
+            margin-right: 0.75rem;
+            font-weight: 700;
+        }
+
+        .toc-text {
+            flex: 1;
+        }
+
+        .toc-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: transparent;
+            transition: all 0.3s ease;
+            margin-left: 0.5rem;
+        }
+
+        /* ScrollSpy Active Sınıfı Animasyonları */
+        .toc-item.active {
+            color: var(--accent);
+            background-color: var(--bg3);
+            font-weight: 600;
+        }
+
+        .toc-item.active .toc-num {
+            color: var(--accent);
+            opacity: 1;
+        }
+
+        .toc-item.active .toc-dot {
+            background-color: var(--accent);
+            box-shadow: 0 0 8px var(--accent);
+            animation: dotPulse 1.5s infinite;
+        }
+
+        @keyframes dotPulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(36, 150, 237, 0.7); }
+            70% { transform: scale(1.3); box-shadow: 0 0 0 6px rgba(36, 150, 237, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(36, 150, 237, 0); }
+        }
+
+        @keyframes tocEntering {
+            from { transform: translateX(-15px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        
+        .toc-entering {
+            animation: tocEntering 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        /* İçerik Alanı */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding: 3rem 4rem 8rem 4rem;
+            max-width: 1100px;
+        }
+        
+        .header-actions {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            margin-bottom: 2rem;
+            position: relative;
+            z-index: 10;
+        }
+
+
+
+        .theme-toggle {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+
+        .theme-toggle:hover {
+            background-color: var(--bg4);
+            border-color: var(--accent);
+            transform: rotate(15deg) scale(1.05);
+            box-shadow: 0 4px 12px rgba(36, 150, 237, 0.2);
+        }
+
+        /* 5. REHBER İÇERİK İSKELETİ */
+        .section {
+            margin-bottom: 5rem;
+            scroll-margin-top: 2rem;
+        }
+
+        .section-title {
+            font-size: 2.2rem;
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .section-num {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1.8rem;
+        }
+
+        .card {
+            background-color: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+            transition: all 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        .card:hover {
+            border-color: var(--border2);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+        
+        body.light-mode .card:hover {
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+        }
+        
+        .reveal-hidden {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: all 0.7s cubic-bezier(0.2, 0.8, 0.2, 1);
+        }
+        
+        .reveal-visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .card h3 {
+            font-size: 1.3rem;
+            color: var(--text-main);
+            margin-bottom: 1rem;
+        }
+        
+        .card p {
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+        
+        .card ul {
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--text-muted);
+        }
+        
+        .card li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sub {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            font-size: 1.25rem;
+            color: var(--accent);
+            margin: 2.5rem 0 1rem 0;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px dashed var(--border);
+            display: inline-block;
+        }
+
+        .info-box {
+            padding: 1rem 1.25rem;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            display: flex;
+            gap: 1rem;
+            align-items: flex-start;
+            font-size: 0.95rem;
+            border-left: 4px solid;
+            background-color: var(--bg3);
+        }
+        
+        .info-box.pro-tip {
+            border-left-color: var(--accent);
+        }
+        
+        .info-box.pro-tip::before {
+            content: '💡';
+            font-size: 1.5rem;
+        }
+        
+        .info-box.warning {
+            border-left-color: #EAB308;
+            background-color: rgba(234, 179, 8, 0.1);
+        }
+        
+        .info-box.warning::before {
+            content: '⚠️';
+            font-size: 1.5rem;
+        }
+
+        /* Kod Blokları & Kopyala Butonu */
+        .code-wrapper {
+            position: relative;
+            background-color: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            margin-top: 1rem;
+            overflow: hidden;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .code-wrapper:hover {
+            border-color: var(--accent);
+            box-shadow: 0 0 15px rgba(36, 150, 237, 0.15);
+        }
+
+        .code-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.6rem 1rem;
+            background-color: var(--bg4);
+            border-bottom: 1px solid var(--border);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .copy-btn {
+            background: transparent;
+            border: 1px solid var(--border2);
+            color: var(--text-muted);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+            background-color: rgba(36, 150, 237, 0.1);
+        }
+
+        pre {
+            padding: 1rem;
+            overflow-x: auto;
+            color: #A6ACCD;
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
+        
+        body.light-mode pre {
+            color: #334155;
+        }
+
+        /* Arama Vurgusu */
+        mark.search-hl {
+            background-color: var(--search-hl-bg);
+            color: var(--search-hl-text);
+            border-radius: 3px;
+            padding: 0 3px;
+            box-shadow: 0 0 0 1px rgba(234, 179, 8, 0.5);
+        }
+
+        /* Sözlük Tooltip Sistemi */
+        .tooltip-trigger {
+            border-bottom: 1px dashed var(--accent);
+            cursor: help;
+            color: var(--text-main);
+            position: relative;
+            font-weight: 600;
+            transition: color 0.2s;
+        }
+        
+        .tooltip-trigger:hover {
+            color: var(--accent);
+        }
+
+        .tooltip-box {
+            position: absolute;
+            background-color: var(--bg4);
+            color: var(--text-main);
+            padding: 0.85rem;
+            border-radius: 8px;
+            border: 1px solid var(--border2);
+            font-size: 0.85rem;
+            font-weight: 400;
+            width: max-content;
+            max-width: 300px;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px) scale(0.95);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            z-index: 1000;
+            pointer-events: none;
+            line-height: 1.4;
+        }
+        
+        .tooltip-box::after {
+            content: '';
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -6px;
+            border-width: 6px;
+            border-style: solid;
+            border-color: var(--border2) transparent transparent transparent;
+        }
+        
+        body.light-mode .tooltip-box {
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .tooltip-trigger:hover .tooltip-box {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0) scale(1);
+        }
+
+        /* 2. STICKY HEADER & SECTIONS PROGRESS BAR */
+        #progressBar {
+            position: fixed;
+            bottom: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            height: 52px;
+            background-color: var(--bg2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            z-index: 90;
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.2);
+        }
+
+        body.light-mode #progressBar {
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.05);
+        }
+
+        #progressBar.visible {
+            transform: translateY(0);
+        }
+
+        .prog-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            width: 100%;
+            z-index: 2;
+        }
+
+        .prog-num {
+            color: var(--accent);
+            font-family: 'JetBrains Mono', monospace;
+            font-weight: 700;
+            font-size: 1rem;
+        }
+
+        .prog-title {
+            color: var(--text-main);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            flex: 1;
+        }
+
+        .prog-percent {
+            font-weight: 600;
+            font-family: 'JetBrains Mono', monospace;
+            background-color: var(--bg4);
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            color: var(--text-main);
+        }
+
+        .prog-track {
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            width: 100%;
+            background: transparent;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Progress Parlama ve Genişleme */
+        .prog-fill {
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, rgba(36,150,237,0.05) 0%, rgba(36,150,237,0.15) 100%);
+            border-top: 2px solid var(--accent);
+            position: relative;
+            transition: width 0.1s linear;
+            overflow: hidden;
+        }
+
+        .prog-fill::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            bottom: 0;
+            width: 120px;
+            background: linear-gradient(90deg, transparent, rgba(50, 108, 229, 0.5), transparent);
+            transform: skewX(-20deg);
+            animation: movingGlow 2s infinite linear;
+        }
+
+        @keyframes movingGlow {
+            0% { right: 100%; opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { right: -60px; opacity: 0; }
+        }
+
+        /* 4. Yukarı Çık Butonu (Dairesel SVG Yüzdeli) */
+        #scrollTop {
+            position: fixed;
+            bottom: 5rem;
+            right: 2.5rem;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--bg3);
+            border: 1px solid var(--border);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+        }
+        
+        body.light-mode #scrollTop {
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        #scrollTop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scrollTop:hover {
+            transform: translateY(-5px);
+            background-color: var(--bg4);
+            border-color: var(--accent);
+        }
+
+        .scroll-ring {
+            position: absolute;
+            top: -1px;
+            left: -1px;
+            width: 48px;
+            height: 48px;
+            transform: rotate(-90deg);
+            pointer-events: none;
+        }
+
+        .scroll-ring circle {
+            fill: transparent;
+            stroke-width: 2.5;
+            cx: 24;
+            cy: 24;
+            r: 22.5;
+        }
+        
+        .scroll-ring .bg {
+            stroke: transparent;
+        }
+
+        .scroll-ring .progress {
+            stroke: var(--cyan);
+            stroke-dasharray: 141.37; /* 2 * pi * 22.5 */
+            stroke-dashoffset: 141.37;
+            transition: stroke-dashoffset 0.1s linear;
+            stroke-linecap: round;
+        }
+
+        #scrollTop svg.icon {
+            width: 18px;
+            height: 18px;
+            fill: var(--text-main);
+            z-index: 2;
+        }
+        
+        @media (max-width: 1024px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; padding: 2rem; max-width: 100%; }
+            #progressBar { left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="app-container">
+        
+        <!-- YAN MENÜ (Sidebar / TOC) -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h1 class="sidebar-title">Docker & k8s<br>Reference</h1>
+                <div class="search-container">
+                    <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+                    <input type="text" id="searchInput" class="search-input" placeholder="Ara...">
+                    <span class="search-shortcut">⌘K</span>
+                </div>
+            </div>
+            
+            <ul class="toc-list" id="tocList">
+                <li><a href="#s01" class="toc-item active"><span class="toc-num">01</span><span class="toc-text">Docker Anatomisi</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s02" class="toc-item"><span class="toc-num">02</span><span class="toc-text">Katman Optimizasyonu</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s03" class="toc-item"><span class="toc-num">03</span><span class="toc-text">Network & Volumes</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s04" class="toc-item"><span class="toc-num">04</span><span class="toc-text">K8s Temelleri & Mimari</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s05" class="toc-item"><span class="toc-num">05</span><span class="toc-text">K8s Pods & Yaşam Döngüsü</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s06" class="toc-item"><span class="toc-num">06</span><span class="toc-text">Deployments & Ölçeklendirme</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s07" class="toc-item"><span class="toc-num">07</span><span class="toc-text">Services & Ingress</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s08" class="toc-item"><span class="toc-num">08</span><span class="toc-text">Kalıcı Veri Yönetimi</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s09" class="toc-item"><span class="toc-num">09</span><span class="toc-text">ConfigMaps & Secrets</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s10" class="toc-item"><span class="toc-num">10</span><span class="toc-text">Gelişmiş K8s Objeleri</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s11" class="toc-item"><span class="toc-num">11</span><span class="toc-text">Helm ile Paket Yönetimi</span><div class="toc-dot"></div></a></li>
+                <li><a href="#s12" class="toc-item"><span class="toc-num">12</span><span class="toc-text">GitOps & CI/CD Entegrasyonu</span><div class="toc-dot"></div></a></li>
+            </ul>
+        </aside>
+
+        <!-- ANA İÇERİK -->
+        <main class="main-content">
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" title="Tema Değiştir">☀️</button>
+            </div>
+
+            <section class="section" id="s01">
+                <h2 class="section-title"><span class="section-num">01.</span> Konteyner Teknolojisi & Docker Anatomisi</h2>
+                
+                <h3 class="sub">Sanal Makineler (VM) vs. Konteynerler</h3>
+                <div class="card">
+                    <p>Geleneksel sanal makineler (VM), donanımı hypervisor seviyesinde sanallaştırarak her birine tam bir Guest OS (Misafir İşletim Sistemi) kurar. Bu durum kaynak tüketimini (CPU, RAM, Disk) artırır ve başlatma sürelerini dakikalara çıkarır.</p>
+                    <p>Konteynerler ise çekirdek (Kernel) paylaşımı yaparak işletim sistemi seviyesinde sanallaştırma sağlar. Ortak bir Linux çekirdeği üzerinde sadece uygulamanın gereksinim duyduğu kütüphaneleri izole ederler. Sonuç: Milisaniyeler içinde başlayan, megabaytlar seviyesinde kaynak tüketen bir mimari.</p>
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Performans Kazancı:</strong> Aynı donanım üzerinde 10 adet VM çalıştırabilirken, yüzlerce Container çalıştırabilirsiniz. Bu yoğunluk, mikroservis mimarisinin temelini oluşturur.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="sub">Docker Engine Yapısı</h3>
+                <div class="card">
+                    <p>Docker Engine temel olarak üç bileşenden oluşur:</p>
+                    <ul>
+                        <li><strong>Docker Daemon (dockerd):</strong> Konteynerleri, imajları ve ağları yöneten arka plan servisidir.</li>
+                        <li><strong>REST API:</strong> Programların veya Docker CLI'ın Daemon ile konuşmasını sağlayan arayüzdür.</li>
+                        <li><strong>Docker CLI (docker):</strong> Geliştiricinin komutlarını REST API üzerinden Daemon'a ileten istemcidir.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">İmaj (Image) ve Konteyner (Container)</h3>
+                <div class="card">
+                    <p><strong>Image:</strong> Uygulamanızı, çalışması için gereken ortam değişkenleri, bağımlılıklar ve dosyalarla birlikte paketleyen salt okunur (read-only) şablondur.</p>
+                    <p><strong>Container:</strong> Bir Image'ın çalıştırılabilir, izole edilmiş çalışan örneğidir. Üzerine yazılabilir ince bir katman (writable container layer) eklenerek hayat bulur.</p>
+                    <div class="info-box warning">
+                        <div>
+                            <strong>Veri Uçuculuğu:</strong> Bir Container silindiğinde, writable layer içindeki tüm veriler de kaybolur. Kalıcı veri için mutlaka Volumes veya Bind Mounts kullanılmalıdır.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s02">
+                <h2 class="section-title"><span class="section-num">02.</span> Profesyonel Dockerfile & Katman Optimizasyonu</h2>
+                
+                <h3 class="sub">Temel Dockerfile Talimatları</h3>
+                <div class="card">
+                    <p>Bir Dockerfile, Docker Engine'in imajı adım adım nasıl inşa edeceğini (build) tanımlayan manifestodur.</p>
+                    <ul>
+                        <li><strong>FROM:</strong> Başlangıç temel imajını belirler. Tüm Dockerfile'lar FROM ile başlamalıdır (argümanlar hariç).</li>
+                        <li><strong>RUN:</strong> İmaj derlenirken çalıştırılacak shell komutlarıdır (Örn: `apt-get install`). Yeni bir katman oluşturur.</li>
+                        <li><strong>COPY:</strong> Host sistemdeki dosyaları imajın içine kopyalar.</li>
+                        <li><strong>ENV:</strong> İmaj ve sonrasında konteyner için ortam değişkenleri tanımlar.</li>
+                        <li><strong>EXPOSE:</strong> Konteynerin dinleyeceği portu belirtir (Sadece dökümantasyon amaçlıdır, portu dışarı açmaz).</li>
+                        <li><strong>CMD / ENTRYPOINT:</strong> Konteyner başlatıldığında varsayılan olarak çalışacak ana süreci tanımlar.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Multi-stage Build (Çok Aşamalı Derleme)</h3>
+                <div class="card">
+                    <p>İmaj boyutunu (Image Size) dramatik ölçüde düşürmenin en iyi yolu, derleme araçlarını (compiler, SDK) son imajın dışında bırakmaktır. Aşağıda bir Go projesinin Alpine ortamına taşınması örneğini görebilirsiniz.</p>
+                    
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>Dockerfile (Multi-stage)</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code># 1. Aşama: Builder (Derleme Aşaması)
+FROM golang:1.20-alpine AS builder
+WORKDIR /app
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN CGO_ENABLED=0 GOOS=linux go build -a -installsuffix cgo -o main .
+
+# 2. Aşama: Production (Çalıştırma Aşaması)
+FROM alpine:latest
+WORKDIR /root/
+# Builder aşamasından sadece derlenmiş binary dosyasını alıyoruz
+COPY --from=builder /app/main .
+EXPOSE 8080
+CMD ["./main"]</code></pre>
+                    </div>
+                    
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Distroless İmajlar:</strong> Alpine yerine Google'ın geliştirdiği "Distroless" imajları kullanarak, içinde shell (sh/bash) bile barındırmayan, sadece uygulamanızı çalıştıracak kadar minimal ve süper güvenli imajlar elde edebilirsiniz.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="sub">Layer Cache Mekanizması & Sıralama Optimizasyonu</h3>
+                <div class="card">
+                    <p>Docker, her talimatı bir katman (layer) olarak kaydeder. Bir dosya değiştiğinde, o katman ve sonrasındaki tüm katmanların önbelleği (cache) bozulur ve yeniden çalıştırılır. Bağımlılıkların (package.json, go.mod) koddan (src) önce kopyalanması build süresini saniyelere indirebilir.</p>
+                    
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>Dockerfile (Optimizasyon)</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>FROM node:18-alpine
+WORKDIR /app
+
+# Kötü Pratik: Tüm kod ve package.json aynı anda kopyalanırsa, her kod değişiminde npm install baştan çalışır.
+# COPY . . 
+# RUN npm install
+
+# İyi Pratik (Cache-Friendly): Önce sadece package.json kopyalanır.
+COPY package*.json ./
+RUN npm install --production
+
+# Kod kopyalama işlemi en sona bırakılır. 
+COPY . .
+CMD ["node", "server.js"]</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s03">
+                <h2 class="section-title"><span class="section-num">03.</span> Docker Network & Veri Saklama (Volumes)</h2>
+                
+                <h3 class="sub">Docker Ağ Sürücüleri</h3>
+                <div class="card">
+                    <ul>
+                        <li><strong>Bridge (Varsayılan):</strong> Aynı makinede çalışan konteynerlerin kendi aralarında konuşmasını sağlayan izole, sanal bir ağdır. Dışarıdan erişim için port yönlendirme (`-p 80:80`) gerekir.</li>
+                        <li><strong>Host:</strong> Konteyner ile host makine arasındaki ağ izolasyonunu kaldırır. Konteyner doğrudan hostun IP'sini ve ağ arayüzünü kullanır. (Sadece Linux'ta performans artışı sağlar).</li>
+                        <li><strong>Overlay:</strong> Docker Swarm kümesindeki farklı fiziksel makineler üzerinde çalışan konteynerleri aynı ağdaymış gibi birbirine bağlar.</li>
+                        <li><strong>None:</strong> Konteynerin ağ bağlantısını tamamen keser (loopback hariç). Maksimum izolasyon sağlar.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Veri Kalıcılığı (Data Persistence)</h3>
+                <div class="card">
+                    <p>Konteynerler uçucudur. Kalıcı veriler için üç temel saklama yöntemi bulunur:</p>
+                    <ul>
+                        <li><strong>Named Volumes:</strong> Docker tarafından yönetilen, en güvenilir ve önerilen saklama birimidir. `/var/lib/docker/volumes/` altında güvenle saklanır.</li>
+                        <li><strong>Bind Mounts:</strong> Host makinedeki belirlediğiniz tam bir dosya yolunu (Örn: `/home/user/data`) konteynere bağlar. Host sistemin yapısına bağımlıdır.</li>
+                        <li><strong>Tmpfs Mounts:</strong> Verileri hostun belleğinde (RAM) tutar, diske yazmaz. Hassas veriler veya hız gerektiren geçici dosyalar için idealdir.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Docker Compose & Çoklu Konteyner Ortamları</h3>
+                <div class="card">
+                    <p>Docker Compose, birden fazla konteyneri bir YAML dosyası (`docker-compose.yml`) üzerinden deklaratif (bildirimsel) olarak yönetmemizi sağlayan orkestrasyon aracıdır.</p>
+                    
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>docker-compose.yml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>version: "3.8"
+
+services:
+  web:
+    build: ./frontend
+    ports:
+      - "3000:3000"
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+  api:
+    image: my-backend-api:v1.0
+    environment:
+      - DB_HOST=database
+      - DB_USER=root
+      - DB_PASS=secret
+    networks:
+      - app-network
+    depends_on:
+      - database
+
+  database:
+    image: postgres:14-alpine
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: secret
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  db-data:</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s04">
+                <h2 class="section-title"><span class="section-num">04.</span> Kubernetes (K8s) Temelleri & Mimari</h2>
+                
+                <h3 class="sub">K8s Control Plane (Master Node) Bileşenleri</h3>
+                <div class="card">
+                    <p>Control Plane, kümenin (cluster) beynidir. Global kararları (örneğin zamanlama) alır ve küme olaylarını yönetir.</p>
+                    <ul>
+                        <li><strong>kube-apiserver:</strong> Tüm Kubernetes bileşenlerinin birbirleriyle iletişim kurduğu dışa dönük ana API kapısıdır. `kubectl` komutları doğrudan buraya ulaşır.</li>
+                        <li><strong>etcd:</strong> Kümedeki tüm durum (state) verilerini barındıran, tutarlı ve yüksek erişilebilirlik sağlayan Key-Value (Anahtar-Değer) deposudur.</li>
+                        <li><strong>kube-scheduler:</strong> Yeni oluşturulan Pod'ların donanım ihtiyaçlarını (CPU/RAM) ve diğer kuralları değerlendirerek, çalışmak için en uygun Worker Node'u seçer.</li>
+                        <li><strong>kube-controller-manager:</strong> Node'ların çökmesi, replika sayılarının eksilmesi gibi durumları denetleyen ve kümenin istenen durumda (desired state) kalmasını sağlayan kontrolcülerin yöneticisidir.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Worker Node Bileşenleri</h3>
+                <div class="card">
+                    <p>İşçi düğümleri, uygulamalarınızın (Pod'ların) fiziksel olarak çalıştığı makinelerdir.</p>
+                    <ul>
+                        <li><strong>kubelet:</strong> Master Node'dan gelen talimatları uygulayan ve düğüm üzerindeki Pod'ların sağlıklı çalıştığından emin olan birincil ajan/servistir.</li>
+                        <li><strong>kube-proxy:</strong> Düğüm üzerindeki ağ kurallarını yöneten, dışarıdan gelen trafiği doğru Pod'lara (Ingress/Service) yönlendiren ağ vekilidir.</li>
+                        <li><strong>Container Runtime (CRI):</strong> Konteynerleri fiziksel olarak başlatan ve çalıştıran yazılımdır (containerd, CRI-O vb.).</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Bildirimsel Yönetim ve `kubectl` Felsefesi</h3>
+                <div class="card">
+                    <p>Kubernetes, Emirsel (Imperative - "Bunu böyle yap") komutlar yerine Bildirimsel (Declarative - "Şu durumu sağla") yapıyı benimser.</p>
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Declarative Gücü:</strong> <code>kubectl apply -f deployment.yaml</code> komutu çalıştırdığınızda K8s'e nasıl yapacağını değil, ulaşılmasını istediğiniz son durumu verirsiniz. K8s mevcut durumu o duruma eşitlemek için tüm aksiyonları kendi kendine alır.
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>terminal</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code># Imperative (Önerilmez, debug için kullanılır):
+kubectl run my-nginx --image=nginx --replicas=3
+
+# Declarative (Best Practice):
+kubectl apply -f my-deployment.yaml</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s05">
+                <h2 class="section-title"><span class="section-num">05.</span> K8s Pods & Yaşam Döngüsü</h2>
+                
+                <h3 class="sub">Pod Anatomisi ve Paylaşım</h3>
+                <div class="card">
+                    <p>Pod, Kubernetes ortamındaki en küçük ve en temel dağıtım birimidir. Bir veya birden fazla sıkı sıkıya bağlı konteyneri barındırır. Aynı Pod içindeki tüm konteynerler şu özellikleri paylaşır:</p>
+                    <ul>
+                        <li><strong>Network Namespace:</strong> Tüm konteynerler aynı IP adresini ve port alanını paylaşır. Birbirleriyle <code>localhost</code> üzerinden haberleşebilirler.</li>
+                        <li><strong>Storage Volumes:</strong> Pod seviyesinde tanımlanan depolama alanlarına tüm konteynerler erişebilir.</li>
+                    </ul>
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Sidecar Pattern:</strong> Ana uygulamanızın çalıştığı konteynerin yanına, log toplama (fluentd) veya proxy (envoy) amaçlı yardımcı bir konteyner eklendiği yaygın bir tasarım şablonudur.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="sub">Yaşam Döngüsü Aşamaları</h3>
+                <div class="card">
+                    <p>Bir Pod, oluşturulduğu andan yok edilene kadar çeşitli durumlardan (Phase) geçer:</p>
+                    <ul>
+                        <li><strong>Pending:</strong> K8s kümesi Pod'u kabul etti, ancak konteyner imajları indiriliyor veya düğüm ataması (Scheduling) bekleniyor.</li>
+                        <li><strong>Running:</strong> Pod bir düğüme atandı ve tüm konteynerler yaratıldı. En az bir konteyner çalışıyor durumda.</li>
+                        <li><strong>Succeeded:</strong> Pod içindeki tüm konteynerler işlemini başarıyla tamamladı ve sonlandı. (Örn: CronJob'lar).</li>
+                        <li><strong>Failed:</strong> Konteynerlerden en az biri hata ile (sıfır olmayan çıkış kodu) sonlandı.</li>
+                        <li><strong>Unknown:</strong> Pod'un durumu düğüm ile iletişim kurulamadığı için alınamıyor.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Sağlık Kontrolleri (Probes)</h3>
+                <div class="card">
+                    <p>Uygulamalarınızın gerçekten sağlıklı ve trafik kabul edebilir durumda olup olmadığını anlamak için üç tip kontrol mekanizması kullanılır:</p>
+                    <ul>
+                        <li><strong>Liveness Probe:</strong> "Konteyner yaşıyor mu?" Uygulama kilitlendiyse, K8s bu kontrolün başarısız olması durumunda konteyneri yeniden başlatır.</li>
+                        <li><strong>Readiness Probe:</strong> "Konteyner trafik almaya hazır mı?" Uygulama açılırken veritabanı bağlantısı bekliyorsa, hazır olana kadar Service'lerden bu Pod'a trafik gönderilmez.</li>
+                        <li><strong>Startup Probe:</strong> Yavaş başlayan uygulamalar için diğer procların (Liveness/Readiness) onu öldürmesini geçici olarak engeller.</li>
+                    </ul>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>probes.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: v1
+kind: Pod
+metadata:
+  name: probe-example
+spec:
+  containers:
+  - name: app
+    image: my-app:latest
+    livenessProbe:
+      httpGet:
+        path: /healthz
+        port: 8080
+      initialDelaySeconds: 3
+      periodSeconds: 3
+    readinessProbe:
+      tcpSocket:
+        port: 8080
+      initialDelaySeconds: 5
+      periodSeconds: 10</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="sub">Init Containers</h3>
+                <div class="card">
+                    <p>Ana konteynerler başlamadan <strong>önce</strong> sırayla ve başarıyla tamamlanması gereken geçici konteynerlerdir.</p>
+                    <div class="info-box warning">
+                        <div>
+                            <strong>Kullanım Senaryosu:</strong> Ana uygulama başlamadan önce veritabanı şemasını oluşturmak (migration) veya bir servisin (Örn: veritabanı) hazır olmasını beklemek için <code>initContainers</code> mükemmel bir çözümdür.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s06">
+                <h2 class="section-title"><span class="section-num">06.</span> Deployments, ReplicaSets & Ölçeklendirme</h2>
+                
+                <h3 class="sub">Deployment ve ReplicaSet Anatomisi</h3>
+                <div class="card">
+                    <p>Doğrudan Pod oluşturmak yerine her zaman bir <strong>Deployment</strong> kullanılır. Deployment, arka planda bir <strong>ReplicaSet</strong> yönetir; ReplicaSet ise Pod sayısının her zaman istenen düzeyde (desired state) olmasını garantiler.</p>
+                    <ul>
+                        <li><strong>Rollout:</strong> Uygulamanın yeni bir versiyonu (yeni imaj) yayınlandığında, yeni bir ReplicaSet oluşur ve trafik yavaşça oraya kayar.</li>
+                        <li><strong>Rollback:</strong> Yeni versiyonda bir hata varsa, K8s saniyeler içinde eski ReplicaSet'e geri dönme imkanı sunar (<code>kubectl rollout undo</code>).</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Güncelleme Stratejileri</h3>
+                <div class="card">
+                    <p>Deployment nesnesi uygulamayı kesintiye uğratmadan güncellemek için gelişmiş stratejilere sahiptir:</p>
+                    <ul>
+                        <li><strong>RollingUpdate (Varsayılan):</strong> Pod'lar sırayla kapatılıp yenileri açılır. Bu süreçte <code>maxSurge</code> (geçici olarak limitin ne kadar üstüne çıkılabileceği) ve <code>maxUnavailable</code> (kaç Pod'un aynı anda kapalı olabileceği) parametreleri kullanılır.</li>
+                        <li><strong>Recreate:</strong> Yeni versiyona geçmeden önce tüm eski Pod'lar anında silinir. Geçici bir kesinti (downtime) yaşanır, ancak versiyon çakışmaları önlenir.</li>
+                    </ul>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>deployment.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: nginx-deployment
+spec:
+  replicas: 3
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 1
+      maxUnavailable: 0
+  selector:
+    matchLabels:
+      app: nginx
+  template:
+    metadata:
+      labels:
+        app: nginx
+    spec:
+      containers:
+      - name: nginx
+        image: nginx:1.24
+        ports:
+        - containerPort: 80</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="sub">Yatay Ölçeklendirme: HPA (Horizontal Pod Autoscaler)</h3>
+                <div class="card">
+                    <p>Trafik arttığında uygulamayı ayakta tutmak için otomatik ölçeklendirme gerekir. HPA, donanım metriklerini (CPU, RAM) izleyerek veya özel metriklerle Pod sayısını dinamik olarak artırır/azaltır.</p>
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Metrik İzleme:</strong> HPA'nın çalışabilmesi için kümenizde <code>metrics-server</code> kurulu olmalı ve Pod'larınızda mutlaka CPU/RAM <code>resources.requests</code> tanımları yapılmış olmalıdır.
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s07">
+                <h2 class="section-title"><span class="section-num">07.</span> K8s Ağ Dünyası: Services & Ingress</h2>
+                
+                <h3 class="sub">Service Soyutlaması ve Kube-proxy</h3>
+                <div class="card">
+                    <p>Pod'lar fani (geçici) varlıklardır; her silinip açıldıklarında IP adresleri değişir. <strong>Service</strong> objesi, bu değişken Pod'ların önünde sabit bir IP ve DNS adı sağlayan soyut bir yük dengeleyicidir.</p>
+                    <p>Arka planda her Node üzerinde çalışan <code>kube-proxy</code>, iptables veya IPVS kuralları aracılığıyla Service'e gelen trafiği ilgili Pod'lara yönlendirir.</p>
+                </div>
+
+                <h3 class="sub">Service Türleri</h3>
+                <div class="card">
+                    <ul>
+                        <li><strong>ClusterIP (Varsayılan):</strong> Sadece küme içinden (internal) erişilebilen, sabit bir IP sağlar.</li>
+                        <li><strong>NodePort:</strong> Tüm Node'ların statik bir portunu (Örn: 30000-32767) dışarıya açarak trafiği Service'e yönlendirir.</li>
+                        <li><strong>LoadBalancer:</strong> AWS, GCP gibi bulut sağlayıcılarının yük dengeleyicilerini (Cloud LB) entegre ederek uygulamayı dış dünyaya açar.</li>
+                        <li><strong>ExternalName:</strong> CNAME kaydı gibi davranarak Service'i dışarıdaki harici bir DNS ismine bağlar.</li>
+                    </ul>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>service.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: v1
+kind: Service
+metadata:
+  name: frontend-service
+spec:
+  type: ClusterIP
+  selector:
+    app: frontend
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 3000</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="sub">Ingress ve Ingress Controller</h3>
+                <div class="card">
+                    <p>Service türleri genellikle 4. katmanda (TCP/UDP) çalışır. <strong>Ingress</strong> ise 7. katmanda (HTTP/HTTPS) çalışarak host tabanlı (domain.com) ve yol tabanlı (/api, /web) gelişmiş trafik yönlendirmesi, SSL sonlandırma (SSL Termination) ve yük dengeleme sağlar.</p>
+                    <p>Ingress objesinin çalışabilmesi için kümede bir <strong>Ingress Controller</strong> (Nginx, Traefik, HAProxy vb.) çalışıyor olmalıdır.</p>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>ingress.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: main-ingress
+  annotations:
+    nginx.ingress.kubernetes.io/rewrite-target: /
+spec:
+  rules:
+  - host: myapp.example.com
+    http:
+      paths:
+      - path: /api
+        pathType: Prefix
+        backend:
+          service:
+            name: backend-api
+            port:
+              number: 8080
+      - path: /
+        pathType: Prefix
+        backend:
+          service:
+            name: frontend-web
+            port:
+              number: 80</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s08">
+                <h2 class="section-title"><span class="section-num">08.</span> Kalıcı Veri Yönetimi (PV, PVC, StorageClass)</h2>
+                
+                <h3 class="sub">Kalıcı Depolama İhtiyacı</h3>
+                <div class="card">
+                    <p>Konteynerlerin efemer (geçici) doğası, veritabanları veya dosya sunucuları gibi kalıcılık (persistence) gerektiren stateful uygulamalar için bir problemdir. Pod silindiğinde tüm veriler yok olur. Kubernetes, depolama mimarisini soyutlayarak bu sorunu çözer.</p>
+                </div>
+
+                <h3 class="sub">Mimaride Sorumluluk Ayrımı: PV ve PVC</h3>
+                <div class="card">
+                    <p>K8s, depolama sistemlerinde yönetim ve kullanım süreçlerini birbirinden ayırır:</p>
+                    <ul>
+                        <li><strong>PersistentVolume (PV):</strong> Altyapı yöneticisi (Admin) tarafından kümeye eklenen fiziksel depolama birimidir (NFS, AWS EBS, Local Disk). Pod'ların yaşam döngüsünden bağımsızdır.</li>
+                        <li><strong>PersistentVolumeClaim (PVC):</strong> Geliştiricinin uygulama için talep ettiği depolama miktarı ve erişim modu bildirimidir (Örn: "Bana 10GB Okunabilir/Yazılabilir bir disk ver").</li>
+                    </ul>
+                    <div class="info-box warning">
+                        <div>
+                            <strong>Eşleşme Süreci (Binding):</strong> Bir PVC oluşturulduğunda K8s arka planda, bu talebi karşılayacak kapasite ve modlara sahip boş bir PV arar ve bunları birbirine bağlar.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="sub">StorageClass ve Dinamik Üretim (Dynamic Provisioning)</h3>
+                <div class="card">
+                    <p>Bulut ortamlarında yöneticilerin manuel olarak PV yaratması hantaldır. <strong>StorageClass</strong>, bir PVC talep edildiğinde arkada yatan bulut API'sini tetikleyerek otomatik (dinamik) olarak diskin ve PV'nin yaratılmasını sağlar.</p>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>pvc-pod.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: mysql-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 20Gi
+  storageClassName: standard
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: mysql-db
+spec:
+  containers:
+  - name: mysql
+    image: mysql:8.0
+    env:
+      - name: MYSQL_ROOT_PASSWORD
+        value: "secret"
+    volumeMounts:
+      - name: mysql-storage
+        mountPath: /var/lib/mysql
+  volumes:
+    - name: mysql-storage
+      persistentVolumeClaim:
+        claimName: mysql-pvc</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s09">
+                <h2 class="section-title"><span class="section-num">09.</span> ConfigMaps & Secrets ile Ayar Yönetimi</h2>
+                
+                <h3 class="sub">12-Factor App Prensibi</h3>
+                <div class="card">
+                    <p>Modern yazılım geliştirme standartlarına (Twelve-Factor App) göre, uygulamaların kaynak kodu (Source Code) ile çalışacağı ortama ait konfigürasyonları (Config) birbirinden kesinlikle ayrılmalıdır. K8s bu ayrımı sağlamak için ConfigMap ve Secret objelerini sunar.</p>
+                </div>
+
+                <h3 class="sub">ConfigMap: Ortam Değişkenleri ve Dosyalar</h3>
+                <div class="card">
+                    <p>Hassas olmayan verileri (veritabanı host adresi, log seviyesi, Nginx konfigürasyon dosyaları vb.) saklamak için kullanılır. Pod'lara iki yöntemle enjekte edilebilir:</p>
+                    <ul>
+                        <li><strong>Environment Variables (Çevre Değişkeni):</strong> Uygulamanın <code>process.env</code> üzerinden doğrudan erişebileceği değişkenler.</li>
+                        <li><strong>Volume Mounts (Dosya):</strong> Bir JSON veya Conf dosyasının sanal bir disk olarak Pod içine yerleştirilmesi.</li>
+                    </ul>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>configmap-pod.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  LOG_LEVEL: "debug"
+  API_ENDPOINT: "https://api.internal.com"
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: config-demo-pod
+spec:
+  containers:
+  - name: my-app
+    image: my-app:latest
+    envFrom:
+      - configMapRef:
+          name: app-config</code></pre>
+                    </div>
+                </div>
+
+                <h3 class="sub">Secret: Hassas Verilerin Saklanması</h3>
+                <div class="card">
+                    <p>Şifreler, veritabanı bağlantı dizesi (Connection String), TLS sertifikaları veya API tokenları gibi kritik verileri tutmak için tasarlanmıştır. Veriler Base64 algoritması ile kodlanarak saklanır.</p>
+                    <div class="info-box warning">
+                        <div>
+                            <strong>Güvenlik Uyarısı (Security Note):</strong> K8s Secret'ları varsayılan olarak şifrelenmez (encrypt edilmez), sadece Base64 formatında encode edilir. Bu yüzden Secret objelerinizi düz metin halinde Git deponuza (GitHub/GitLab) KESİNLİKLE pushlamayın. Git ortamı için <code>SealedSecrets</code>, <code>SOPS</code> veya <code>External Secrets (Vault)</code> kullanılması endüstri standardıdır.
+                        </div>
+                    </div>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>secret.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: v1
+kind: Secret
+metadata:
+  name: db-credentials
+type: Opaque
+data:
+  # "secret123" kelimesinin base64 hali: c2VjcmV0MTIz
+  db-password: c2VjcmV0MTIz</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s10">
+                <h2 class="section-title"><span class="section-num">10.</span> Gelişmiş K8s Objeleri (StatefulSets, DaemonSets, Jobs)</h2>
+                
+                <h3 class="sub">StatefulSet: Kararlı Mimariler</h3>
+                <div class="card">
+                    <p>Stateless (durumsuz) uygulamalar için Deployment kullanılırken, PostgreSQL, MongoDB, Kafka gibi veritabanı veya mesaj kuyruğu sistemleri için <strong>StatefulSet</strong> şarttır. StatefulSet şu iki kritik avantajı sağlar:</p>
+                    <ul>
+                        <li><strong>Kararlı Ağ Kimliği (Ordinal Index):</strong> Pod'lar rastgele hash'ler yerine <code>db-0, db-1, db-2</code> şeklinde numaralandırılarak açılır. Pod ölse bile yeniden açıldığında aynı ismi alır, bu sayede Master-Slave mimarileri kurulabilir.</li>
+                        <li><strong>Kararlı Depolama:</strong> <code>volumeClaimTemplates</code> kullanılarak her Pod'a ayrı ve kendine özel bir kalıcı disk (PVC) otomatik atanır.</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">DaemonSet: Her Node'a Bir Pod</h3>
+                <div class="card">
+                    <p>Bir uygulamanın kümedeki istisnasız <strong>tüm Node'larda (veya belirli etiketlere sahip Node'larda) tam olarak bir kopyasının</strong> çalışmasını garanti eden objelerdir. Node sayısı artarsa DaemonSet otomatik olarak yeni Node'a da bir Pod yerleştirir.</p>
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Kullanım Senaryoları:</strong> Merkezi log toplama ajanları (Fluentd, Promtail, Filebeat) ve Node seviyesinde donanım metriklerini izleyen araçlar (Prometheus Node Exporter) için idealdir.
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="sub">Job ve CronJob: Operasyonel İşler</h3>
+                <div class="card">
+                    <p>Sürekli çalışan servisler yerine, bir işi yapıp tamamlandığında kapanan (çıkış kodu 0 veren) objelerdir.</p>
+                    <ul>
+                        <li><strong>Job:</strong> Tek seferlik, tamamlanana kadar çalışan operasyonlar. (Örn: Veritabanı Migration scriptleri). Başarısız olursa Pod'u tekrar tetikleyebilir.</li>
+                        <li><strong>CronJob:</strong> Job objelerini standart Linux Cron formatında (Örn: <code>0 2 * * *</code> - Her gece saat 02:00) zamanlayarak çalıştıran yapılardır. Periyodik yedeklemeler için kullanılır.</li>
+                    </ul>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>cronjob.yaml</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code>apiVersion: batch/v1
+kind: CronJob
+metadata:
+  name: nightly-backup
+spec:
+  schedule: "0 2 * * *"
+  jobTemplate:
+    spec:
+      template:
+        spec:
+          containers:
+          - name: backup-worker
+            image: backup-script:v1
+          restartPolicy: OnFailure</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s11">
+                <h2 class="section-title"><span class="section-num">11.</span> Helm Charts ile Kubernetes Paket Yönetimi</h2>
+                
+                <h3 class="sub">Helm Nedir?</h3>
+                <div class="card">
+                    <p>Kubernetes ortamları için <code>apt</code>, <code>yum</code> veya <code>npm</code> gibi düşünebileceğiniz resmi paket yöneticisidir. Yüzlerce satırlık karmaşık Kubernetes YAML dosyalarını tek bir parametre dosyası (values.yaml) ile yönetilebilir, sürümlendirilebilir paketler (Chart) haline getirir.</p>
+                </div>
+
+                <h3 class="sub">Helm Chart Mimarisi</h3>
+                <div class="card">
+                    <p>Bir Helm Chart projesi oluşturduğunuzda (<code>helm create my-app</code>) standart bir dizin yapısı oluşur:</p>
+                    <ul>
+                        <li><strong>Chart.yaml:</strong> Paketin versiyon, isim ve bağımlılık (dependencies) bilgilerini tutan manifesto dosyasıdır.</li>
+                        <li><strong>values.yaml:</strong> Kullanıcının değiştirebileceği tüm değişkenleri (Örn: replicaCount, image tag, port) tutan ana yapılandırma dosyasıdır.</li>
+                        <li><strong>templates/:</strong> İçerisinde <code>Go-Template</code> motoru kullanılarak yazılmış taslak YAML dosyalarını barındırır. (Örn: <code>replicas: {{ .Values.replicaCount }}</code>).</li>
+                    </ul>
+                </div>
+
+                <h3 class="sub">Helm Temel Komutları ve Operasyonlar</h3>
+                <div class="card">
+                    <p>Helm, sadece kurulum değil, bir uygulamanın tüm yaşam döngüsünü yönetir:</p>
+                    <div class="code-wrapper">
+                        <div class="code-header">
+                            <span>terminal</span>
+                            <button class="copy-btn" onclick="copyCode(this)">Kopyala</button>
+                        </div>
+                        <pre><code># Yeni bir proje iskelesi oluşturur
+helm create my-webapp
+
+# Helm deposundan bir hazır paket indirir ve kurar
+helm repo add bitnami https://charts.bitnami.com/bitnami
+helm install my-db bitnami/postgresql
+
+# Kendi yazdığınız Chart'ı values dosyasındaki değişkenlerle günceller
+helm upgrade my-webapp ./my-webapp -f custom-values.yaml
+
+# Herhangi bir hata durumunda bir önceki çalışan sürüme geri döner
+helm rollback my-webapp 1</code></pre>
+                    </div>
+                </div>
+            </section>
+
+            <section class="section" id="s12">
+                <h2 class="section-title"><span class="section-num">12.</span> GitOps & CI/CD Konteyner Entegrasyonları</h2>
+                
+                <h3 class="sub">GitOps Felsefesi (Push vs Pull Modeli)</h3>
+                <div class="card">
+                    <p>Geleneksel CI/CD sistemlerinde (Jenkins, GitLab CI vb.), boru hattı (pipeline) kodu derler, imajı üretir ve son aşamada <code>kubectl apply</code> komutunu dışarıdan K8s'e gönderir (Push Modeli). Bu güvenlik riskleri ve durum uyumsuzlukları yaratır.</p>
+                    <p><strong>GitOps</strong> yaklaşımı ise <strong>Pull Modeline</strong> dayanır. Git deposunu "Tek Doğruluk Kaynağı" (Single Source of Truth) olarak kabul eder. Küme içerisinde çalışan bir ajan (ArgoCD veya Flux), Git deposunu sürekli izler ve küme ile Git arasındaki farkı bulup eşitler.</p>
+                    <div class="info-box pro-tip">
+                        <div>
+                            <strong>Drift Resolution:</strong> GitOps mantığında, eğer birisi sunucuya sızıp komut satırından Pod sayısını 5'e çıkarırsa, ArgoCD hemen fark edip "Git deposunda bu 3 olarak yazıyor" diyerek sistemi otomatik olarak 3'e geri çeker (Self-healing).
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="sub">Eksiksiz Bir Modern CI/CD/GitOps Akışı</h3>
+                <div class="card">
+                    <p>Bugün endüstri standardı olarak kabul edilen modern uygulama dağıtım akışı şu şekilde işler:</p>
+                    <ul>
+                        <li><strong>1. CI Aşaması (Sürekli Entegrasyon):</strong> Geliştirici kodu yazar ve GitHub'a Pushlar. GitHub Actions tetiklenir, birim testleri (Unit Tests) koşar, Docker imajını (Örn: v1.0.1) derler ve Docker Hub'a (Registry) yükler.</li>
+                        <li><strong>2. Config Güncellemesi:</strong> Aynı CI pipeline'ı, ayrı bir Git deposunda tutulan Helm veya Kustomize dosyalarındaki <code>image_tag</code> değerini <code>v1.0.1</code> olarak günceller ve commit atar.</li>
+                        <li><strong>3. CD Aşaması (GitOps):</strong> Kubernetes kümesi içinde yaşayan ArgoCD, bu repodaki değişimi 3 dakika (varsayılan) içinde fark eder. Mevcut K8s durumuyla senkronize (Sync) işlemini başlatır ve yeni Pod'lar devreye alınır.</li>
+                    </ul>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- ALT İLERLEME ÇUBUĞU (Progress Bar) -->
+    <div id="progressBar">
+        <div class="prog-track">
+            <div class="prog-fill" id="progFill"></div>
+        </div>
+        <div class="prog-info">
+            <span class="prog-num" id="progNum">01</span>
+            <span class="prog-title" id="progTitle">Docker Temelleri</span>
+            <span class="prog-percent" id="progPercent">%0</span>
+        </div>
+    </div>
+
+    <!-- YUKARI ÇIK BUTONU -->
+    <button id="scrollTop" aria-label="Yukarı Çık">
+        <svg class="scroll-ring">
+            <circle class="bg"></circle>
+            <circle class="progress"></circle>
+        </svg>
+        <svg class="icon" viewBox="0 0 24 24">
+            <path d="M12 4l-8 8h6v8h4v-8h6z"/>
+        </svg>
+    </button>
+
+    <!-- JS FONKSİYONLARI -->
+    <script>
+        // 1. TEMA DEĞİŞTİRİCİ
+        const themeToggle = document.getElementById('themeToggle');
+        const body = document.body;
+        
+        themeToggle.addEventListener('click', () => {
+            body.classList.toggle('light-mode');
+            if(body.classList.contains('light-mode')) {
+                themeToggle.innerHTML = '🌙';
+            } else {
+                themeToggle.innerHTML = '☀️';
+            }
+        });
+
+        // 2. SÖZLÜK VE TOOLTIP SİSTEMİ
+        document.addEventListener('DOMContentLoaded', () => {
+            const dictionary = {
+                'Image': 'Çalıştırılabilir bir pakettir. Uygulamayı ve çalışması için gereken tüm bağımlılıkları içerir.',
+                'Container': 'Bir imajın çalışan, izole edilmiş bir örneğidir.',
+                'Layer Optimization': 'Docker imaj boyutunu küçültmek ve build sürelerini kısaltmak için katmanların optimize edilmesi işlemidir.',
+                'Pod': 'Kubernetes içindeki en küçük dağıtılabilir birim. Bir veya birden fazla konteyneri barındırır.',
+                'Deployment': 'Pod ve ReplicaSet yönetimini deklaratif olarak sağlayan Kubernetes objesidir.',
+                'Ingress': 'Dışarıdan gelen HTTP/HTTPS trafiğini küme içindeki servislere yönlendiren API objesidir.',
+                'StatefulSet': 'Kalıcı veriye ihtiyaç duyan ve sıra gözetilerek yönetilmesi gereken podlar için kullanılır.'
+            };
+
+            const paragraphs = document.querySelectorAll('.card p');
+            paragraphs.forEach(p => {
+                let html = p.innerHTML;
+                for (const [word, def] of Object.entries(dictionary)) {
+                    // Yalnızca kelime sınırlarına uyan tam kelimeleri seç
+                    const regex = new RegExp(`\\b(${word})\\b`, 'g');
+                    html = html.replace(regex, `<span class="tooltip-trigger">$1<span class="tooltip-box">${def}</span></span>`);
+                }
+                p.innerHTML = html;
+            });
+
+            // Başlangıç tetiklemesi
+            handleScroll();
+        });
+
+        // 3. ARAMA MOTORU (Cmd+K / Ctrl+K)
+        const searchInput = document.getElementById('searchInput');
+        document.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchInput.focus();
+            }
+        });
+
+        searchInput.addEventListener('input', function(e) {
+            const term = e.target.value.trim().toLowerCase();
+            
+            // Mevcut vurguları temizle
+            document.querySelectorAll('mark.search-hl').forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+            
+            // Sol Menüyü Filtrele
+            document.querySelectorAll('.toc-item').forEach(item => {
+                const text = item.textContent.toLowerCase();
+                if(text.includes(term)) {
+                    item.parentElement.style.display = 'block';
+                } else {
+                    item.parentElement.style.display = 'none';
+                }
+            });
+
+            if (term.length < 2) return;
+
+            // İçerik Vurgulama
+            const walkDOM = function (node, func) {
+                if (node.nodeType === 3) {
+                    func(node);
+                } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE' && node.nodeName !== 'MARK' && !node.classList.contains('tooltip-box')) {
+                    let child = node.firstChild;
+                    while (child) {
+                        let next = child.nextSibling;
+                        walkDOM(child, func);
+                        child = next;
+                    }
+                }
+            };
+
+            const mainContent = document.querySelector('.main-content');
+            
+            const highlightText = function(node) {
+                const text = node.nodeValue;
+                const lowerText = text.toLowerCase();
+                const index = lowerText.indexOf(term);
+                
+                if (index >= 0 && text.trim().length > 0) {
+                    const mark = document.createElement('mark');
+                    mark.className = 'search-hl';
+                    const matchText = text.substring(index, index + term.length);
+                    mark.textContent = matchText;
+                    
+                    const before = document.createTextNode(text.substring(0, index));
+                    const after = document.createTextNode(text.substring(index + term.length));
+                    
+                    const parent = node.parentNode;
+                    parent.insertBefore(before, node);
+                    parent.insertBefore(mark, node);
+                    parent.insertBefore(after, node);
+                    parent.removeChild(node);
+                }
+            };
+            
+            walkDOM(mainContent, highlightText);
+        });
+
+        // 4. SCROLLSPY, PROGRESS BAR & YUKARI ÇIK BUTONU
+        const sections = document.querySelectorAll('.section');
+        const tocItems = document.querySelectorAll('.toc-item');
+        const progressBar = document.getElementById('progressBar');
+        const progNum = document.getElementById('progNum');
+        const progTitle = document.getElementById('progTitle');
+        const progPercent = document.getElementById('progPercent');
+        const progFill = document.getElementById('progFill');
+        const scrollTopBtn = document.getElementById('scrollTop');
+        const scrollProgress = document.querySelector('.scroll-ring .progress');
+        
+        function handleScroll() {
+            let current = '';
+            let currentSection = null;
+            const scrollY = window.pageYOffset;
+            
+            sections.forEach(sec => {
+                const sectionTop = sec.offsetTop;
+                if (scrollY >= sectionTop - 250) {
+                    current = sec.getAttribute('id');
+                    currentSection = sec;
+                }
+            });
+
+            // Sol Menü Animasyon ve Aktif Durumu
+            tocItems.forEach(item => {
+                const wasActive = item.classList.contains('active');
+                item.classList.remove('active', 'toc-entering');
+                if (item.getAttribute('href') === `#${current}`) {
+                    item.classList.add('active');
+                    if (!wasActive) {
+                        item.classList.add('toc-entering');
+                    }
+                }
+            });
+
+            // Alt İlerleme Çubuğu Yüzdesi
+            const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+            const isAtBottom = scrollY >= docHeight - 10;
+
+            if (currentSection) {
+                progressBar.classList.add('visible');
+                const secTop = currentSection.offsetTop;
+                const secHeight = currentSection.clientHeight;
+                const scrolledInSection = Math.max(0, scrollY - secTop + window.innerHeight / 2);
+                let percent = (scrolledInSection / secHeight) * 100;
+                
+                // Fix for 100% at bottom
+                if (isAtBottom) percent = 100;
+                else if (percent > 100) percent = 100;
+                
+                const activeToc = document.querySelector(`.toc-item[href="#${current}"]`);
+                if (activeToc) {
+                    progNum.textContent = activeToc.querySelector('.toc-num').textContent;
+                    progTitle.textContent = activeToc.querySelector('.toc-text').textContent;
+                }
+                
+                progPercent.textContent = `%${Math.round(percent)}`;
+                progFill.style.width = `${percent}%`;
+
+                // Modül İçi Dairesel Progress
+                let moduleProgress = 0;
+                let rawScrolled = scrollY - secTop + 100;
+                if (rawScrolled > 0) {
+                    moduleProgress = rawScrolled / secHeight;
+                }
+                if (isAtBottom) moduleProgress = 1;
+                else if (moduleProgress > 1) moduleProgress = 1;
+                else if (moduleProgress < 0) moduleProgress = 0;
+
+                const offset = 141.37 - (moduleProgress * 141.37);
+                scrollProgress.style.strokeDashoffset = offset;
+                
+                window.currentActiveSection = currentSection;
+            } else {
+                progressBar.classList.remove('visible');
+            }
+
+            if (scrollY > 300) {
+                scrollTopBtn.classList.add('visible');
+            } else {
+                scrollTopBtn.classList.remove('visible');
+            }
+        }
+
+        window.addEventListener('scroll', handleScroll);
+
+        // Yukarı Çık Tıklama Olayı (Modül Başına Dön)
+        scrollTopBtn.addEventListener('click', () => {
+            if (window.currentActiveSection) {
+                window.scrollTo({ top: window.currentActiveSection.offsetTop - 80, behavior: 'smooth' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        });
+
+        // 5. KOD KOPYALAMA
+        function copyCode(btn) {
+            const pre = btn.parentElement.nextElementSibling;
+            const code = pre.textContent;
+            navigator.clipboard.writeText(code).then(() => {
+                const originalText = btn.textContent;
+                btn.textContent = 'Kopyalandı!';
+                btn.style.color = 'var(--accent)';
+                btn.style.borderColor = 'var(--accent)';
+                
+                setTimeout(() => {
+                    btn.textContent = originalText;
+                    btn.style.color = '';
+                    btn.style.borderColor = '';
+                }, 2000);
+            });
+        }
+
+        // 6. SCROLL REVEAL (Arayüz Animasyonları)
+        document.addEventListener('DOMContentLoaded', () => {
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if(entry.isIntersecting) {
+                        entry.target.classList.add('reveal-visible');
+                        observer.unobserve(entry.target); 
+                    }
+                });
+            }, { threshold: 0.1 });
+
+            document.querySelectorAll('.card, .sub').forEach((el, index) => {
+                el.classList.add('reveal-hidden');
+                el.style.transitionDelay = `${(index % 3) * 0.05}s`;
+                observer.observe(el);
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,1404 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bilgisayar Mühendisliği Algoritmaları Başvuru Rehberi</title>
+    
+    <!-- Modern Web Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- MathJax for Mathematical Formulas (Big-O Notations) -->
+    <script>
+        MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']]
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Prism.js IDE Syntax Highlighting Theme (Tomorrow Night) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+
+    <style>
+        /* Modern CSS Variables & Design Tokens */
+        :root {
+            /* Palette Requirements - Dark Mode (Sharp Black & Gray) */
+            --bg-color: #050505; /* Deep Black */
+            --surface-color: #121212; /* Sharp Gray */
+            --surface-color-hover: #1c1c1c;
+            
+            /* Accents (More Vibrant for GUI colorization) */
+            --accent-blue: #3b82f6;
+            --accent-cyan: #06b6d4;
+            --accent-purple: #8b5cf6;
+            --accent-pink: #ec4899;
+            
+            /* Typography Colors */
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border-color: #262626; /* Sharp border contrast */
+            
+            /* Fonts */
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            
+            /* Metrics */
+            --sidebar-width: 320px;
+            --bottom-bar-height: 70px;
+            --border-radius: 12px;
+            
+            /* Effects */
+            --glow-cyan: 0 0 15px rgba(6, 182, 212, 0.5);
+            --glow-purple: 0 0 15px rgba(139, 92, 246, 0.5);
+            --hl-bg: rgba(6, 182, 212, 0.15);
+            --hl-color: #06b6d4;
+        }
+
+        /* Light Mode Theme */
+        body.light-theme {
+            --bg-color: #f8fafc;
+            --surface-color: #ffffff;
+            --surface-color-hover: #f1f5f9;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --accent-cyan: #0891b2;
+            --accent-blue: #2563eb;
+            --accent-purple: #7c3aed;
+            --glow-cyan: 0 0 10px rgba(8, 145, 178, 0.3);
+            --glow-purple: 0 0 10px rgba(124, 58, 237, 0.3);
+        }
+
+        /* Global Reset */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+            transition: background-color 0.4s ease, color 0.4s ease;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            font-weight: 700;
+            color: #FFFFFF;
+            margin-bottom: 1rem;
+        }
+
+        p {
+            margin-bottom: 1rem;
+            font-size: 1.05rem;
+        }
+
+        /* Selection & Highlight Styles */
+        ::selection {
+            background-color: rgba(49, 120, 198, 0.4);
+            color: #fff;
+        }
+        
+        mark.search-hl {
+            background-color: var(--hl-bg);
+            color: var(--hl-color);
+            border-radius: 4px;
+            padding: 2px 4px;
+            box-shadow: var(--glow-cyan);
+            transition: background-color 0.2s;
+        }
+
+        /* ----- LAYOUT ----- */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: var(--sidebar-width);
+            height: calc(100vh - var(--bottom-bar-height));
+            background-color: var(--surface-color);
+            border-right: 1px solid var(--border-color);
+            display: flex;
+            flex-direction: column;
+            z-index: 100;
+            box-shadow: 4px 0 15px rgba(0,0,0,0.2);
+        }
+
+        #main-content {
+            margin-left: var(--sidebar-width);
+            padding: 60px 80px;
+            padding-bottom: calc(var(--bottom-bar-height) + 60px);
+            min-height: 100vh;
+        }
+
+        /* ----- SIDEBAR COMPONENTS ----- */
+        .sidebar-header {
+            padding: 28px 24px;
+            border-bottom: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .sidebar-header h2 {
+            margin: 0;
+            font-size: 1.3rem;
+            background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple), var(--accent-cyan));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -0.5px;
+        }
+
+        #themeToggle {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.3rem;
+            transition: transform 0.2s ease, filter 0.2s;
+            filter: grayscale(0.5);
+        }
+        #themeToggle:hover {
+            transform: scale(1.1) rotate(15deg);
+            filter: grayscale(0);
+        }
+
+        .search-container {
+            padding: 20px 24px;
+        }
+
+        #searchInput {
+            width: 100%;
+            padding: 14px 18px;
+            background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            color: var(--text-main);
+            font-family: var(--font-body);
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s, background-color 0.3s;
+        }
+
+        #searchInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        #searchInput:focus {
+            border-color: var(--accent-cyan);
+            background-color: var(--bg-color);
+            box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.15);
+        }
+
+        #toc {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 16px 24px 16px;
+        }
+
+        /* Custom Scrollbar for TOC */
+        #toc::-webkit-scrollbar {
+            width: 6px;
+        }
+        #toc::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #toc::-webkit-scrollbar-thumb {
+            background: rgba(255,255,255,0.1);
+            border-radius: 10px;
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .toc-item {
+            padding: 12px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-muted);
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            font-size: 0.95rem;
+            font-weight: 500;
+            border-left: 3px solid transparent;
+        }
+
+        .toc-item:hover {
+            background-color: var(--surface-color-hover);
+            color: var(--text-main);
+        }
+
+        .toc-item.active {
+            background-color: rgba(49, 120, 198, 0.1);
+            color: var(--accent-cyan);
+            border-left-color: var(--accent-cyan);
+        }
+
+        /* ----- MAIN CONTENT SECTIONS ----- */
+        .sections section {
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 48px;
+            margin-bottom: 48px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .sections section.hidden {
+            display: none;
+        }
+
+        .sections section h2 {
+            font-size: 2.2rem;
+            color: #fff;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 16px;
+            margin-bottom: 24px;
+            position: relative;
+        }
+        
+        .sections section h2::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 80px;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-cyan));
+            box-shadow: var(--glow-purple);
+        }
+
+        /* ----- EDUCATIONAL TOOLS ----- */
+        /* Custom Tooltip */
+        .term-highlight {
+            position: relative;
+            color: var(--accent-cyan);
+            cursor: help;
+            border-bottom: 1px dashed rgba(0, 229, 255, 0.5);
+            transition: color 0.2s, border-bottom-color 0.2s;
+            font-weight: 500;
+        }
+
+        .term-highlight:hover {
+            color: #fff;
+            border-bottom-color: var(--accent-cyan);
+        }
+
+        .term-highlight::after {
+            content: attr(data-tooltip);
+            position: absolute;
+            bottom: calc(100% + 10px);
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            padding: 10px 16px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 400;
+            white-space: nowrap;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+            border: 1px solid rgba(0, 229, 255, 0.3);
+            z-index: 10;
+        }
+
+        .term-highlight::before {
+            content: '';
+            position: absolute;
+            bottom: calc(100% + 4px);
+            left: 50%;
+            transform: translateX(-50%);
+            border-width: 6px;
+            border-style: solid;
+            border-color: rgba(0, 229, 255, 0.3) transparent transparent transparent;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 11;
+        }
+
+        .term-highlight:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+        .term-highlight:hover::before {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Code Blocks & Copy Button */
+        .code-wrapper {
+            position: relative;
+            background-color: #1d1f21; /* Prism tomorrow dark bg */
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            margin: 32px 0;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.4);
+            overflow: hidden;
+        }
+        
+        .code-wrapper::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 3px;
+            background: linear-gradient(90deg, var(--accent-pink), var(--accent-purple), var(--accent-cyan));
+            z-index: 10;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background-color: rgba(255,255,255,0.1);
+            color: #fff;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 6px;
+            padding: 6px 14px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: var(--font-body);
+            backdrop-filter: blur(4px);
+            z-index: 10;
+        }
+
+        .copy-btn:hover {
+            background-color: var(--accent-purple);
+            border-color: var(--accent-purple);
+            box-shadow: var(--glow-purple);
+        }
+
+        /* Override some Prism Defaults for better spacing */
+        pre[class*="language-"] {
+            margin: 0 !important;
+            padding: 24px !important;
+            padding-top: 40px !important; /* space for copy btn */
+            background: transparent !important;
+            font-family: var(--font-code) !important;
+            font-size: 0.95rem !important;
+            line-height: 1.6 !important;
+        }
+        code[class*="language-"] {
+            font-family: var(--font-code) !important;
+        }
+
+        /* ----- BOTTOM PROGRESS BAR ----- */
+        #progressBar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: var(--bottom-bar-height);
+            background-color: rgba(17, 22, 37, 0.95);
+            backdrop-filter: blur(10px);
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            align-items: center;
+            padding: 0 40px;
+            z-index: 200;
+            box-shadow: 0 -4px 24px rgba(0,0,0,0.25);
+        }
+
+        .progress-info {
+            min-width: 220px;
+            font-family: var(--font-heading);
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        #progNum {
+            color: var(--accent-cyan);
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        #progName {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .progress-track {
+            flex: 1;
+            height: 6px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            margin: 0 40px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        #progFill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 0%;
+            background: linear-gradient(90deg, var(--accent-purple), var(--accent-pink), var(--accent-cyan));
+            border-radius: 4px;
+            transition: width 0.15s ease-out;
+            box-shadow: var(--glow-purple);
+        }
+
+        #progPercent {
+            min-width: 50px;
+            text-align: right;
+            font-family: var(--font-code);
+            color: var(--accent-cyan);
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+
+        /* ----- SCROLL TOP BUTTON (RING) ----- */
+        #scrollTopBtn {
+            position: fixed;
+            bottom: calc(var(--bottom-bar-height) + 24px);
+            right: 40px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background-color: var(--surface-color);
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 150;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.3);
+            transition: transform 0.2s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.2s;
+            outline: none;
+        }
+
+        #scrollTopBtn:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 229, 255, 0.2);
+            border-color: rgba(0, 229, 255, 0.3);
+        }
+
+        #scrollTopBtn .icon {
+            position: absolute;
+            font-size: 1.2rem;
+            color: var(--text-main);
+            transition: color 0.2s;
+            pointer-events: none;
+        }
+
+        #scrollTopBtn:hover .icon {
+            color: var(--accent-cyan);
+        }
+
+        .progress-ring {
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.15s ease-out;
+            stroke-linecap: round;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 1024px) {
+            #main-content {
+                padding: 40px;
+            }
+        }
+        @media (max-width: 768px) {
+            #sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease;
+            }
+            #main-content {
+                margin-left: 0;
+                padding: 24px;
+                padding-bottom: calc(var(--bottom-bar-height) + 24px);
+            }
+            #progressBar {
+                padding: 0 20px;
+            }
+            .progress-track {
+                margin: 0 20px;
+            }
+            #scrollTopBtn {
+                right: 20px;
+            }
+            .progress-info {
+                min-width: auto;
+            }
+            #progName {
+                display: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- SIDEBAR: Dynamic TOC & Search -->
+    <aside id="sidebar">
+        <div class="sidebar-header">
+            <h2>Algo Rehberi</h2>
+            <button id="themeToggle" aria-label="Tema Değiştir">🌙</button>
+        </div>
+        <div class="search-container">
+            <input type="text" id="searchInput" placeholder="İçerik veya başlık ara...">
+        </div>
+        <nav id="toc">
+            <ul class="toc-list" id="tocList">
+                <!-- Javascript will populate TOC dynamically -->
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main id="main-content">
+        <div class="sections">
+            
+            <!-- MODULE 1: Arama Algoritmaları -->
+<section id="s01" data-name="01. Arama Algoritmaları">
+    <h2>01. Arama Algoritmaları</h2>
+    <p>Bilgisayar bilimlerinde veri kümeleri içinde belirli bir hedefi bulmak en temel işlemlerden biridir. Verinin yapısına (sıralı olup olmamasına) göre arama stratejimiz büyük farklılık gösterir.</p>
+    
+    <h3>Linear Search (Doğrusal Arama)</h3>
+    <p>Linear search, bir dizi içerisindeki elemanları baştan sona doğru tek tek kontrol ederek hedef değeri arayan en basit arama yöntemidir. Verinin sıralı olmasına gerek yoktur, bu nedenle işlem öncesi hazırlık gerektirmez. Ancak büyük veri setlerinde oldukça yavaştır.</p>
+    
+    <ul>
+        <li><strong>Zaman Karmaşıklığı (Time):</strong> En kötü ve ortalama durumda \(O(n)\), en iyi durumda (hedef ilk elemansa) \(O(1)\)'dir.</li>
+        <li><strong>Alan Karmaşıklığı (Space):</strong> Ek bellek kullanmadığı için in-place çalışır, dolayısıyla \(O(1)\)'dir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def linear_search(arr, target):
+    """Hedef elemanın indeksini döner, bulamazsa -1 döner."""
+    for i in range(len(arr)):
+        if arr[i] == target:
+            return i
+    return -1</code></pre>
+    </div>
+
+    <div style="background: rgba(49, 120, 198, 0.1); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-blue);">💡 Mühendislik Notu:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Eğer veri kümesi çok küçükse veya veri sıklıkla güncelleniyorsa (sürekli ekleme yapılıyor ve yapıyı sıralı tutmak maliyetliyse), karmaşık algoritmalar kurmak yerine Linear Search kullanmak mantıklı olabilir. İşlemci önbelleğinin dizileri okuma şekli olan <span class="term-highlight" data-tooltip="İşlemci önbelleğinin ardışık veriyi bloklar halinde okuma avantajı.">spatial locality</span> prensibinden dolayı küçük dizilerde CPU cycle açısından şaşırtıcı derecede performanslıdır.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>Binary Search (İkili Arama)</h3>
+    <p>Binary search, <strong>sıralanmış</strong> bir dizide hedef elemanı bulmak için arama uzayını her adımda yarıya indiren son derece verimli bir algoritmadır. Temelinde yatan <span class="term-highlight" data-tooltip="Problemi daha küçük alt problemlere bölüp çözme yaklaşımı.">Divide and Conquer</span> (Böl ve Fethet) mantığı ile büyük veri tabanlarında sorgulama sürelerini milisaniyelere indirir.</p>
+    
+    <ul>
+        <li><strong>Zaman Karmaşıklığı (Time):</strong> Her adımda küme yarıya düştüğü için ortalama ve en kötü durumda \(O(\log n)\)'dir.</li>
+        <li><strong>Alan Karmaşıklığı (Space):</strong> İteratif yaklaşımda \(O(1)\), rekürsif yaklaşımda fonksiyon çağrı yığını (call stack) nedeniyle \(O(\log n)\)'dir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def binary_search(arr, target):
+    left, right = 0, len(arr) - 1
+    
+    while left <= right:
+        # (left + right) // 2 yerine integer overflow'u önleyen yapı:
+        mid = left + (right - left) // 2
+        
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid + 1
+        else:
+            right = mid - 1
+            
+    return -1</code></pre>
+    </div>
+
+    <div style="background: rgba(0, 229, 255, 0.1); border-left: 4px solid var(--accent-cyan); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-cyan);">🚀 Good Practice:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Binary search implemente ederken orta noktayı hesaplamak için kullanılan <code>(left + right) / 2</code> matematiği, <code>left + right</code> değerinin veri tipinin sınırını aşması durumunda meşhur <span class="term-highlight" data-tooltip="Değişkenin maksimum sınırı aşıp sayıların sıfırlanması veya negatife dönmesi.">Integer Overflow</span> hatasına sebep olur. Python'da sayılar dinamik büyüse de, C++, Java veya Go yazarken <code>left + (right - left) / 2</code> formu kesin bir standarttır.</p>
+    </div>
+</section>
+
+<!-- MODULE 2: Sıralama Algoritmaları -->
+<section id="s02" data-name="02. Sıralama Algoritmaları">
+    <h2>02. Sıralama Algoritmaları</h2>
+    <p>Sıralama (sorting), veriyi düzene sokarak; analize, Binary Search gibi verimli sorgu tekniklerine ve arayüz gösterimlerine hazır hale getirmek için vazgeçilmezdir. Temel seviyeden sistem mimarisi seviyesine kadar 4 popüler algoritmayı ele alalım.</p>
+
+    <h3>Bubble Sort (Kabarcık Sıralaması)</h3>
+    <p>Bubble Sort, dizinin içindeki yan yana duran iki elemanı kıyaslayarak, eğer yanlış sıradalarsa aralarında <span class="term-highlight" data-tooltip="İki değişkenin değerlerinin karşılıklı olarak değiştirilmesi.">Swap</span> (yer değiştirme) yapma mantığıyla çalışır. En büyük elemanlar her turda dizinin sonuna doğru köpük/kabarcık gibi yükselir.</p>
+
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> Ortalama ve En Kötü: \(O(n^2)\). Zaten tam sıralı bir dizide tek pass atılarak bitirilebildiği için En İyi: \(O(n)\).</li>
+        <li><strong>Alan Karmaşıklığı:</strong> Yerinde işlem yaptığı için ek bellek gerekmez, \(O(1)\).</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def bubble_sort(arr):
+    n = len(arr)
+    for i in range(n):
+        swapped = False
+        # Her iterasyonda en büyük eleman sona oturacağı için n-i-1'e kadar dönüyoruz
+        for j in range(0, n - i - 1):
+            if arr[j] > arr[j + 1]:
+                arr[j], arr[j + 1] = arr[j + 1], arr[j]
+                swapped = True
+        # Eğer iç döngüde hiç swap yapılmadıysa dizi zaten sıralıdır
+        if not swapped:
+            break
+    return arr</code></pre>
+    </div>
+
+    <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid #FF6B6B; padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: #FF6B6B;">⚠️ Code Smell:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Bubble Sort eğitim ve algoritma mantığını kavratmak amacıyla kusursuz olsa da, gerçek sistem projelerinde neredeyse hiç kullanılmaz. Gereksiz derecede yoğun bellek yazma döngüleri yüzünden ciddi anlamda verimsizdir.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>Insertion Sort (Araya Ekleme Sıralaması)</h3>
+    <p>Gündelik hayatta oyun kartlarını elimizde sıralarken yaptığımız mantıkla çalışır. Dizi sanal olarak "sıralı" ve "sırasız" iki bölüme ayrılır. Algoritma sırasız bölümden bir eleman alır ve sol taraftaki sıralı olan bölümün içindeki doğru konumu bulup araya yerleştirir.</p>
+
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> Ortalama ve En Kötü: \(O(n^2)\). Neredeyse sıralı bir dizide En İyi: \(O(n)\).</li>
+        <li><strong>Alan Karmaşıklığı:</strong> In-place çalıştığı için \(O(1)\).</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def insertion_sort(arr):
+    for i in range(1, len(arr)):
+        key = arr[i]
+        j = i - 1
+        
+        # Key elemanından daha büyük olan değerleri bir adım sağa kaydırıyoruz
+        while j >= 0 and key < arr[j]:
+            arr[j + 1] = arr[j]
+            j -= 1
+            
+        # Uygun boşluk bulunduğunda key'i o noktaya yerleştiriyoruz
+        arr[j + 1] = key
+        
+    return arr</code></pre>
+    </div>
+
+    <div style="background: rgba(49, 120, 198, 0.1); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-blue);">💡 Mühendislik Notu:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Veri setinin zaten neredeyse sıralı olduğu durumlarda ve eleman sayısı küçükse (genelde N < 15) Insertion Sort rakipsiz bir hız sunar. Bu sebeple Python'un yerleşik "Timsort" algoritması, Merge Sort mekaniğini kullanırken listeleri küçük parçalara böldüğünde alt dizileri birleştirmeden hemen önce Insertion Sort kullanarak devasa bir performans kazanımı elde eder.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>Merge Sort (Birleştirme Sıralaması)</h3>
+    <p>Merge Sort, katı bir <span class="term-highlight" data-tooltip="Problemi bağımsız alt problemlere bölüp, sonuçları ustaca birleştirme tekniği.">Divide and Conquer</span> algoritmasıdır. Diziyi, alt küme eleman sayısı 1 kalana kadar ısrarla ikiye böler. Tek elemanlı bir dizi zaten doğası gereği sıralı olduğundan, bu küçük ve sıralı dizileri birbirleriyle nizami olarak geri birleştirerek (merge) ana yapıyı inşa eder.</p>
+
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> Veri ne kadar karışık olursa olsun her zaman stabil biçimde: \(O(n \log n)\).</li>
+        <li><strong>Alan Karmaşıklığı:</strong> Birleştirme işlemi esnasında ek belleğe ihtiyaç duyduğu için: \(O(n)\).</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def merge_sort(arr):
+    if len(arr) > 1:
+        mid = len(arr) // 2
+        L = arr[:mid]
+        R = arr[mid:]
+
+        # Alt parçalar için Recursive kırılım
+        merge_sort(L)
+        merge_sort(R)
+
+        i = j = k = 0
+
+        # İki alt diziyi temp pointer'lar aracılığıyla karşılaştırıp sırala
+        while i < len(L) and j < len(R):
+            if L[i] < R[j]:
+                arr[k] = L[i]
+                i += 1
+            else:
+                arr[k] = R[j]
+                j += 1
+            k += 1
+
+        # Eğer sol veya sağda artan eleman kaldıysa direkt sona ekle
+        while i < len(L):
+            arr[k] = L[i]
+            i += 1
+            k += 1
+
+        while j < len(R):
+            arr[k] = R[j]
+            j += 1
+            k += 1
+            
+    return arr</code></pre>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>Quick Sort (Hızlı Sıralama)</h3>
+    <p>Adından da anlaşılacağı üzere en hızlı algoritmalardan biridir. Diziden rastgele (veya sistemli) bir elemanı <span class="term-highlight" data-tooltip="Bölümlendirme işlemi için referans noktası alınan temel eleman.">Pivot</span> olarak alır. Pivot'tan küçük olan değerler dizinin soluna, büyük olanlar sağına geçirilir (Partitioning süreci). Ardından sol ve sağ parçalara da özyinelemeli (rekürsif) olarak Quick Sort uygulanır.</p>
+
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> Ortalama ve En İyi durumda: \(O(n \log n)\). Eğer dizinin her kırılımında kötü bir pivot seçilirse En Kötü: \(O(n^2)\).</li>
+        <li><strong>Alan Karmaşıklığı:</strong> Genelde bellek üstünde (in-place) yer değiştirme yaptığı için recursion derinliğine bağlı olarak \(O(\log n)\)'dir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def quick_sort(arr):
+    # Base case: 1 veya 0 elemanlı diziler zaten sıralıdır.
+    if len(arr) <= 1:
+        return arr
+    else:
+        # Array'in ortasındaki elemanı pivot belirliyoruz
+        pivot = arr[len(arr) // 2]
+        
+        # Pythonic List Comprehension ile üç gruba ayırma
+        left = [x for x in arr if x < pivot]
+        middle = [x for x in arr if x == pivot]
+        right = [x for x in arr if x > pivot]
+        
+        # Parçaları rekürsif olarak geri bağla
+        return quick_sort(left) + middle + quick_sort(right)</code></pre>
+    </div>
+
+    <div style="background: rgba(0, 229, 255, 0.1); border-left: 4px solid var(--accent-cyan); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-cyan);">🚀 Good Practice:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Gördüğünüz <code>quick_sort</code> örneği, Python'un esnek sözdizimini (List Comprehension) kullanarak kod okunabilirliğini harika bir seviyeye çekiyor. Ancak bu yöntem bellekten yeni bir liste kopyası türettiği için teknik olarak out-of-place çalışır. Sistem optimizasyonlarında (örneğin C/C++) <span class="term-highlight" data-tooltip="Dizinin başında ve sonunda başlatılan iki işaretçinin (pointer) ortaya doğru ilerleyip yer değiştirmesi.">Two-pointer</span> partitioning yaklaşımıyla in-place (yerleşik) bellek yönetimi kullanılır ve gerçek Quick Sort hızı bu şekilde elde edilir.</p>
+    </div>
+</section>
+
+<!-- MODULE 3: Grafik Algoritmaları -->
+<section id="s03" data-name="03. Grafik (Çizge) Algoritmaları">
+    <h2>03. Grafik Algoritmaları</h2>
+    <p>Grafikler (Graphs); verileri <span class="term-highlight" data-tooltip="Bir ağdaki düğüm, nokta veya kavşak (Vertex).">Düğüm (V)</span> ve bu düğümleri birbirine bağlayan <span class="term-highlight" data-tooltip="İki düğüm arasındaki bağlantı veya yol (Edge).">Kenar (E)</span> kümeleri olarak modeller. İnternet topolojisi, sosyal ağ arkadaşlık analizleri veya harita üzerindeki GPS rotalama sistemleri tamamen bu algoritmaların üzerine inşa edilmiştir.</p>
+
+    <h3>1. BFS (Breadth-First Search) ve DFS (Depth-First Search)</h3>
+    <p>Ağ yapılarını dolaşmanın ve aramanın en temel iki yöntemidir. BFS, bir düğümün önce tüm komşularını tarayarak sığ ve dairesel bir yayılım yaparken (veri yapısı olarak Kuyruk kullanır); DFS, bir koldan gidebileceği en derin noktaya kadar iner (veri yapısı olarak Yığın veya Özyineleme kullanır).</p>
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> Her iki algoritma da tüm düğüm ve kenarları dolaştığı için \(O(V + E)\)'dir.</li>
+        <li><strong>Kullanım:</strong> BFS, ağırlıksız (unweighted) graflarda hedefe giden en kısa yolu (shortest path) bulmayı garanti eder. DFS ise labirent problemleri, topological sorting ve graf içinde döngü tespiti (cycle detection) için idealdir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">from collections import deque
+
+def bfs(graph, start):
+    visited = set([start])
+    queue = deque([start])
+    
+    while queue:
+        vertex = queue.popleft()
+        print(f"Ziyaret ediliyor: {vertex}")
+        
+        for neighbor in graph[vertex]:
+            if neighbor not in visited:
+                visited.add(neighbor)
+                queue.append(neighbor)</code></pre>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>2. Dijkstra Algoritması</h3>
+    <p>Ağırlıklı (mesafeli) ağlarda başlangıç noktasından diğer noktalara uzanan en kısa yolu bulur. Gerçek dünyada Google Maps gibi GPS navigasyon ve ağ yönlendirme sistemlerinin temel taşıdır. Algoritma <span class="term-highlight" data-tooltip="Her adımda o anki en avantajlı (kısa) tercihi yapan yöntem.">Greedy</span> bir yaklaşımla, henüz ziyaret edilmemiş ve mesafesi en kısa olan düğümü seçerek ilerler.</p>
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> <span class="term-highlight" data-tooltip="Minimum değerleri kuyruktan logaritmik hızda çekmeye yarayan ağaç tabanlı yapı.">Min-Heap (Priority Queue)</span> kullanıldığında \(O((V + E) \log V)\) seviyesine kadar optimize edilebilir.</li>
+        <li><strong>Limitasyon:</strong> Grafikte negatif ağırlıklı bir kenar (negative edge weight) varsa Dijkstra bu yapıyı kavrayamaz ve yanlış sonuç verebilir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">import heapq
+
+def dijkstra(graph, start):
+    # Tüm mesafeleri sonsuz, başlangıcı 0 yap
+    distances = {vertex: float('infinity') for vertex in graph}
+    distances[start] = 0
+    pq = [(0, start)] # (Mesafe, Düğüm) formatında Min-Heap
+    
+    while pq:
+        current_dist, current_v = heapq.heappop(pq)
+        
+        # Daha kısa bir yol çoktan bulunduysa atla
+        if current_dist > distances[current_v]:
+            continue
+            
+        for neighbor, weight in graph[current_v].items():
+            distance = current_dist + weight
+            # Relaxation (Gevşetme) aşaması
+            if distance < distances[neighbor]:
+                distances[neighbor] = distance
+                heapq.heappush(pq, (distance, neighbor))
+                
+    return distances</code></pre>
+    </div>
+
+    <div style="background: rgba(49, 120, 198, 0.1); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-blue);">💡 Mühendislik Notu:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Dijkstra güvenilirdir ancak kördür; hedefin nerede olduğunu bilmez ve suyu damlatan bir mürekkep gibi her yöne yayılır. Trafik verisi devreye girdiğinde salt graf aramak çok maliyetlidir. Modern GPS sistemleri, Dijkstra'nın modifiye edilmiş hali olan ve hedef noktaya doğru <strong>Heuristic</strong> coğrafi yönelim sergileyen <strong>A* (A-Star)</strong> algoritmasını tercih eder.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>3. Bellman-Ford Algoritması</h3>
+    <p>Dijkstra'nın çuvalladığı "Negatif Kenar Ağırlıkları" durumunu çözmek için geliştirilmiştir. Algoritma, graf içindeki tüm kenarları tam \(V - 1\) kez gevşetir (<span class="term-highlight" data-tooltip="Düğümler arası mesafenin daha optimum bir yol bulunduğunda kısaltılması.">Relaxation</span>). Ayrıca grafikte sonu gelmeyen bir negatif döngü (negative-weight cycle) olup olmadığını tespit edebilir.</p>
+    <ul>
+        <li><strong>Zaman Karmaşıklığı:</strong> Tüm kenarlar iteratif olarak taranacağı için \(O(V \cdot E)\)'dir.</li>
+        <li><strong>Kullanım Alanı:</strong> Özellikle finans piyasalarındaki para birimi çevrim döngülerinde (döviz kurlarındaki arbitraj açıklarını tespit etmede) negatif döngü yakalama özelliği sayesinde kritik bir rol oynar.</li>
+    </ul>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>4. Minimum Spanning Tree (MST): Kruskal ve Prim</h3>
+    <p>Bir grafiğin tüm düğümlerini "asla döngü oluşturmayacak şekilde" ve "kenar ağırlıkları toplamı minimum olacak şekilde" birbirine bağlama (ağaç formuna getirme) problemidir. Şehirlere elektrik şebekesi kurarken veya fiber optik ağları planlarken kablo maliyetini minimize etmek için kullanılır.</p>
+    <ul>
+        <li><strong>Kruskal Algoritması:</strong> Tüm kenarları küçükten büyüğe sıralar ve <span class="term-highlight" data-tooltip="Bağımsız alt kümeleri birleştirip döngü oluşmasını engelleyen veri yapısı.">Disjoint-Set (Union-Find)</span> yapısı sayesinde döngü yaratmayan kenarları sırayla ağaca dahil eder. Karmaşıklık: \(O(E \log E)\).</li>
+        <li><strong>Prim Algoritması:</strong> Bir başlangıç noktasından yola çıkar ve halihazırda var olan ağaca en az maliyetle eklenebilecek komşu düğümleri (Priority Queue kullanarak) büyüterek ilerler. Karmaşıklık: \(O((V + E) \log V)\).</li>
+    </ul>
+</section>
+
+<!-- MODULE 4: Dinamik Programlama -->
+<section id="s04" data-name="04. Dinamik Programlama">
+    <h2>04. Dinamik Programlama (DP)</h2>
+    <p>Dinamik Programlama (DP); kompleks yapıdaki problemleri, birbirleriyle örtüşen alt problemlere (overlapping subproblems) bölerek ve bu alt problemlerin sonuçlarını bellekte saklayıp tekrar kullanım sağlayarak çözen güçlü bir metodolojidir. Özellikle üstel (exponential) zamanlı problemleri polinomsal zamana çekerek hayati önem taşır.</p>
+
+    <h3>Memoization ve Tabulation Yaklaşımları</h3>
+    <p>DP mimarisi, sonuçları kaydetme şekline göre iki farklı ana prensibi kullanır:</p>
+
+    <div style="overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+            <thead style="background-color: rgba(255, 255, 255, 0.05);">
+                <tr>
+                    <th style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: var(--accent-cyan); width: 20%;">DP Özelliği</th>
+                    <th style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: #fff; width: 40%;">Memoization (Top-Down)</th>
+                    <th style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: #fff; width: 40%;">Tabulation (Bottom-Up)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);"><strong>Yönelim ve Algı</strong></td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Ana problemi direkt hedef alıp ihtiyaç duydukça alt problemlere inen "Yukarıdan Aşağıya" yaklaşım.</td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">En küçük problemi çözüp adım adım ana hedefe ilerleyen "Aşağıdan Yukarıya" yaklaşım.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);"><strong>Kod Mimarisi</strong></td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Özyineleme (Recursion) + Hash Map/Array (Önbellek)</td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">İterasyon (For Döngüleri) + DP Tablosu (Array/Matrix)</td>
+                </tr>
+                <tr>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);"><strong>Zayıf Noktaları</strong></td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Maximum Call Stack Exceeded (Rekürsiyon yığıtı aşımı) riski barındırır.</td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">İhtiyaç duyulmayan "ölü" alt durumlar bile zorunlu olarak hesaplanır.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>1. Fibonacci Dizisi Optimizasyonu</h3>
+    <p>Saf bir recursive fibonacci fonksiyonu hesaplama tekrarları yüzünden \(O(2^n)\) zaman alarak sistem kilitlenmelerine sebep olur. Tabulation kullanarak bellek gereksinimini \(O(1)\)'e kadar düşürmek mümkündür.</p>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python"># Bottom-Up (Tabulation) Yaklaşımı ile Uzay(Space) Optimizasyonu O(1)
+def fib_optimized(n):
+    if n <= 1: return n
+    
+    a, b = 0, 1
+    for _ in range(2, n + 1):
+        a, b = b, a + b
+    return b</code></pre>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>2. 0/1 Knapsack (Sırt Çantası) Problemi</h3>
+    <p>Belli bir kapasiteye sahip bir çantaya, elimizdeki eşyaları; hem ağırlıkları hem de değerlerini göz önüne alarak, toplam karı maksimize edecek şekilde yerleştirme problemidir. Eşyalar bir bütün olarak alınmak zorundadır (bölünemez, 0/1 kuralı). Veri sıkıştırma algoritmaları ve bütçe/yatırım portföy optimizasyonunda çok sık kullanılır.</p>
+    <ul>
+        <li><strong>Zaman ve Alan Karmaşıklığı:</strong> Eşya sayısı \(n\), çanta kapasitesi \(W\) olmak üzere her ikisi de \(O(n \cdot W)\)'dir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def knapsack(weights, values, capacity):
+    n = len(weights)
+    # (n+1) x (capacity+1) boyutunda bir DP tablosu oluşturulur
+    dp = [[0 for _ in range(capacity + 1)] for _ in range(n + 1)]
+    
+    for i in range(1, n + 1):
+        for w in range(1, capacity + 1):
+            if weights[i-1] <= w:
+                # Eşyayı al (kalan kapasite üst tablodan çekilir) veya alma (eskiyi koru)
+                dp[i][w] = max(values[i-1] + dp[i-1][w - weights[i-1]], dp[i-1][w])
+            else:
+                # Eşya kapasiteyi aşıyorsa mecburen almayacağız
+                dp[i][w] = dp[i-1][w]
+                
+    return dp[n][capacity]</code></pre>
+    </div>
+
+    <div style="background: rgba(255, 107, 107, 0.1); border-left: 4px solid #FF6B6B; padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: #FF6B6B;">⚠️ Code Smell:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">DP problemlerinde Matrix (2D dizi) oluştururken Python'da asla `[[0] * cols] * rows` yapısını kullanmamalısınız. Bu sentaks tüm satırlar için aynı referansı kopyalar (Shallow Copy yaratır) ve tek bir satırda yaptığınız güncelleme tüm satırları bozar. Matris üretirken List Comprehension olan `[[0 for _ in range(cols)] for _ in range(rows)]` kalıbı kullanılmalıdır.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>3. Longest Common Subsequence - LCS (En Uzun Ortak Alt Dizi)</h3>
+    <p>Verilen iki metin dizisi içerisindeki; araya başka karakterler girse dahi sıralaması/zincir yapısı bozulmayan en uzun ortak karakter dizisini bulur. <strong>Git Diff</strong> gibi kod versiyonlama kıyaslamalarında, metin benzerliği analizlerinde ve Biyoinformatik alanında DNA molekülü zinciri hizalamasında (DNA Sequence Alignment) temeli oluşturur.</p>
+    <ul>
+        <li><strong>Zaman ve Alan Karmaşıklığı:</strong> İki metnin (dizinin) uzunlukları \(m\) ve \(n\) olmak üzere maliyet \(O(m \cdot n)\)'dir.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python">def lcs(text1, text2):
+    m, n = len(text1), len(text2)
+    dp = [[0] * (n + 1) for _ in range(m + 1)]
+    
+    for i in range(1, m + 1):
+        for j in range(1, n + 1):
+            if text1[i-1] == text2[j-1]:
+                # Karakterler eşleşirse çapraz hücreyi (önceki LCS durumu) +1 arttır
+                dp[i][j] = dp[i-1][j-1] + 1
+            else:
+                # Eşleşmezse üstteki veya soldaki maksimumu taşı
+                dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+                
+    return dp[m][n]</code></pre>
+    </div>
+</section>
+
+<!-- MODULE 5: İleri Düzey Sistemler -->
+<section id="s05" data-name="05. İleri Düzey Sistemler">
+    <h2>05. İleri Düzey Sistem ve Ağ Akışı Algoritmaları</h2>
+    <p>Bilgisayar mühendisliği sadece veriyi aramak ve sıralamakla sınırlı değildir. Kısıtlı sistem kaynaklarının adil paylaşımı, devasa ağ bant genişliklerinin optimizasyonu, verinin gizliliği ve mükemmel çözümün imkansız olduğu felsefi sınırların aşılması bu modülün odak noktasıdır.</p>
+
+    <h3>1. İşletim Sistemleri (OS) Seviyesi Algoritmalar</h3>
+    
+    <h4>CPU Zamanlama (Scheduling)</h4>
+    <p>İşletim sisteminin kalbi olan Scheduler'in (Zamanlayıcı), sınırlı işlemci gücünü arka planda çalışan yüzlerce sürece (process) hangi adalet ve öncelik kuralına göre paylaştıracağını belirler.</p>
+    <ul>
+        <li><strong>Round Robin (RR):</strong> Her işleme eşit ve tamamen sabit bir <span class="term-highlight" data-tooltip="İşlemci tarafından bir defada ayrılan kesintisiz maksimum süre (Time Quantum).">Zaman Dilimi</span> tahsis edilir. Süresi biten işlem durdurulur ve kuyruğun sonuna atılır. Son derece adildir ve yanıt süresi hızlıdır. Modern masaüstü işletim sistemlerinin (Linux, Windows) vazgeçilmezidir.</li>
+        <li><strong>SJF (Shortest Job First):</strong> Çalışma süresi (Burst Time) en kısa olan işlemlere her zaman öncelik verir. Matematiksel olarak ortalama bekleme süresini (Waiting Time) en aza indirir. Ancak çok uzun süren bir işlemin sürekli geri atılarak işlemci yüzü görememesi (<span class="term-highlight" data-tooltip="Bir sürecin sistem kaynaklarına erişiminin süresiz olarak ertelenmesi durumu.">Starvation</span>) gibi büyük bir riski vardır.</li>
+    </ul>
+
+    <h4>Sayfa Değiştirme (Page Replacement)</h4>
+    <p>Bilgisayarın RAM (Fiziksel Bellek) alanı dolduğunda, işletim sisteminin belleğe yeni bloklar yükleyebilmek için halihazırda RAM'de bulunan hangi sayfayı disk takas alanına (Swap/Pagefile) göndereceğine karar verdiği algoritmalardır.</p>
+    <ul>
+        <li><strong>LRU (Least Recently Used):</strong> Üzerinden en uzun süre geçmiş, "en son ne zaman kullanıldığı en eski olan" sayfayı bellekten atar. Önbellek (Cache) ve veritabanı sistemlerinde altın standarttır. Doubly Linked List ve Hash Map birleştirilerek kullanıldığında zaman karmaşıklığı \(O(1)\)'dir.</li>
+        <li><strong>FIFO (First-In, First-Out):</strong> Mantığı son derece basittir; RAM'e ilk giren, ilk dışarı atılır. Ancak işletim sistemlerinde meşhur <strong>Belady'nin Anomalisi</strong> (Bilgisayara RAM eklendikçe bellek hatası oranının şaşırtıcı bir şekilde artması durumu) ile karşılaşma ihtimali vardır.</li>
+    </ul>
+
+    <div class="code-wrapper">
+        <button class="copy-btn">Kopyala</button>
+        <pre><code class="language-python"># O(1) Zaman Karmaşıklığına Sahip Klasik Bir LRU Cache İmplementasyonu
+from collections import OrderedDict
+
+class LRUCache:
+    def __init__(self, capacity: int):
+        # OrderedDict; hem key-value tutar hem de eklenme sırasını (Linked List gibi) korur
+        self.cache = OrderedDict()
+        self.capacity = capacity
+
+    def get(self, key: int) -> int:
+        if key not in self.cache:
+            return -1
+        # Öğeye erişildiği için tazelemek amacıyla onu sıranın "en sonuna" taşıyoruz
+        self.cache.move_to_end(key)
+        return self.cache[key]
+
+    def put(self, key: int, value: int) -> None:
+        if key in self.cache:
+            self.cache.move_to_end(key)
+        self.cache[key] = value
+        
+        # Eğer fiziksel kapasite aşılırsa, "en eski" olanı (başta duranı) bellekten çıkar
+        if len(self.cache) > self.capacity:
+            self.cache.popitem(last=False)</code></pre>
+    </div>
+
+    <h4>Banker Algoritması (Deadlock Avoidance)</h4>
+    <p>İşletim sistemlerinde süreçler birden fazla kaynağa (Örn: Hem yazıcıya hem diske) aynı anda ihtiyaç duyabilir. Sistem, kaynakları dağıtırken bir kilitlenme (<span class="term-highlight" data-tooltip="İki veya daha fazla sürecin, birbirinin elindeki kaynağı sonsuza kadar beklemesi durumu.">Deadlock</span>) oluşup oluşmayacağını Banker's algoritması ile öngörür. Sisteme bir kaynak talebi geldiğinde algoritma; "Eğer ben bu kaynağı verirsem sistem hala Güvenli Durumda (Safe State) kalıp tüm süreçleri er ya da geç bitirebilir mi?" analizi yapar. Eğer güvensiz (Unsafe) bir duruma düşülüyorsa süreci bekletir.</p>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>2. Ağ Akışı (Network Flow) Optimizasyonu</h3>
+    <p>Graf teorisinin ileri uç noktalarından biridir. Bir ağ üzerinden (Örn: Kıtalararası internet omurgası, petrol boru hatları veya şehir içi trafik rotaları) bir başlangıç düğümünden (Source) bitiş düğümüne (Sink), ağın taşıma kapasitesini ihlal etmeden ulaştırılabilecek <strong>Maksimum Akışı (Maximum Flow)</strong> hesaplar.</p>
+
+    <ul>
+        <li><strong>Ford-Fulkerson:</strong> Graf üzerinde başlangıçtan bitişe kapasitesi olan bir yol (Augmenting Path) bulunduğu sürece ağın genel kapasitesini iteratif olarak artırır. Ancak irrasyonel kapasitelerde sonsuz döngü tehlikesi barındırır.</li>
+        <li><strong>Edmonds-Karp Algoritması:</strong> Ford-Fulkerson algoritmasının stabilize edilmiş versiyonudur. Yolları rastgele değil, her zaman BFS (Breadth-First Search) kullanarak "en az düğümden geçen en kısa yolu" seçerek günceller. Zaman karmaşıklığı: \(O(V \cdot E^2)\) ile kesin olarak sınırlandırılmıştır. Bant genişliği darboğazlarını tespit etmede kritik bir yaklaşımdır.</li>
+    </ul>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>3. Kriptografi ve Veri Güvenliği</h3>
+    <p>Modern internet altyapısı ve blokzincir teknolojileri, bazı matematiksel denklemlerin bilgisayarlar tarafından "tersten çözülememesi" kuralı üzerine bina edilmiştir.</p>
+
+    <div style="overflow-x: auto; margin: 24px 0; border-radius: 8px; border: 1px solid var(--border-color);">
+        <table style="width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem;">
+            <thead style="background-color: rgba(255, 255, 255, 0.05);">
+                <tr>
+                    <th style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: var(--accent-cyan);">Algoritma</th>
+                    <th style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: #fff;">Tip ve Görevi</th>
+                    <th style="padding: 14px 18px; border-bottom: 1px solid var(--border-color); color: #fff;">Matematiksel Çalışma Mantığı</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);"><strong>AES</strong></td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Simetrik (Gizlilik)</td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Veriyi şifrelemek ve çözmek için tek (aynı) anahtarı kullanır. Bloklar halinde çalışıp bit düzeyinde kaydırmalar, yer değiştirmeler ve matris XOR matematiği uygular. Donanım hızlandırması sayesinde işlemcilerde şimşek hızındadır.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);"><strong>RSA</strong></td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Asimetrik (Gizlilik)</td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Açık (Public) ve Gizli (Private) iki anahtarı vardır. Muazzam büyüklükte (Örn: 2048 bit) iki asal sayının çarpılması esasına dayanır. Kırılması, bu devasa çarpımı geriye doğru <strong>asal çarpanlarına ayırmanın (Prime Factorization)</strong> klasik bilgisayarlar için yüzlerce yıl sürmesi temeline dayanır.</td>
+                </tr>
+                <tr>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);"><strong>SHA-256</strong></td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Hash (Bütünlük)</td>
+                    <td style="padding: 14px 18px; border-bottom: 1px solid var(--border-color);">Veriyi şifrelemez; verinin parmak izini çıkarır. Tek yönlüdür (asla geri döndürülemez). İndirilen bir dosyanın yolda modifiye edilip edilmediğini doğrulamak ve şifreleri veritabanında salt text olarak tutmamak için kullanılır.</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="background: rgba(49, 120, 198, 0.1); border-left: 4px solid var(--accent-blue); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-blue);">💡 Mühendislik Notu (Hibrit Sistemler):</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Tarayıcınız ile bir bankanın sunucusu HTTPS (TLS/SSL) protokolü ile konuşurken ilginç bir dans başlar. RSA algoritması (asimetrik olması sebebiyle) son derece güvenlidir ancak CPU için çok yavaş ve ağırdır. Tarayıcı ve sunucu; hızlı olan <strong>AES</strong> algoritmasının anahtarını birbirleriyle paylaşabilmek (tokalaşmak) için RSA algoritmasını kullanırlar. AES anahtarı RSA'nın koruması altında güvenle taşındıktan sonra RSA devreden çıkar ve o andan itibaren tüm yüksek hacimli video/veri iletişimi son derece hızlı olan AES ile devam eder.</p>
+    </div>
+
+    <hr style="border: 0; border-top: 1px dashed var(--border-color); margin: 40px 0;">
+
+    <h3>4. Kapanış Teorisi: P vs NP ve Sezgisel Yaklaşımlar</h3>
+    <p>Bilgisayar mühendisliğinin kutsal kasesi ve en büyük çözülmemiş sorusu "P = NP mi?" sorusudur. Kodlarken karşımıza çıkan her problemi %100 kesinlikle veya pratik/kabul edilebilir bir sürede çözme lüksümüz yoktur.</p>
+
+    <ul>
+        <li><strong>P (Polynomial) Problemler:</strong> Geliştirdiğimiz bir algoritma ile polinomsal (<span class="term-highlight" data-tooltip="Kabul edilebilir ve donanımın gücüyle ölçeklenebilir işlem süresi.">Makul Sürelerde</span>) çözümü bulunabilen ve sonucu kolayca bulunabilen problemlerdir (Örn: Diziyi sıralamak, Binary Search, Dijkstra).</li>
+        <li><strong>NP (Nondeterministic Polynomial):</strong> Makul sürede doğrudan çözüm üreten bir algoritması henüz bulunmayan; ancak biri size "Ben cevabı buldum" deyip bir kanıt getirdiğinde, o cevabın doğru olup olmadığını saniyeler içerisinde <em>doğrulayabildiğiniz</em> problem tipleridir (Örn: Sudoku, Şifre Kırma, Boolean Satisfiability).</li>
+        <li><strong>NP-Complete ve NP-Hard:</strong> Mühendislikte karşımıza çıkan bilinen en inatçı problem kümeleridir. Klasik ve deterministik kod yazarak %100 doğru ve kesin çözümü bulmaya çalışırsanız, çözümün Evrenin yaşından daha uzun süreceği optimizasyon problemleri bu sınıfa girer (Örn: Kargo şirketleri için Seyyar Satıcı - Traveling Salesman problemi).</li>
+    </ul>
+
+    <div style="background: rgba(0, 229, 255, 0.1); border-left: 4px solid var(--accent-cyan); padding: 16px; border-radius: 6px; margin: 24px 0;">
+        <strong style="color: var(--accent-cyan);">🚀 Sezgisel (Heuristic) Mimari Felsefesi:</strong>
+        <p style="margin: 8px 0 0 0; font-size: 0.95rem; line-height: 1.6;">Projenizde bir problemin matematiksel olarak NP-Hard olduğunu fark ettiğiniz an, mükemmel çözümü aramayı derhal bırakmalısınız. Bunun yerine mühendisler <strong>Sezgisel (<span class="term-highlight" data-tooltip="Mükemmeli değil, hızlı ve tatmin edici çözümü hedefleyen algoritma stili.">Heuristic</span>)</strong> algoritmalara başvururlar. A* Search, Genetik Algoritmalar, Makine Öğrenmesi ağırlıkları veya Karınca Kolonisi Optimizasyonları (ACO); size hiçbir zaman %100 en iyi cevabı garanti etmezler. Ancak, normalde yüzyıllar sürecek bir denklemi, saniyeler içerisinde <em>"Kusursuza yakın, yeterince iyi (Good Enough)"</em> bir tolerans payı ile çözerler. Gezegenimizdeki otonom drone'lardan, yapay zeka sinir ağlarına kadar modern teknolojinin kalbi, mükemmeliyetten vazgeçip sezgisel tavizler verdiğimiz için atmaktadır.</p>
+    </div>
+
+</section>
+
+        </div>
+    </main>
+
+    <!-- BOTTOM PROGRESS BAR -->
+    <div id="progressBar">
+        <div class="progress-info">
+            <span id="progNum">Modül 0</span>
+            <span style="color:var(--text-muted); margin:0 6px;">&bull;</span>
+            <span id="progName">Yükleniyor...</span>
+        </div>
+        <div class="progress-track">
+            <div id="progFill"></div>
+        </div>
+        <div id="progPercent">0%</div>
+    </div>
+
+    <!-- SCROLL TOP BUTTON WITH SVG RING -->
+    <button id="scrollTopBtn" aria-label="Modül Başına Dön">
+        <svg class="progress-ring" width="52" height="52">
+            <!-- Background circle -->
+            <circle class="progress-ring__circle_bg" stroke="rgba(255,255,255,0.05)" stroke-width="3" fill="transparent" r="23" cx="26" cy="26"/>
+            <!-- Animated progress circle -->
+            <circle class="progress-ring__circle" stroke="var(--accent-cyan)" stroke-width="3" fill="transparent" r="23" cx="26" cy="26"/>
+        </svg>
+        <div class="icon">↑</div>
+    </button>
+
+    <!-- JAVASCRIPT ENGINE & LIBRARIES -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const sections = Array.from(document.querySelectorAll('.sections section'));
+            const tocList = document.getElementById('tocList');
+            const searchInput = document.getElementById('searchInput');
+            
+            const progNum = document.getElementById('progNum');
+            const progName = document.getElementById('progName');
+            const progFill = document.getElementById('progFill');
+            const progPercent = document.getElementById('progPercent');
+            
+            const circle = document.querySelector('.progress-ring__circle');
+            const scrollTopBtn = document.getElementById('scrollTopBtn');
+            const themeToggle = document.getElementById('themeToggle');
+
+            // --- Theme Toggle Logic ---
+            let currentTheme = 'dark';
+            try {
+                currentTheme = localStorage.getItem('algo-theme') || 'dark';
+            } catch (e) {
+                console.warn('localStorage is blocked, continuing without it.');
+            }
+
+            if (currentTheme === 'light') {
+                document.body.classList.add('light-theme');
+                themeToggle.textContent = '☀️';
+            } else {
+                themeToggle.textContent = '🌙';
+            }
+
+            themeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('light-theme');
+                const isLight = document.body.classList.contains('light-theme');
+                themeToggle.textContent = isLight ? '☀️' : '🌙';
+                
+                try {
+                    localStorage.setItem('algo-theme', isLight ? 'light' : 'dark');
+                } catch (e) {}
+            });
+
+            // 1. Initialize SVG Ring Metrics
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+            
+            let activeSectionIndex = 0;
+
+            // 2. Build Dynamic TOC
+            sections.forEach((sec, index) => {
+                const li = document.createElement('li');
+                li.className = 'toc-item';
+                if(index === 0) li.classList.add('active');
+                
+                li.dataset.index = index;
+                
+                // Numara kısmını renkli hale getirmek için regex ile ayır
+                const name = sec.dataset.name;
+                const match = name.match(/^(\d+\.)(.*)/);
+                if (match) {
+                    li.innerHTML = `<span style="color: var(--accent-cyan); font-weight: 700; margin-right: 2px;">${match[1]}</span>${match[2]}`;
+                } else {
+                    li.textContent = name;
+                }
+                
+                // Click navigation
+                li.addEventListener('click', () => {
+                    const top = sec.offsetTop - 100;
+                    window.scrollTo({ top, behavior: 'smooth' });
+                });
+                
+                tocList.appendChild(li);
+            });
+
+            // Update SVG Ring offset
+            function setRingProgress(percent) {
+                const offset = circumference - (percent / 100) * circumference;
+                circle.style.strokeDashoffset = offset;
+            }
+
+            // 3. Scroll & Progress Tracking Logic
+            function handleScroll() {
+                const scrollY = window.scrollY;
+                const windowHeight = window.innerHeight;
+                const documentHeight = document.documentElement.scrollHeight;
+                
+                let currentSec = sections[0];
+                let currentIndex = 0;
+                
+                // Identify active module based on offset Trigger
+                const offsetTrigger = 150; 
+                for (let i = sections.length - 1; i >= 0; i--) {
+                    if (scrollY >= sections[i].offsetTop - offsetTrigger) {
+                        currentSec = sections[i];
+                        currentIndex = i;
+                        break;
+                    }
+                }
+                activeSectionIndex = currentIndex;
+                
+                // Sync TOC Active Class
+                document.querySelectorAll('.toc-item').forEach((item, idx) => {
+                    item.classList.toggle('active', idx === currentIndex);
+                });
+                
+                // Update Progress Labels
+                progNum.textContent = `MODÜL ${currentIndex + 1}`;
+                progName.textContent = currentSec.dataset.name;
+                
+                // Calculate Internal Percentage
+                let percent = 0;
+                const secTop = currentSec.offsetTop;
+                const secHeight = currentSec.offsetHeight;
+                
+                // Force 100% if we hit the absolute bottom of the page
+                if (Math.ceil(scrollY + windowHeight) >= documentHeight - 5) {
+                    percent = 100;
+                } else {
+                    const scrolledInside = scrollY - (secTop - 100);
+                    if (scrolledInside > 0) {
+                        // Estimate scroll ratio within the active section
+                        percent = (scrolledInside / secHeight) * 100;
+                    }
+                }
+                
+                percent = Math.min(100, Math.max(0, Math.round(percent)));
+                
+                // Apply Styles
+                progFill.style.width = `${percent}%`;
+                progPercent.textContent = `${percent}%`;
+                setRingProgress(percent);
+            }
+            
+            window.addEventListener('scroll', handleScroll);
+            handleScroll(); // Initial call
+
+            // 4. Scroll to Top Button (Module Scope)
+            scrollTopBtn.addEventListener('click', () => {
+                if (sections[activeSectionIndex]) {
+                    const targetTop = sections[activeSectionIndex].offsetTop - 100;
+                    
+                    // Eğer zaten bölümün (modülün) en üstündeysek, bir önceki bölüme zıpla
+                    if (window.scrollY <= targetTop + 5) {
+                        if (activeSectionIndex > 0) {
+                            const prevTop = sections[activeSectionIndex - 1].offsetTop - 100;
+                            window.scrollTo({ top: prevTop, behavior: 'smooth' });
+                        } else {
+                            window.scrollTo({ top: 0, behavior: 'smooth' }); // İlk bölümdeysek sayfanın en başına git
+                        }
+                    } else {
+                        // Değilsek bulunduğumuz bölümün başına git
+                        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+                    }
+                }
+            });
+
+            // 5. Code Copy Functionality setup
+            function bindCopyButtons() {
+                document.querySelectorAll('.copy-btn').forEach(btn => {
+                    // Remove old listeners to prevent duplicates after search renders
+                    const newBtn = btn.cloneNode(true);
+                    btn.parentNode.replaceChild(newBtn, btn);
+                    
+                    newBtn.addEventListener('click', (e) => {
+                        const pre = e.target.nextElementSibling;
+                        if(pre) {
+                            navigator.clipboard.writeText(pre.textContent).then(() => {
+                                newBtn.textContent = 'Kopyalandı!';
+                                newBtn.style.color = 'var(--accent-cyan)';
+                                setTimeout(() => {
+                                    newBtn.textContent = 'Kopyala';
+                                    newBtn.style.color = '';
+                                }, 2000);
+                            });
+                        }
+                    });
+                });
+            }
+            bindCopyButtons();
+
+            // 6. Search Engine & Text Highlighting
+            
+            // Backup HTML for resetting state cleanly
+            sections.forEach(sec => {
+                sec.dataset.originalHtml = sec.innerHTML;
+            });
+            
+            function escapeRegExp(string) {
+                return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); 
+            }
+
+            function highlightTextNodes(node, regex) {
+                if (node.nodeType === 3) { // Text node
+                    const match = node.nodeValue.match(regex);
+                    if (match) {
+                        const span = document.createElement('span');
+                        span.innerHTML = node.nodeValue.replace(regex, '<mark class="search-hl">$&</mark>');
+                        node.parentNode.replaceChild(span, node);
+                    }
+                } else if (node.nodeType === 1 && !['SCRIPT', 'STYLE', 'MARK'].includes(node.nodeName)) {
+                    // Recurse down element nodes
+                    Array.from(node.childNodes).forEach(child => highlightTextNodes(child, regex));
+                }
+            }
+
+            searchInput.addEventListener('input', (e) => {
+                const query = e.target.value.trim();
+                
+                if (query === '') {
+                    // Restore Original State
+                    sections.forEach(sec => {
+                        sec.innerHTML = sec.dataset.originalHtml;
+                        sec.classList.remove('hidden');
+                    });
+                    bindCopyButtons();
+                    if(window.MathJax) MathJax.typesetPromise();
+                    
+                    document.querySelectorAll('.toc-item').forEach(item => {
+                        item.style.display = 'block';
+                    });
+                    handleScroll();
+                    return;
+                }
+
+                const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+
+                sections.forEach((sec, idx) => {
+                    // Clean slate for searching
+                    sec.innerHTML = sec.dataset.originalHtml;
+                    const textContent = sec.textContent || sec.innerText;
+                    
+                    if (regex.test(textContent)) {
+                        sec.classList.remove('hidden');
+                        document.querySelector(`.toc-item[data-index="${idx}"]`).style.display = 'block';
+                        highlightTextNodes(sec, regex);
+                    } else {
+                        sec.classList.add('hidden');
+                        document.querySelector(`.toc-item[data-index="${idx}"]`).style.display = 'none';
+                    }
+                });
+                
+                bindCopyButtons();
+                if(window.MathJax) MathJax.typesetPromise();
+                handleScroll();
+            });
+
+        });
+    </script>
+</body>
+</html>

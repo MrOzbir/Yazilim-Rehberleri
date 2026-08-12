@@ -1,0 +1,1051 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkedIn'i Efektif Kullanma Rehberi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    /* ─── CSS Variables ─────────────────────────────── */
+    :root {
+      --blue-deep:   #0A3D62;
+      --blue-mid:    #0077B5;
+      --blue-light:  #00A0DC;
+      --blue-pale:   #E8F4FD;
+      --gold:        #C9A84C;
+      --dark:        #111827;
+      --gray-700:    #374151;
+      --gray-400:    #9CA3AF;
+      --gray-100:    #F3F4F6;
+      --white:       #FFFFFF;
+      --radius:      16px;
+      --shadow-sm:   0 2px 8px rgba(0,119,181,.10);
+      --shadow-md:   0 8px 32px rgba(0,119,181,.14);
+      --shadow-lg:   0 20px 60px rgba(0,0,0,.12);
+    }
+
+    /* ─── Reset ─────────────────────────────────────── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #F7FAFD;
+      color: var(--dark);
+      line-height: 1.7;
+      overflow-x: hidden;
+    }
+
+    /* ─── Scrollbar ──────────────────────────────────── */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--gray-100); }
+    ::-webkit-scrollbar-thumb { background: var(--blue-mid); border-radius: 3px; }
+
+    /* ─── Hero ───────────────────────────────────────── */
+    .hero {
+      position: relative;
+      background: linear-gradient(135deg, var(--blue-deep) 0%, #0C5480 50%, var(--blue-mid) 100%);
+      padding: 80px 24px 100px;
+      overflow: hidden;
+      text-align: center;
+    }
+    .hero::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background:
+        radial-gradient(ellipse 60% 80% at 20% 50%, rgba(0,160,220,.25) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 60% at 80% 20%, rgba(10,61,98,.4) 0%, transparent 70%);
+    }
+    .hero-dots {
+      position: absolute;
+      inset: 0;
+      background-image: radial-gradient(rgba(255,255,255,.08) 1px, transparent 1px);
+      background-size: 32px 32px;
+    }
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 13px;
+      font-weight: 500;
+      letter-spacing: .06em;
+      text-transform: uppercase;
+      padding: 8px 18px;
+      border-radius: 100px;
+      margin-bottom: 28px;
+      position: relative;
+    }
+    .hero-badge::before {
+      content: '';
+      width: 7px; height: 7px;
+      background: var(--gold);
+      border-radius: 50%;
+    }
+    .hero h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(2.2rem, 6vw, 4rem);
+      font-weight: 900;
+      color: #fff;
+      line-height: 1.15;
+      position: relative;
+      margin-bottom: 20px;
+    }
+    .hero h1 span {
+      color: var(--gold);
+    }
+    .hero-sub {
+      font-size: clamp(.95rem, 2vw, 1.15rem);
+      color: rgba(255,255,255,.8);
+      max-width: 600px;
+      margin: 0 auto 40px;
+      position: relative;
+    }
+    .hero-stats {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      position: relative;
+    }
+    .stat-pill {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-size: .9rem;
+      font-weight: 500;
+    }
+    .stat-pill strong { color: var(--gold); }
+
+    /* ─── TOC ────────────────────────────────────────── */
+    .toc-wrapper {
+      max-width: 860px;
+      margin: -40px auto 0;
+      padding: 0 24px;
+      position: relative;
+      z-index: 10;
+    }
+    .toc {
+      background: var(--white);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      padding: 32px 36px;
+    }
+    .toc h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--blue-deep);
+      margin-bottom: 18px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .toc-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 10px;
+    }
+    .toc-item {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 14px;
+      border-radius: 10px;
+      background: var(--blue-pale);
+      text-decoration: none;
+      color: var(--blue-deep);
+      font-size: .88rem;
+      font-weight: 500;
+      transition: background .2s, transform .2s;
+    }
+    .toc-item:hover {
+      background: var(--blue-mid);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .toc-num {
+      width: 24px; height: 24px;
+      background: var(--blue-mid);
+      color: #fff;
+      border-radius: 50%;
+      font-size: .75rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      transition: background .2s;
+    }
+    .toc-item:hover .toc-num { background: rgba(255,255,255,.3); }
+
+    /* ─── Main Layout ────────────────────────────────── */
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+    main { padding: 60px 0 80px; }
+
+    /* ─── Section Header ─────────────────────────────── */
+    .section-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 20px;
+      margin-bottom: 36px;
+    }
+    .section-icon {
+      width: 56px; height: 56px;
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.6rem;
+      flex-shrink: 0;
+      box-shadow: var(--shadow-sm);
+    }
+    .icon-blue  { background: linear-gradient(135deg, var(--blue-mid), var(--blue-light)); }
+    .icon-gold  { background: linear-gradient(135deg, #B8890A, var(--gold)); }
+    .icon-teal  { background: linear-gradient(135deg, #0891B2, #22D3EE); }
+
+    .section-title h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: clamp(1.5rem, 3.5vw, 2rem);
+      color: var(--blue-deep);
+      line-height: 1.2;
+    }
+    .section-title p {
+      font-size: .95rem;
+      color: var(--gray-400);
+      margin-top: 4px;
+    }
+
+    /* ─── Divider ────────────────────────────────────── */
+    .divider {
+      border: none;
+      height: 2px;
+      background: linear-gradient(90deg, var(--blue-mid), transparent);
+      margin-bottom: 40px;
+      border-radius: 2px;
+    }
+
+    /* ─── Cards ──────────────────────────────────────── */
+    .card {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px 30px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,119,181,.07);
+      margin-bottom: 20px;
+      transition: box-shadow .25s, transform .25s;
+    }
+    .card:hover {
+      box-shadow: var(--shadow-md);
+      transform: translateY(-3px);
+    }
+    .card h3 {
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: var(--blue-deep);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .card h3 .tag {
+      font-family: 'DM Sans', sans-serif;
+      font-size: .72rem;
+      font-weight: 600;
+      letter-spacing: .07em;
+      text-transform: uppercase;
+      padding: 3px 10px;
+      border-radius: 100px;
+    }
+    .tag-blue  { background: var(--blue-pale); color: var(--blue-mid); }
+    .tag-gold  { background: #FEF3C7; color: #92400E; }
+    .tag-green { background: #D1FAE5; color: #065F46; }
+
+    .card p, .card li { font-size: .93rem; color: var(--gray-700); }
+    .card ul { padding-left: 0; list-style: none; }
+    .card ul li {
+      padding: 6px 0 6px 22px;
+      position: relative;
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .card ul li:last-child { border-bottom: none; }
+    .card ul li::before {
+      content: '→';
+      position: absolute;
+      left: 0;
+      color: var(--blue-mid);
+      font-weight: 700;
+    }
+
+    /* ─── Alert / Highlight Box ──────────────────────── */
+    .alert {
+      border-radius: 12px;
+      padding: 20px 24px;
+      margin-bottom: 20px;
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+    }
+    .alert-icon { font-size: 1.4rem; flex-shrink: 0; }
+    .alert-blue {
+      background: var(--blue-pale);
+      border-left: 4px solid var(--blue-mid);
+    }
+    .alert-gold {
+      background: #FFFBEB;
+      border-left: 4px solid var(--gold);
+    }
+    .alert-green {
+      background: #F0FDF4;
+      border-left: 4px solid #16A34A;
+    }
+    .alert strong { color: var(--blue-deep); display: block; margin-bottom: 4px; }
+    .alert p { font-size: .9rem; color: var(--gray-700); }
+
+    /* ─── Steps ──────────────────────────────────────── */
+    .steps { counter-reset: step; }
+    .step {
+      display: flex;
+      gap: 20px;
+      margin-bottom: 24px;
+      align-items: flex-start;
+    }
+    .step-num {
+      counter-increment: step;
+      width: 40px; height: 40px;
+      background: linear-gradient(135deg, var(--blue-mid), var(--blue-light));
+      color: #fff;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0;
+      box-shadow: 0 4px 12px rgba(0,119,181,.3);
+    }
+    .step-content h4 {
+      font-size: .98rem;
+      font-weight: 600;
+      color: var(--blue-deep);
+      margin-bottom: 6px;
+    }
+    .step-content p { font-size: .9rem; color: var(--gray-700); }
+
+    /* ─── Formula Box ────────────────────────────────── */
+    .formula {
+      background: linear-gradient(135deg, var(--blue-deep) 0%, #0C5480 100%);
+      border-radius: var(--radius);
+      padding: 28px 32px;
+      color: #fff;
+      margin-bottom: 20px;
+      position: relative;
+      overflow: hidden;
+    }
+    .formula::after {
+      content: '';
+      position: absolute;
+      top: -40px; right: -40px;
+      width: 160px; height: 160px;
+      background: rgba(255,255,255,.05);
+      border-radius: 50%;
+    }
+    .formula h4 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      margin-bottom: 16px;
+      color: var(--gold);
+    }
+    .formula-parts {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+    .formula-part {
+      background: rgba(255,255,255,.12);
+      border: 1px solid rgba(255,255,255,.2);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: .88rem;
+      font-weight: 500;
+    }
+    .formula-plus {
+      color: var(--gold);
+      font-size: 1.2rem;
+      font-weight: 700;
+    }
+
+    /* ─── Template Box ───────────────────────────────── */
+    .template {
+      background: var(--gray-100);
+      border-radius: 12px;
+      padding: 22px 26px;
+      margin-top: 14px;
+      border: 1px dashed var(--gray-400);
+      position: relative;
+    }
+    .template-label {
+      position: absolute;
+      top: -11px; left: 18px;
+      background: var(--blue-mid);
+      color: #fff;
+      font-size: .72rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      padding: 3px 12px;
+      border-radius: 100px;
+    }
+    .template p {
+      font-size: .9rem;
+      color: var(--gray-700);
+      line-height: 1.8;
+    }
+    .template em { color: var(--blue-mid); font-style: normal; font-weight: 600; }
+
+    /* ─── Grid 2col ──────────────────────────────────── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 20px;
+      margin-bottom: 20px;
+    }
+
+    /* ─── Tip Strip ──────────────────────────────────── */
+    .tip-strip {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background: linear-gradient(90deg, #FEF3C7, #FFFBEB);
+      border-radius: 10px;
+      padding: 14px 20px;
+      margin-bottom: 14px;
+      font-size: .88rem;
+      color: var(--gray-700);
+    }
+    .tip-strip strong { color: #92400E; }
+
+    /* ─── Section Spacer ─────────────────────────────── */
+    .section { margin-bottom: 72px; }
+
+    /* ─── Intro Card ─────────────────────────────────── */
+    .intro-hero {
+      background: linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%);
+      border-radius: var(--radius);
+      padding: 36px 36px;
+      border: 1px solid #BFDBFE;
+      margin-bottom: 20px;
+    }
+    .intro-hero h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--blue-deep);
+      margin-bottom: 14px;
+    }
+    .intro-hero p { font-size: .95rem; color: var(--gray-700); margin-bottom: 10px; }
+    .stat-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      margin-top: 20px;
+    }
+    .stat-box {
+      background: #fff;
+      border-radius: 10px;
+      padding: 14px 20px;
+      text-align: center;
+      box-shadow: var(--shadow-sm);
+      flex: 1 1 120px;
+    }
+    .stat-box .num {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--blue-mid);
+      font-weight: 700;
+    }
+    .stat-box .lbl { font-size: .78rem; color: var(--gray-400); }
+
+    /* ─── Post Anatomy ───────────────────────────────── */
+    .post-anatomy {
+      background: var(--white);
+      border-radius: var(--radius);
+      padding: 28px;
+      box-shadow: var(--shadow-sm);
+      border: 1px solid rgba(0,119,181,.07);
+      margin-bottom: 20px;
+    }
+    .post-anatomy h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: var(--blue-deep);
+      margin-bottom: 18px;
+      display: flex; align-items: center; gap: 8px;
+    }
+    .post-part {
+      display: flex;
+      gap: 14px;
+      align-items: flex-start;
+      margin-bottom: 16px;
+    }
+    .post-part:last-child { margin-bottom: 0; }
+    .post-bar {
+      width: 4px;
+      min-height: 50px;
+      border-radius: 4px;
+      flex-shrink: 0;
+    }
+    .bar-red    { background: #EF4444; }
+    .bar-blue   { background: var(--blue-mid); }
+    .bar-green  { background: #10B981; }
+    .post-part-content h4 { font-size: .9rem; font-weight: 600; color: var(--dark); margin-bottom: 4px; }
+    .post-part-content p  { font-size: .86rem; color: var(--gray-700); }
+    .post-part-content code {
+      display: block;
+      margin-top: 6px;
+      background: var(--gray-100);
+      padding: 8px 12px;
+      border-radius: 7px;
+      font-family: 'DM Mono', monospace;
+      font-size: .82rem;
+      color: var(--blue-deep);
+    }
+
+    /* ─── Checklist ──────────────────────────────────── */
+    .checklist li {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 8px 0;
+      font-size: .9rem;
+      color: var(--gray-700);
+      border-bottom: 1px solid var(--gray-100);
+    }
+    .checklist li:last-child { border-bottom: none; }
+    .check-icon {
+      width: 20px; height: 20px;
+      background: #D1FAE5;
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: .7rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    /* ─── Footer ─────────────────────────────────────── */
+    footer {
+      background: var(--blue-deep);
+      color: rgba(255,255,255,.7);
+      text-align: center;
+      padding: 32px 24px;
+      font-size: .88rem;
+    }
+    footer strong { color: var(--gold); }
+
+    /* ─── Animations ─────────────────────────────────── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(24px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .fade-up { animation: fadeUp .6s ease both; }
+    .delay-1 { animation-delay: .1s; }
+    .delay-2 { animation-delay: .2s; }
+    .delay-3 { animation-delay: .3s; }
+
+    /* ─── Responsive ─────────────────────────────────── */
+    @media (max-width: 640px) {
+      .hero { padding: 60px 20px 80px; }
+      .toc  { padding: 24px 20px; }
+      .card { padding: 22px 20px; }
+      .formula { padding: 22px 20px; }
+      .intro-hero { padding: 24px 20px; }
+      .section-header { flex-direction: column; gap: 12px; }
+      .step { flex-direction: column; gap: 10px; }
+      .step-num { width: 34px; height: 34px; font-size: .85rem; }
+      .formula-parts { flex-direction: column; }
+      .formula-plus { align-self: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ════════════════════════════════════════════════
+       HERO
+  ════════════════════════════════════════════════ -->
+  <header class="hero">
+    <div class="hero-dots"></div>
+    <div class="fade-up">
+      <div class="hero-badge">Kariyer Rehberi 2025</div>
+      <h1>LinkedIn'i <span>Efektif</span><br>Kullanma Rehberi</h1>
+      <p class="hero-sub">Kişisel markanı inşa et, görünürlüğünü artır ve doğru insanlarla bağlantı kur. Algoritmayı anlayan profesyoneller için pratik strateji kılavuzu.</p>
+    </div>
+    <div class="hero-stats fade-up delay-2">
+      <div class="stat-pill">🌍 <strong>1 Milyar+</strong> Kullanıcı</div>
+      <div class="stat-pill">📈 <strong>%70</strong> İşe Alım LinkedIn'den</div>
+      <div class="stat-pill">🔥 <strong>Haftalık</strong> İçerik = 5x Görünürlük</div>
+    </div>
+  </header>
+
+  <!-- ════════════════════════════════════════════════
+       İÇİNDEKİLER
+  ════════════════════════════════════════════════ -->
+  <div class="toc-wrapper">
+    <div class="toc fade-up delay-3">
+      <h2>📋 İçindekiler</h2>
+      <div class="toc-grid">
+        <a href="#giris" class="toc-item">
+          <span class="toc-num">0</span> Giriş: Neden LinkedIn?
+        </a>
+        <a href="#profil" class="toc-item">
+          <span class="toc-num">1</span> Profil Optimizasyonu
+        </a>
+        <a href="#icerik" class="toc-item">
+          <span class="toc-num">2</span> İçerik Stratejisi
+        </a>
+        <a href="#network" class="toc-item">
+          <span class="toc-num">3</span> Ağ Büyütme & Networking
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- ════════════════════════════════════════════════
+       MAIN
+  ════════════════════════════════════════════════ -->
+  <main>
+    <div class="container">
+
+      <!-- ─── GİRİŞ ─────────────────────────────────── -->
+      <section class="section" id="giris">
+
+        <div class="section-header">
+          <div class="section-icon icon-blue">🚀</div>
+          <div class="section-title">
+            <h2>Giriş: Neden LinkedIn Kişisel Marka?</h2>
+            <p>Dijital çağda görünmezsen, yoksan.</p>
+          </div>
+        </div>
+        <hr class="divider">
+
+        <div class="intro-hero">
+          <h2>LinkedIn artık sadece bir CV deposu değil.</h2>
+          <p>Dünyanın en büyük profesyonel ağı, aynı zamanda bir <strong>düşünce liderliği platformu</strong>, bir <strong>iş geliştirme kanalı</strong> ve bir <strong>kariyer ivmelendiricisi</strong>dir. Bir işveren, bir müşteri ya da bir iş ortağı seni bulmak istediğinde ilk baktığı yer LinkedIn profilidir.</p>
+          <p>Aktif bir LinkedIn varlığı, seni aynı pozisyona başvuran on kişiden sıyrılmanı sağlar. Pasif kalmak ise seni görünmez kılar — ne kadar yetenekli olursan ol.</p>
+          <div class="stat-row">
+            <div class="stat-box">
+              <div class="num">87%</div>
+              <div class="lbl">İşe alım uzmanı LinkedIn kullanıyor</div>
+            </div>
+            <div class="stat-box">
+              <div class="num">5x</div>
+              <div class="lbl">İçerik paylaşanların görünürlük artışı</div>
+            </div>
+            <div class="stat-box">
+              <div class="num">40%</div>
+              <div class="lbl">Ağınız dışındaki kişilere ulaşma şansı</div>
+            </div>
+            <div class="stat-box">
+              <div class="num">3dk</div>
+              <div class="lbl">İlk izlenim oluşma süresi</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="alert alert-gold">
+          <div class="alert-icon">💡</div>
+          <div>
+            <strong>Temel İlke</strong>
+            <p>Kişisel marka, kendini tanıtmak değil; <em>insanların seni nasıl hatırladığıdır</em>. LinkedIn, bu algıyı bilinçli olarak şekillendirebileceğin en güçlü araçtır.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── BÖLÜM 1: PROFİL ───────────────────────── -->
+      <section class="section" id="profil">
+
+        <div class="section-header">
+          <div class="section-icon icon-gold">👤</div>
+          <div class="section-title">
+            <h2>Bölüm 1: Profil Optimizasyonu</h2>
+            <p>Kaya gibi sağlam bir temel inşa et</p>
+          </div>
+        </div>
+        <hr class="divider">
+
+        <!-- Fotoğraf & Banner -->
+        <div class="card">
+          <h3>📸 Profil Fotoğrafı & Arka Plan (Banner) <span class="tag tag-blue">Kritik</span></h3>
+          <div class="grid-2">
+            <div>
+              <p style="font-weight:600; color:var(--blue-deep); margin-bottom:8px;">✅ Profil Fotoğrafı</p>
+              <ul>
+                <li>Omuzlardan yukarısı görünsün, yüzünüz frame'in %60'ını kaplasın</li>
+                <li>Nötr ya da açık renkli sade bir arka plan tercih edin</li>
+                <li>Profesyonel ama erişilebilir bir gülümseme — aşırı resmi olmayın</li>
+                <li>Minimum 400×400 px, tercihen 800×800 px kalite</li>
+                <li>Güncel bir fotoğraf kullanın (5 yıldan eski olmasın)</li>
+              </ul>
+            </div>
+            <div>
+              <p style="font-weight:600; color:var(--blue-deep); margin-bottom:8px;">🎨 Banner / Arka Plan</p>
+              <ul>
+                <li>1584×396 px boyutunda özel tasarım yapın (Canva ücretsiz)</li>
+                <li>Mesleki uzmanlık alanınızı görsel olarak yansıtın</li>
+                <li>Bir slogan, unvan ya da CTA (call-to-action) ekleyin</li>
+                <li>Renk paletinizi profil fotoğrafınızla uyumlu tutun</li>
+                <li>Boş banner bırakmak profil skorunuzu düşürür</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Headline Formülü -->
+        <div class="card">
+          <h3>✍️ Başlık (Headline) Formülü <span class="tag tag-gold">Formül</span></h3>
+          <p style="margin-bottom:16px;">Çoğu kişi headline'a sadece "Yazılım Mühendisi @ Şirket X" yazar. Bu sizi Google'da sıralayabilir ama sizi <em>seçilmez</em> kılar. Etkili bir headline şu soruyu yanıtlar: <strong>"Seni takip etmek neden değer?"</strong></p>
+
+          <div class="formula">
+            <h4>🎯 Güçlü Headline Formülü</h4>
+            <div class="formula-parts">
+              <div class="formula-part">Ne yapıyorsun?</div>
+              <div class="formula-plus">+</div>
+              <div class="formula-part">Kime yardım ediyorsun?</div>
+              <div class="formula-plus">+</div>
+              <div class="formula-part">Nasıl bir sonuç yaratıyorsun?</div>
+            </div>
+          </div>
+
+          <div class="alert alert-green" style="margin-top:16px;">
+            <div class="alert-icon">✅</div>
+            <div>
+              <strong>Örnekler</strong>
+              <p>❌ Kötü: "Senior Product Manager @ Tech Corp"<br>
+              ✅ İyi: "Ürün Yöneticisi | B2B SaaS şirketlerinin büyüme süreçlerini hızlandırıyorum | Roadmap & Data-Driven Strateji"<br><br>
+              ❌ Kötü: "İnsan Kaynakları Uzmanı"<br>
+              ✅ İyi: "İşe Alım Lideri | Şirketlerin doğru yetenekleri bulmalarına yardımcı oluyorum | Tech & Startup odaklı"</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hakkında -->
+        <div class="card">
+          <h3>📖 Hakkında (About) Hikayesi <span class="tag tag-blue">4 Adım</span></h3>
+          <p style="margin-bottom:20px;">About bölümü, ziyaretçinin "Beni terk edip etmeyeceğine" karar verdiği yerdir. CV'nizi kopyalayıp yapıştırmayın — bir hikaye anlatın.</p>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>🪝 Kanca Cümlesi (ilk 2 satır)</h4>
+                <p>LinkedIn varsayılan olarak ilk ~200 karakteri gösterir. "Daha fazla gör" dedirtecek merak uyandırıcı bir açılış yazın. Örn: <em>"10 yıldır şirketlerin büyümesini veri ile yönetiyorum — ama en büyük dersi bir hata sayesinde öğrendim."</em></p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>🏆 Değer Önerisi</h4>
+                <p>Kim olduğunuzu değil, ne sağladığınızı anlatın. "X sektöründe Y yıl deneyimim var" değil, <em>"X problemini Y şekilde çözmekte uzmanım"</em> dili kullanın.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>📊 Kanıt & Sonuçlar</h4>
+                <p>Somut başarıları rakamla yazın. <em>"%30 maliyet azaltması", "5M+ kullanıcıya ulaşan ürün", "12 kişilik ekibi yönettim"</em> gibi ölçülebilir sonuçlar güvenilirlik yaratır.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <h4>📬 Call-to-Action</h4>
+                <p>About bölümünü bir CTA ile kapatın. <em>"Proje bazlı iş birlikleri için DM atabilirsiniz"</em> ya da <em>"[email] üzerinden ulaşabilirsiniz"</em> gibi net bir yönlendirme ekleyin.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Deneyim & Yetenekler -->
+        <div class="card">
+          <h3>💼 Deneyimler & Yetenekler <span class="tag tag-green">Etki Dili</span></h3>
+          <div class="alert alert-blue" style="margin-bottom:16px;">
+            <div class="alert-icon">⚡</div>
+            <div>
+              <strong>Altın Kural: Görev değil, etki yaz.</strong>
+              <p>Her deneyim maddesini şu formülle yazın: <strong>Eylem fiili + ne yaptın + sonuç/etki</strong></p>
+            </div>
+          </div>
+          <div class="grid-2">
+            <div>
+              <p style="color:#EF4444; font-weight:600; margin-bottom:8px;">❌ Zayıf Dil</p>
+              <ul>
+                <li>Takım toplantılarına katıldım</li>
+                <li>Müşteri hizmetlerinden sorumluydum</li>
+                <li>Raporlar hazırladım</li>
+                <li>Proje yöneticisiydim</li>
+              </ul>
+            </div>
+            <div>
+              <p style="color:#16A34A; font-weight:600; margin-bottom:8px;">✅ Güçlü Dil</p>
+              <ul>
+                <li>Haftalık sprint toplantılarını yöneterek teslimat süresini %20 kısalttım</li>
+                <li>NPS skorunu 42'den 68'e çıkardım (6 ay)</li>
+                <li>C-suite için aylık KPI dashboardları geliştirdim</li>
+                <li>8 kişilik ekiple 3M TL bütçeli projeyi teslim ettim</li>
+              </ul>
+            </div>
+          </div>
+          <div class="tip-strip" style="margin-top:16px;">
+            <span>💡</span>
+            <p><strong>Yetenekler bölümü:</strong> En kritik 5 yeteneğinizi en üste koyun. Bağlantılarınızdan onay (endorsement) isteyin — 10+ onay alan yetenekler arama sonuçlarında önce çıkar.</p>
+          </div>
+        </div>
+
+      </section>
+
+      <!-- ─── BÖLÜM 2: İÇERİK ────────────────────────── -->
+      <section class="section" id="icerik">
+
+        <div class="section-header">
+          <div class="section-icon icon-teal">📣</div>
+          <div class="section-title">
+            <h2>Bölüm 2: İçerik Stratejisi</h2>
+            <p>Görünürlük kazanmak ve akılda kalmak</p>
+          </div>
+        </div>
+        <hr class="divider">
+
+        <!-- İçerik Türleri -->
+        <div class="card">
+          <h3>📚 Ne Tür İçerikler Paylaşılmalı?</h3>
+          <p style="margin-bottom:16px;">İçerikleriniz üç kategoride dengeli dağılmalıdır. Sadece başarılarınızı paylaşmak sizi "brag account" gibi gösterir; sadece bilgi paylaşmak ise kişiliksiz kılar.</p>
+
+          <div class="grid-2">
+            <div class="tip-strip" style="flex-direction:column; align-items:flex-start;">
+              <strong>🧠 Uzmanlık & Sektör Analizi</strong>
+              <p style="font-size:.85rem; margin-top:4px;">Sektörünüzdeki bir trendi analiz edin, bir tool'u karşılaştırın ya da "3 yıldır takip ettiğim değişim" formatında yazın. Bu içerikler <em>düşünce liderliği</em> oluşturur.</p>
+            </div>
+            <div class="tip-strip" style="flex-direction:column; align-items:flex-start;">
+              <strong>🏆 Başarı & Öğrenme Hikayeleri</strong>
+              <p style="font-size:.85rem; margin-top:4px;">Bir projedeki zorluğu ve çözümü anlatın. <em>Başarısızlık hikayeleri</em> yüksek etkileşim alır — çünkü özgündür ve insanlar kendini tanır.</p>
+            </div>
+            <div class="tip-strip" style="flex-direction:column; align-items:flex-start;">
+              <strong>🔨 Pratik İpuçları & Araçlar</strong>
+              <p style="font-size:.85rem; margin-top:4px;">"Bu araçla 2 saatlik işi 15 dakikaya indirdim" ya da "X konusunda bilmediğiniz 5 şey" formatı çok paylaşılır. Takipçiye doğrudan değer katar.</p>
+            </div>
+            <div class="tip-strip" style="flex-direction:column; align-items:flex-start;">
+              <strong>👥 Kişisel Perspektifler</strong>
+              <p style="font-size:.85rem; margin-top:4px;">Bir kitap notunuzu, konferans izlenimlerinizi ya da sektördeki tartışmalı bir konudaki görüşünüzü paylaşın. İnsan olan içerikler daha fazla yorum alır.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Post Anatomisi -->
+        <div class="post-anatomy">
+          <h3>🔬 Viral Post Anatomisi</h3>
+          <div class="post-part">
+            <div class="post-bar bar-red"></div>
+            <div class="post-part-content">
+              <h4>🪝 Kanca / Hook (İlk 1–2 Satır)</h4>
+              <p>LinkedIn postta varsayılan olarak ilk ~130 karakter görünür. "Daha fazla gör" dedirtecek merak ya da fayda vaat eden bir cümle yazın.</p>
+              <code>❌ "Bugün iş yerinde ilginç bir şey yaşadım."<br>✅ "3 yıl önce işimi kaybettim. Bugün o anın neden kariyerimin en iyi şeyi olduğunu anlıyorum."</code>
+            </div>
+          </div>
+          <div class="post-part">
+            <div class="post-bar bar-blue"></div>
+            <div class="post-part-content">
+              <h4>📖 Gelişme (Gövde)</h4>
+              <p>Kısa paragraflar kullanın (2–3 satır). Boşluklu yazı LinkedIn'de çok daha iyi okunur. Listelemek istiyorsanız ✅ ya da → gibi semboller kullanın, ancak aşırıya kaçmayın.</p>
+            </div>
+          </div>
+          <div class="post-part">
+            <div class="post-bar bar-green"></div>
+            <div class="post-part-content">
+              <h4>📢 Call-to-Action (Son)</h4>
+              <p>Yorumları davet edin — ama klişe soru sormayın. Algoritmik açıdan en iyi CTA, insanların kendi deneyimlerini paylaşmasına zemin hazırlar.</p>
+              <code>❌ "Siz ne düşünüyorsunuz? Yorum yazın!"<br>✅ "Sizin en büyük dönüm noktanız hangi andı?"</code>
+            </div>
+          </div>
+        </div>
+
+        <!-- Algoritma İpuçları -->
+        <div class="card">
+          <h3>⚙️ Algoritma İpuçları & Paylaşım Stratejisi <span class="tag tag-blue">Teknik</span></h3>
+          <ul class="checklist" style="list-style:none; padding:0;">
+            <li>
+              <div class="check-icon">📅</div>
+              <div><strong>Sıklık:</strong> Haftada 2–3 gönderi ideal. Günde 1'den fazla gönderi organik erişimi böler.</div>
+            </li>
+            <li>
+              <div class="check-icon">⏰</div>
+              <div><strong>Zamanlama:</strong> Salı–Perşembe 08:00–10:00 arası en yüksek etkileşim saatleri. Cuma öğleden sonra ve hafta sonu görünürlük düşer.</div>
+            </li>
+            <li>
+              <div class="check-icon">💬</div>
+              <div><strong>İlk Yorum Kuralı:</strong> Gönderiyi yayınladıktan hemen sonra kendi gönderinize ek bilgi veya soru içeren bir <em>ilk yorum</em> atın. Bu, algoritmayı aktive eder ve etkileşim artırır.</div>
+            </li>
+            <li>
+              <div class="check-icon">🏷️</div>
+              <div><strong>Hashtag Kullanımı:</strong> 3–5 hashtag optimal. 20+ hashtag spam sinyali verir. Nişinize özel küçük-orta boyutlu hashtagler büyük generik taglere göre daha iyi performans gösterir.</div>
+            </li>
+            <li>
+              <div class="check-icon">🔗</div>
+              <div><strong>Dış Link:</strong> LinkedIn dış linklere organik erişimi kısıtlar. Linki yoruma koyun veya "link profilimde" yazın — metni poste değil, yoruma ekleyin.</div>
+            </li>
+            <li>
+              <div class="check-icon">🖼️</div>
+              <div><strong>Görsel Güç:</strong> Kişisel fotoğraflar stok fotoğraflara göre ortalama 3x daha fazla etkileşim alır. Slayt (carousel) formatı en yüksek kaydetme oranına sahip formattır.</div>
+            </li>
+          </ul>
+        </div>
+
+      </section>
+
+      <!-- ─── BÖLÜM 3: NETWORKİNG ───────────────────── -->
+      <section class="section" id="network">
+
+        <div class="section-header">
+          <div class="section-icon icon-blue">🤝</div>
+          <div class="section-title">
+            <h2>Bölüm 3: Ağ Büyütme & Etkileşim</h2>
+            <p>Networking — doğru insanlarla, doğru şekilde</p>
+          </div>
+        </div>
+        <hr class="divider">
+
+        <!-- Bağlantı Kurma -->
+        <div class="card">
+          <h3>🎯 Doğru İnsanlarla Nasıl Bağlantı Kurulur?</h3>
+          <p style="margin-bottom:16px;">LinkedIn'de "herkesle bağlantı kurmak" değersiz bir ağ yaratır. Odaklanmanız gereken kişi profilleri şunlardır:</p>
+          <div class="grid-2">
+            <div>
+              <ul>
+                <li>Hedef sektörünüzdeki decision-maker'lar</li>
+                <li>Sizi ilgilendiren şirketlerdeki çalışanlar</li>
+                <li>İçeriklerini düzenli takip ettiğiniz düşünce liderleri</li>
+              </ul>
+            </div>
+            <div>
+              <ul>
+                <li>Aynı topluluk veya etkinliklerde bulunduğunuz kişiler</li>
+                <li>Ortak bağlantılarınız olan 2. derece bağlantılar</li>
+                <li>Mezun olduğunuz üniversitenin alumni'leri</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="alert alert-gold" style="margin-top:20px; margin-bottom:0;">
+            <div class="alert-icon">⚡</div>
+            <div>
+              <strong>Kural: Asla boş istek atmayın.</strong>
+              <p>Kişiselleştirilmemiş bağlantı istekleri genellikle yok sayılır veya reddedilir. LinkedIn'de biriyle bağlantı kurmak, gerçek hayatta el sıkışmak gibidir — kendinizi tanıtın.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bağlantı Notu Şablonu -->
+        <div class="card">
+          <h3>📝 Kişiselleştirilmiş Bağlantı Notu Şablonları <span class="tag tag-gold">Şablon</span></h3>
+          <p style="margin-bottom:18px;">Duruma göre uyarlayabileceğiniz 3 farklı senaryo:</p>
+
+          <p style="font-weight:600; color:var(--blue-deep); margin-bottom:10px;">1️⃣ İçerik üzerinden bağlantı</p>
+          <div class="template">
+            <div class="template-label">Kopyala & Uyarla</div>
+            <p>Merhaba <em>[İsim]</em>,<br><br>
+            "<em>[Post başlığı veya konusu]</em>" yazınızı çok değerli buldum — özellikle <em>[spesifik bir detay]</em> noktasındaki perspektifiniz benim de üzerinde düşündüğüm bir konuydu.<br><br>
+            <em>[Sizin alandaki kısa bağlantı]</em> alanında çalışıyorum. Görüşlerinizi takip etmek ve ağıma dahil etmek istedim. Bağlantı kurmak ister misiniz?</p>
+          </div>
+
+          <p style="font-weight:600; color:var(--blue-deep); margin-bottom:10px; margin-top:20px;">2️⃣ Ortak bağlantı veya etkinlik üzerinden</p>
+          <div class="template">
+            <div class="template-label">Kopyala & Uyarla</div>
+            <p>Merhaba <em>[İsim]</em>,<br><br>
+            Geçen hafta <em>[etkinlik adı / topluluk adı]</em>'nda sizi gördüm / sizinle ortak bağlantım olan <em>[kişi adı]</em> üzerinden profilinize ulaştım.<br><br>
+            <em>[Ortak alan veya ilgi]</em> konusunda çalışıyorsunuz gibi görünüyor — bu benim de odaklandığım bir alan. Bağlantı kurmak istedim!</p>
+          </div>
+
+          <p style="font-weight:600; color:var(--blue-deep); margin-bottom:10px; margin-top:20px;">3️⃣ İş veya iş birliği talebi için</p>
+          <div class="template">
+            <div class="template-label">Kopyala & Uyarla</div>
+            <p>Merhaba <em>[İsim]</em>,<br><br>
+            <em>[Şirket adı]</em>'nın <em>[alan/ürün]</em> konusundaki çalışmalarını takip ediyorum. <em>[Kendi uzmanlığınız]</em> alanında çalışıyorum ve <em>[değer önerisi: nasıl katkı sağlayabileceğiniz]</em> konusunda fikir alışverişi yapmak istiyorum.<br><br>
+            15 dakikalık bir görüşme için uygun bir vaktiniz olur mu?</p>
+          </div>
+        </div>
+
+        <!-- Liderlerle Etkileşim -->
+        <div class="card">
+          <h3>🌟 Sektör Liderleriyle Etkileşim Stratejileri</h3>
+          <div class="alert alert-blue" style="margin-bottom:16px;">
+            <div class="alert-icon">🎯</div>
+            <div>
+              <strong>Temel Strateji: Önce ver, sonra iste.</strong>
+              <p>Bir düşünce liderine direkt "bana iş ver" veya "bağlantı kur" yazmak çalışmaz. Önce gerçek değer yaratan etkileşimler kurarak radarına girin.</p>
+            </div>
+          </div>
+          <div class="steps">
+            <div class="step">
+              <div class="step-num">1</div>
+              <div class="step-content">
+                <h4>Düzenli & Değerli Yorum Yapın</h4>
+                <p>"Harika paylaşım!" yorumları sizi öne çıkarmaz. İçeriğe gerçek değer katan, kendi perspektifinizi ekleyen ya da bir soru soran yorumlar yazın. Yorum yazan isimleri profil sahibi genellikle fark eder.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">2</div>
+              <div class="step-content">
+                <h4>İçeriklerini Paylaşın + Görüşünüzü Ekleyin</h4>
+                <p>Sadece "repost" değil — içeriği paylaşırken kendi görüşünüzü de yazın. Bu hem orijinal kişiye görünürlük sağlar hem de sizi kendi ağınızda "curator" olarak konumlandırır.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">3</div>
+              <div class="step-content">
+                <h4>Onları Kendi İçeriğinizde Etiketleyin</h4>
+                <p>Onlardan öğrendiğiniz bir şeyi kendi içeriğinizde paylaşırken @etiketle takdirle anın. Samimi ve özgün olsun — sadece dikkat çekmek için etiketleme yapmayın.</p>
+              </div>
+            </div>
+            <div class="step">
+              <div class="step-num">4</div>
+              <div class="step-content">
+                <h4>DM'yi Doğru Zamanda Atın</h4>
+                <p>3–4 haftalık etkileşimin ardından DM atmak çok daha etkilidir. "Bağlantı isteği + anında satış mesajı" kombinasyonu kaçınılacak en yaygın hatadır.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Son Özet -->
+        <div class="formula">
+          <h4>🚀 LinkedIn Başarı Denklemi</h4>
+          <div class="formula-parts">
+            <div class="formula-part">Optimize Profil</div>
+            <div class="formula-plus">+</div>
+            <div class="formula-part">Tutarlı İçerik</div>
+            <div class="formula-plus">+</div>
+            <div class="formula-part">Bilinçli Network</div>
+            <div class="formula-plus">=</div>
+            <div class="formula-part" style="background:var(--gold); color:#000; font-weight:700;">Kişisel Marka & Fırsat</div>
+          </div>
+          <p style="margin-top:16px; font-size:.88rem; color:rgba(255,255,255,.7);">Bu üç ayağı birlikte tutarlı biçimde uygulayan kişiler, LinkedIn'de 6 ay içinde somut kariyer ve iş fırsatları görmeye başlar.</p>
+        </div>
+
+      </section>
+
+    </div><!-- /container -->
+  </main>
+
+  <!-- ════════════════════════════════════════════════
+       FOOTER
+  ════════════════════════════════════════════════ -->
+  <footer>
+    <p>Bu rehber <strong>LinkedIn Stratejisi 2025</strong> en iyi pratikleri esas alınarak hazırlanmıştır.</p>
+    <p style="margin-top:8px; font-size:.8rem; opacity:.6;">İçerikler düzenli güncelleme gerektirebilir. Platform algoritmaları değişkendir.</p>
+  </footer>
+
+</body>
+</html>

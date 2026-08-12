@@ -1,0 +1,1879 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>TypeScript & İleri Seviye Tip Sistemleri Başvuru Rehberi</title>
+  
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+  
+  <style>
+    /* ==========================================================================
+       1. TS BLUE PALETTE & TYPOGRAPHY
+       ========================================================================== */
+    :root {
+      /* Dark Theme (Default) - Developer Reference */
+      --bg: #0B0F19;
+      --bg2: #111625;
+      --bg3: #181E33;
+      --bg4: #20263F;
+      --border: #2B3554;
+      --border2: #3E4B75;
+      
+      /* Accents */
+      --accent: #3178C6;    /* TypeScript Blue */
+      --accent2: #235A97;   /* Darker TS Blue */
+      --cyan: #00E5FF;      /* Technical Highlight */
+      
+      /* Typography Colors */
+      --text: #E2E8F0;
+      --text-muted: #94A3B8;
+      
+      /* Font Families */
+      --font-heading: 'Plus Jakarta Sans', sans-serif;
+      --font-text: 'Inter', sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+    
+    body.light-mode {
+      /* Light Theme Variables */
+      --bg: #F8FAFC;
+      --bg2: #FFFFFF;
+      --bg3: #F1F5F9;
+      --bg4: #E2E8F0;
+      --border: #E2E8F0;
+      --border2: #CBD5E1;
+      
+      --text: #0F172A;
+      --text-muted: #475569;
+    }
+
+    /* Reset & Base Styles */
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    
+    ::selection { background: rgba(0, 229, 255, 0.3); color: #fff; }
+    ::-moz-selection { background: rgba(0, 229, 255, 0.3); color: #fff; }
+    
+    html {
+      scroll-behavior: smooth;
+    }
+    
+    body {
+      background-color: var(--bg);
+      color: var(--text);
+      font-family: var(--font-text);
+      line-height: 1.6;
+      display: flex;
+      transition: background-color 0.3s ease, color 0.3s ease;
+      overflow-x: hidden;
+    }
+
+    /* ==========================================================================
+       2. DYNAMIC SIDEBAR (TOC)
+       ========================================================================== */
+    .sidebar {
+      width: 320px;
+      height: 100vh;
+      position: sticky;
+      top: 0;
+      background-color: var(--bg2);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      padding: 1.5rem;
+      overflow-y: auto;
+      z-index: 100;
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+    .sidebar-header {
+      margin-bottom: 2rem;
+    }
+
+    .sidebar-title {
+      font-family: var(--font-heading);
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: var(--accent);
+      line-height: 1.3;
+      letter-spacing: -0.02em;
+    }
+
+    .controls {
+      display: flex;
+      gap: 0.5rem;
+      margin-top: 1.25rem;
+    }
+
+    .search-box {
+      flex: 1;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      padding: 0.6rem 0.85rem;
+      border-radius: 6px;
+      font-family: var(--font-text);
+      font-size: 0.875rem;
+      transition: all 0.2s ease;
+    }
+    
+    .search-box:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 0 3px rgba(49, 120, 198, 0.2);
+    }
+    
+    .search-box::placeholder {
+      color: var(--text-muted);
+    }
+
+    .theme-toggle {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      width: 40px;
+      height: 40px;
+      border-radius: 6px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      transition: all 0.2s ease;
+    }
+    
+    .theme-toggle:hover {
+      background: var(--bg4);
+      transform: translateY(-1px);
+    }
+
+    .toc {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      padding: 0.6rem 0.75rem;
+      border-radius: 6px;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: relative;
+    }
+    
+    .toc-item:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    .toc-item.active {
+      background: var(--bg3);
+      color: var(--accent);
+      font-weight: 500;
+      /* .toc-entering effect */
+      transform: translateX(6px);
+      border-left: 3px solid var(--accent);
+    }
+
+    .toc-num {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      margin-right: 0.75rem;
+      font-weight: 800;
+      color: transparent;
+      background: linear-gradient(135deg, var(--cyan) 0%, var(--accent) 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+    }
+
+    .toc-text {
+      flex: 1;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toc-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: transparent;
+      margin-left: 0.5rem;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .toc-item.active .toc-dot {
+      background-color: var(--cyan);
+      animation: dotPulse 1.5s infinite;
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); }
+      70% { transform: scale(1.1); box-shadow: 0 0 0 6px rgba(0, 229, 255, 0); }
+      100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+    }
+
+    /* ==========================================================================
+       3. MAIN CONTENT AREA
+       ========================================================================== */
+    .main-wrapper {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .main-content {
+      padding: 3rem 4rem 8rem 4rem;
+      max-width: 900px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .meta-info {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-bottom: 3rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-family: var(--font-mono);
+      padding-bottom: 1rem;
+      border-bottom: 1px dashed var(--border);
+    }
+    
+    .meta-info svg {
+      width: 16px;
+      height: 16px;
+      stroke: currentColor;
+      stroke-width: 2;
+      fill: none;
+    }
+
+    .section {
+      margin-bottom: 6rem;
+      scroll-margin-top: 3rem;
+    }
+
+    .section h2 {
+      font-family: var(--font-heading);
+      font-size: 1.75rem;
+      color: var(--text);
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      letter-spacing: -0.01em;
+    }
+
+    .section h2 .sec-num {
+      color: var(--accent);
+      font-family: var(--font-mono);
+      font-size: 1.25rem;
+      font-weight: 500;
+      opacity: 0.8;
+    }
+
+    .content-box {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 2rem;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+      transition: box-shadow 0.4s ease, border-color 0.4s ease, transform 0.4s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .content-box::before {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(
+        600px circle at var(--mouse-x, 50%) var(--mouse-y, 50%),
+        rgba(0, 229, 255, 0.04),
+        transparent 40%
+      );
+      opacity: 0;
+      transition: opacity 0.5s ease;
+      pointer-events: none;
+      z-index: 0;
+    }
+    
+    .content-box:hover::before {
+      opacity: 1;
+    }
+    
+    .content-box > * {
+      position: relative;
+      z-index: 1;
+    }
+    
+    .content-box:hover {
+      box-shadow: 0 0 30px rgba(49, 120, 198, 0.25), 0 0 15px rgba(0, 229, 255, 0.15), inset 0 0 10px rgba(49, 120, 198, 0.05);
+      border-color: var(--accent);
+      transform: translateY(-3px);
+    }
+    
+    .content-box p {
+      margin-bottom: 1rem;
+      color: var(--text);
+    }
+
+    /* Sub Sections */
+    .sub {
+      margin-top: 2.5rem;
+      margin-bottom: 1.5rem;
+    }
+    
+    .sub h3 {
+      font-family: var(--font-heading);
+      font-size: 1.3rem;
+      color: var(--accent);
+      margin-bottom: 1rem;
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 0.5rem;
+    }
+
+    /* Cards */
+    .card {
+      background: var(--bg3);
+      border-left: 3px solid var(--accent2);
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+      border-radius: 0 8px 8px 0;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .card:hover {
+      background: var(--bg4);
+      border-left-color: var(--cyan);
+      transform: translateX(6px);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    }
+    
+    .card h4 {
+      font-family: var(--font-heading);
+      font-size: 1.1rem;
+      color: var(--text);
+      margin-bottom: 0.5rem;
+    }
+    
+    .card ul {
+      list-style-position: inside;
+      margin-left: 0.5rem;
+      color: var(--text-muted);
+    }
+    
+    .card ul li {
+      margin-bottom: 0.25rem;
+    }
+
+    /* Info Boxes */
+    .info-box {
+      padding: 1rem 1.25rem;
+      border-radius: 8px;
+      margin-top: 1.5rem;
+      margin-bottom: 1.5rem;
+      font-size: 0.9rem;
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+      line-height: 1.5;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+    }
+    
+    .info-box:hover {
+      transform: scale(1.015);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+    }
+    
+    .info-box.good {
+      background: rgba(16, 185, 129, 0.1);
+      border: 1px solid rgba(16, 185, 129, 0.2);
+      color: #34d399; /* Light green text emphasis */
+    }
+    .info-box.good::before {
+      content: '✅';
+      font-size: 1.2rem;
+    }
+    .info-box.good strong {
+      color: #10b981;
+    }
+    
+    .info-box.bad {
+      background: rgba(239, 68, 68, 0.1);
+      border: 1px solid rgba(239, 68, 68, 0.2);
+      color: #f87171;
+    }
+    .info-box.bad::before {
+      content: '❌';
+      font-size: 1.2rem;
+    }
+    .info-box.bad strong {
+      color: #ef4444;
+    }
+    
+    .info-box.warn {
+      background: rgba(245, 158, 11, 0.1);
+      border: 1px solid rgba(245, 158, 11, 0.2);
+      color: #fbbf24;
+    }
+    .info-box.warn::before {
+      content: '⚠️';
+      font-size: 1.2rem;
+    }
+    .info-box.warn strong {
+      color: #f59e0b;
+    }
+    
+    .info-box div {
+      flex: 1;
+      color: var(--text);
+    }
+
+    /* ==========================================================================
+       4. CODE BLOCKS & COMPONENTS
+       ========================================================================== */
+    .code-container {
+      position: relative;
+      background: #121622; /* Darker, cooler slate for better contrast */
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      margin: 1.5rem 0;
+      overflow: hidden;
+      transition: all 0.3s ease;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    }
+    
+    .code-container:hover {
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      border-color: var(--border2);
+    }
+    
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.6rem 1rem;
+      background: #181E31;
+      border-bottom: 1px solid var(--border);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+    
+    .copy-btn {
+      background: rgba(49, 120, 198, 0.1);
+      border: 1px solid rgba(49, 120, 198, 0.3);
+      color: var(--cyan);
+      padding: 0.25rem 0.75rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 0.75rem;
+      font-family: var(--font-text);
+      font-weight: 600;
+      transition: all 0.2s ease;
+    }
+    
+    .copy-btn:hover {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 10px rgba(49, 120, 198, 0.4);
+    }
+    
+    pre {
+      padding: 1.25rem;
+      overflow-x: auto;
+      margin: 0 !important;
+    }
+    
+    code {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      line-height: 1.6;
+    }
+    
+    /* Prism Theme Overrides for Sharper Colors */
+    pre[class*="language-"] {
+      background: transparent !important;
+      text-shadow: none !important;
+    }
+    code[class*="language-"], pre[class*="language-"] {
+      color: #E2E8F0 !important;
+      text-shadow: none !important;
+    }
+    .token.keyword { color: #C678DD !important; font-weight: 600; } /* Purple */
+    .token.string { color: #98C379 !important; } /* Green */
+    .token.function { color: #61AFEF !important; font-weight: 600; } /* Blue */
+    .token.class-name { color: #E5C07B !important; font-weight: 600; } /* Yellow */
+    .token.builtin, .token.type { color: #56B6C2 !important; font-weight: 600; } /* Cyan */
+    .token.comment { color: #7F848E !important; font-style: italic; }
+    .token.operator, .token.punctuation { color: #ABB2BF !important; }
+    .token.number, .token.boolean { color: #D19A66 !important; } /* Orange */
+    .token.property { color: #E06C75 !important; } /* Red/Pink */
+
+    /* Tooltip Highlight */
+    .term-highlight {
+      color: var(--cyan);
+      border-bottom: 1px dashed var(--cyan);
+      cursor: help;
+      position: relative;
+      font-weight: 500;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .term-highlight:hover {
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+
+    /* ==========================================================================
+       5. STICKY PROGRESS BAR (Bottom)
+       ========================================================================== */
+    .bottom-progress {
+      position: fixed;
+      bottom: 0;
+      left: 320px; /* Aligned with sidebar width */
+      right: 0;
+      height: 54px;
+      background: rgba(17, 22, 37, 0.85); /* Matches bg2 approximately */
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 3rem;
+      z-index: 90;
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      transition: all 0.3s ease;
+    }
+    
+    body.light-mode .bottom-progress {
+      background: rgba(255, 255, 255, 0.85);
+    }
+
+    .bp-info {
+      display: flex;
+      align-items: center;
+      gap: 1.25rem;
+      flex: 1;
+    }
+    
+    .bp-num {
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    
+    .bp-title {
+      color: var(--text);
+      font-family: var(--font-text);
+      font-weight: 500;
+      font-size: 0.9rem;
+    }
+    
+    .bp-percent {
+      font-weight: 600;
+      color: var(--cyan);
+      width: 50px;
+      text-align: right;
+    }
+
+    .bp-track {
+      position: absolute;
+      top: -2px;
+      left: 0;
+      height: 2px;
+      width: 100%;
+      background: transparent;
+    }
+    
+    .bp-fill {
+      height: 100%;
+      background: var(--accent);
+      width: 0%;
+      box-shadow: 0 0 12px var(--accent);
+      transition: width 0.1s ease-out;
+      position: relative;
+    }
+    
+    /* Moving Glow Effect */
+    .bp-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      width: 50px;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.9), transparent);
+      animation: bpMoving 2s linear infinite;
+    }
+    
+    @keyframes bpMoving {
+      0% { transform: translateX(-100%); opacity: 0; }
+      50% { opacity: 1; }
+      100% { transform: translateX(100px); opacity: 0; }
+    }
+
+    /* ==========================================================================
+       6. SCROLL TOP BUTTON (Bottom Right)
+       ========================================================================== */
+    .scroll-top {
+      position: fixed;
+      bottom: 75px;
+      right: 2.5rem;
+      width: 48px;
+      height: 48px;
+      border-radius: 50%;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--accent);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(15px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      z-index: 95;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.15);
+    }
+    
+    .scroll-top.visible {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0);
+    }
+    
+    .scroll-top:hover {
+      background: var(--bg4);
+      transform: translateY(-3px);
+    }
+    
+    .scroll-top svg.icon {
+      width: 20px;
+      height: 20px;
+      fill: none;
+      stroke: currentColor;
+      stroke-width: 2.5;
+      stroke-linecap: round;
+      stroke-linejoin: round;
+      position: relative;
+      z-index: 2;
+    }
+    
+    .progress-ring {
+      position: absolute;
+      top: -1px;
+      left: -1px;
+      width: 48px;
+      height: 48px;
+      transform: rotate(-90deg);
+      pointer-events: none;
+    }
+    
+    .progress-ring circle {
+      fill: transparent;
+      stroke: var(--cyan);
+      stroke-width: 2;
+      stroke-linecap: round;
+      stroke-dasharray: 144.5; /* 2 * pi * r (r=23) */
+      stroke-dashoffset: 144.5;
+      transition: stroke-dashoffset 0.1s linear;
+    }
+
+    /* ==========================================================================
+       7. TOOLTIP THEME OVERRIDE (Tippy.js)
+       ========================================================================== */
+    .tippy-box[data-theme~='ts-theme'] {
+      background-color: var(--bg4);
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-family: var(--font-text);
+      font-size: 0.85rem;
+      padding: 0.35rem 0.5rem;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+      line-height: 1.5;
+    }
+    .tippy-box[data-theme~='ts-theme'] .tippy-arrow {
+      color: var(--border);
+    }
+    .tippy-box[data-theme~='ts-theme'] .tippy-arrow::before {
+      transform: scale(1.1);
+    }
+
+    /* Utilities */
+    .hidden { display: none !important; }
+    
+    /* Responsive Adjustments */
+    @media (max-width: 992px) {
+      .sidebar {
+        width: 280px;
+      }
+      .bottom-progress {
+        left: 280px;
+        padding: 0 1.5rem;
+      }
+      .main-content {
+        padding: 2.5rem 2rem 6rem 2rem;
+      }
+    }
+    
+    @media (max-width: 768px) {
+      .sidebar {
+        position: fixed;
+        transform: translateX(-100%);
+      }
+      .bottom-progress {
+        left: 0;
+      }
+      .main-content {
+        padding: 2rem 1.25rem 6rem 1.25rem;
+      }
+    }
+  </style>
+  
+  <!-- Tippy.js Dependencies -->
+  <script src="https://unpkg.com/@popperjs/core@2"></script>
+  <script src="https://unpkg.com/tippy.js@6"></script>
+
+  <!-- Prism.js for Syntax Highlighting -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-typescript.min.js"></script>
+
+  <!-- AOS Animation Library -->
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <!-- Interactive Fun Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.1/vanilla-tilt.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</head>
+<body>
+
+  <!-- ==========================================
+       SIDEBAR (TOC)
+       ========================================== -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <h1 class="sidebar-title">TypeScript<br>Reference</h1>
+      <div class="controls">
+        <input type="text" id="searchInput" class="search-box" placeholder="Arama yap..." autocomplete="off">
+        <button id="themeToggle" class="theme-toggle" aria-label="Temayı Değiştir">🌙</button>
+      </div>
+    </div>
+    <ul class="toc" id="toc">
+      <!-- Generated via JavaScript -->
+    </ul>
+  </aside>
+
+  <!-- ==========================================
+       MAIN CONTENT
+       ========================================== -->
+  <div class="main-wrapper">
+    <main class="main-content" id="mainContent">
+      
+      <!-- Meta info removed per user request -->
+
+      <!-- S01 -->
+      <section class="section" id="s01">
+        <h2><span class="sec-num">01</span> Introduction to Advanced Types</h2>
+        <div class="content-box">
+          <p>Gelişmiş TypeScript dünyasına giriş. <span class="term-highlight">Structural Typing</span> konsepti ve TypeScript'in tip esnekliği üzerine temeller.</p>
+          
+          <div class="code-container">
+            <div class="code-header">
+              <span>intro.ts</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code>// Örnek kod bloğu şablonu
+interface User {
+  id: number;
+  name: string;
+}
+
+const u: User = { id: 1, name: "Ali" };</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- S02 -->
+      <section class="section" id="s02">
+        <h2><span class="sec-num">02</span> Advanced Generics & Mapped Types</h2>
+        <div class="content-box">
+          <p><span class="term-highlight">Generics</span> ve <span class="term-highlight">Mapped Types</span> kullanarak esnek ve tekrar kullanılabilir yapılar oluşturma.</p>
+          <div class="code-container">
+            <div class="code-header">
+              <span>generics.ts</span>
+              <button class="copy-btn">Copy</button>
+            </div>
+            <pre><code>type ReadonlyCustom&lt;T&gt; = {
+  readonly [P in keyof T]: T[P];
+};</code></pre>
+          </div>
+        </div>
+      </section>
+
+      <!-- S03 -->
+      <section class="section" id="s03">
+        <h2><span class="sec-num">03</span> Conditional Types & Infer</h2>
+        <div class="content-box">
+          <p><span class="term-highlight">Conditional Types</span> ile tipler üzerinde mantıksal işlemler yapma ve tip çıkarımı (infer).</p>
+        </div>
+      </section>
+
+      <!-- S04 -->
+      <section class="section" id="s04">
+        <h2><span class="sec-num">04</span> Discriminated Unions & Exhaustiveness Checking</h2>
+        <div class="content-box">
+          <p>Kompleks durum yönetimleri için <span class="term-highlight">Discriminated Unions</span> kullanımı ve switch-case kontrolleri.</p>
+        </div>
+      </section>
+
+      <!-- S05 -->
+      <section class="section" id="s05">
+        <h2><span class="sec-num">05</span> Utility Types Deep Dive</h2>
+        <div class="content-box">
+          <p>TypeScript'in sunduğu yerleşik <span class="term-highlight">Utility Types</span> (Yardımcı Tipler), mevcut tipleri dönüştürmek ve manipüle etmek için güçlü araçlardır.</p>
+
+          <div class="sub">
+            <h3>Pick&lt;T, K&gt; ve Omit&lt;T, K&gt;</h3>
+            <p>Büyük nesne tiplerinden sadece ihtiyacımız olan alanları seçmek (Pick) veya belirli alanları dışlamak (Omit) için kullanılır.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>pick-omit.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>interface UserProfile {
+  id: string;
+  username: string;
+  email: string;
+  avatarUrl: string;
+  role: 'admin' | 'user';
+}
+
+// Sadece id ve username alanlarını seçiyoruz
+type UserPreview = Pick&lt;UserProfile, 'id' | 'username'&gt;;
+
+// Hassas bilgileri (email, role) dışlıyoruz
+type PublicUser = Omit&lt;UserProfile, 'email' | 'role'&gt;;
+
+const renderUser = (user: PublicUser) =&gt; {
+  console.log(user.username, user.avatarUrl);
+};</code></pre>
+            </div>
+            <div class="info-box good">
+              <div>
+                <strong>Good Practice:</strong> API yanıtlarından veya büyük modellerden DTO (Data Transfer Object) oluştururken <code style="color:var(--accent)">Omit</code> veya <code style="color:var(--accent)">Pick</code> kullanmak tipleri merkezi bir yerde tutmanızı sağlar.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Partial&lt;T&gt;, Required&lt;T&gt; ve Readonly&lt;T&gt;</h3>
+            <p>Bu tipler bir nesnenin <strong>mutability</strong> (değiştirilebilirlik) ve <strong>opsiyonellik</strong> durumlarını topluca manipüle etmeyi sağlar.</p>
+
+            <div class="card">
+              <h4>Kullanım Senaryoları</h4>
+              <ul>
+                <li><code style="color:var(--cyan)">Partial&lt;T&gt;</code>: Güncelleme (Update) işlemlerinde, tüm alanların opsiyonel olması gerektiğinde.</li>
+                <li><code style="color:var(--cyan)">Required&lt;T&gt;</code>: Opsiyonel alanların hepsinin doldurulmasını zorunlu tutmak istediğimiz form validasyonlarında.</li>
+                <li><code style="color:var(--cyan)">Readonly&lt;T&gt;</code>: Nesnenin referansının değiştirilmesini engelleyerek immutability (değişmezlik) sağlamak için.</li>
+              </ul>
+            </div>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>mutability.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>interface Todo {
+  title: string;
+  description?: string;
+}
+
+// Bütün alanlar opsiyonel (?) olur
+const updateTodo = (todo: Todo, fieldsToUpdate: Partial&lt;Todo&gt;) =&gt; {
+  return { ...todo, ...fieldsToUpdate };
+};
+
+// Error: description artık zorunlu!
+const requireAll: Required&lt;Todo&gt; = { title: "Test" }; // Type-Check Error
+
+// Error: Nesne değiştirilemez!
+const frozenTodo: Readonly&lt;Todo&gt; = { title: "Freeze" };
+frozenTodo.title = "Melt"; // Type-Check Error: Cannot assign to 'title' because it is a read-only property.</code></pre>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Record&lt;K, T&gt; ve Exclude/Extract Küme Operasyonları</h3>
+            <p><code style="color:var(--accent)">Record</code> genellikle dinamik sözlükler (dictionary) veya map yapıları kurmak için kullanılır. <code style="color:var(--accent)">Exclude</code> ve <code style="color:var(--accent)">Extract</code> ise Union tipler üzerinde küme teorisi işlemleri (fark ve kesişim) yapar.</p>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>record-set.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>type Role = 'admin' | 'editor' | 'viewer';
+
+// Record ile tüm rollere karşılık gelen yetki listesini mapliyoruz
+const rolePermissions: Record&lt;Role, string[]&gt; = {
+  admin: ['read', 'write', 'delete'],
+  editor: ['read', 'write'],
+  viewer: ['read']
+};
+
+// Küme İşlemleri
+type T0 = Exclude&lt;"a" | "b" | "c", "a"&gt;;  // "b" | "c" (Fark)
+type T1 = Extract&lt;"a" | "b" | "c", "a" | "f"&gt;;  // "a" (Kesişim)
+
+// Pratik Senaryo: Sadece fonksiyon olan property'leri seçme
+type FunctionProperties&lt;T&gt; = {
+  [K in keyof T]: T[K] extends Function ? K : never;
+}[keyof T];</code></pre>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- S06 -->
+      <section class="section" id="s06">
+        <h2><span class="sec-num">06</span> Template Literal Types</h2>
+        <div class="content-box">
+          <p><span class="term-highlight">Template Literal Types</span>, JavaScript'in template string syntax'ını (<code>`...`</code>) tip seviyesine taşır. Metinleri birleştirerek veya manipüle ederek dinamik tipler üretmemizi sağlar.</p>
+
+          <div class="sub">
+            <h3>Şablon Metin Tiplerinin Temelleri</h3>
+            <p>Union tiplerle birlikte kullanıldığında her olası kombinasyon (kartezyen çarpım) için bir tip üretilir.</p>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>template-literal.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>type World = "world";
+type Greeting = `hello ${World}`; // "hello world"
+
+type Color = "red" | "blue";
+type Size = "sm" | "lg";
+type ClassName = `btn-${Size}-${Color}`; 
+// "btn-sm-red" | "btn-sm-blue" | "btn-lg-red" | "btn-lg-blue"</code></pre>
+            </div>
+            
+            <div class="info-box warn">
+              <div>
+                <strong>Bad Practice:</strong> Çok fazla union tipi template literal ile birleştirmek tip sistemini tıkayabilir ve derleme (compilation) süresini uzatabilir.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>API Endpoint ve CSS Property Güvencesi</h3>
+            <p>Dinamik olarak beklenen string yapılarını kurallara bağlamak için idealdir.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>api-css.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>// CSS padding kuralları: p-4, pt-2, pb-8 vb.
+type Direction = "t" | "b" | "l" | "r";
+type Spacing = 1 | 2 | 4 | 8;
+type PaddingClass = `p${Direction}-${Spacing}` | `p-${Spacing}`;
+
+const pad1: PaddingClass = "pt-4"; // Başarılı
+const pad2: PaddingClass = "p-3";  // Type-Check Error: "p-3" is not assignable
+
+// API rotalarını güvenceye alma
+type Endpoint = "/users" | "/posts";
+type ApiRoute = `/api/v1${Endpoint}`;
+
+const fetchRoute = (route: ApiRoute) =&gt; { /* ... */ };
+fetchRoute("/api/v1/users"); // Ok
+fetchRoute("/api/v2/users"); // Type-Check Error</code></pre>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Mapped Types ve As Cümleleri ile Key Dönüştürme</h3>
+            <p><code style="color:var(--accent)">Capitalize</code>, <code style="color:var(--accent)">Uncapitalize</code>, <code style="color:var(--accent)">Uppercase</code>, <code style="color:var(--accent)">Lowercase</code> yerleşik (intrinsic) tipleriyle objelerin key'lerini dönüştürebiliriz.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>key-mapping.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>type Getters&lt;Type&gt; = {
+  [Property in keyof Type as `get${Capitalize&lt;string &amp; Property&gt;}`]: () =&gt; Type[Property]
+};
+
+interface Person {
+  name: string;
+  age: number;
+}
+
+type PersonGetters = Getters&lt;Person&gt;;
+/* 
+Sonuç:
+{
+  getName: () =&gt; string;
+  getAge: () =&gt; number;
+}
+*/</code></pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- S07 -->
+      <section class="section" id="s07">
+        <h2><span class="sec-num">07</span> Classes, Abstract Classes & Interfaces</h2>
+        <div class="content-box">
+          <p>TypeScript, ECMAScript sınıflarına (classes) erişim belirleyicileri, soyutlamalar ve tip kontrolleri ekleyerek nesne yönelimli (OOP) mimariyi güçlendirir.</p>
+
+          <div class="sub">
+            <h3>Erişim Belirleyiciler (Access Modifiers) ve #private</h3>
+            <p>TS <code>public</code>, <code>private</code> ve <code>protected</code> yapısını sunar. Ancak <code>private</code> JS'e derlendiğinde silinir (Type Erasure). ECMAScript'in yerleşik <code>#</code> private field özelliği ise çalışma zamanında da (runtime) koruma sağlar.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>modifiers.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>class BankAccount {
+  public owner: string;
+  private balance: number; // TS seviyesinde gizli (Runtime'da erişilebilir)
+  #secretCode: number;     // Gerçek JS runtime gizliliği (ES2015+)
+
+  constructor(owner: string, initialBalance: number) {
+    this.owner = owner;
+    this.balance = initialBalance;
+    this.#secretCode = Math.random();
+  }
+
+  protected getBalance() {
+    return this.balance; // Alt sınıflardan erişilebilir
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Abstract Class vs Interface</h3>
+            <p>Birbiriyle sıkça karıştırılan bu iki konseptin kullanım alanları farklıdır.</p>
+
+            <div class="card">
+              <h4>Yapısal Karşılaştırma</h4>
+              <ul>
+                <li><strong>Interface:</strong> Sadece bir şekil/sözleşme (contract) tanımlar. Runtime'da tamamen silinir. JS çıktısı yoktur. Çoklu <code>implements</code> edilebilir.</li>
+                <li><strong>Abstract Class:</strong> Hem tip sözleşmesi sağlar hem de varsayılan davranış/kod (implementation) içerebilir. JS class'ına derlenir. Çoklu <code>extends</code> edilemez.</li>
+              </ul>
+            </div>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>abstract-vs-interface.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>interface Loggable {
+  log(message: string): void;
+}
+
+abstract class BaseService {
+  // Tanımlanmış metot (Varsayılan davranış)
+  protected init() {
+    console.log("Service Initialized");
+  }
+  
+  // Soyut metot (Alt sınıflar bunu zorunlu doldurmalı)
+  abstract process(data: any): boolean;
+}
+
+class UserService extends BaseService implements Loggable {
+  process(data: any): boolean {
+    this.init();
+    return true;
+  }
+  
+  log(message: string): void {
+    console.log(message);
+  }
+}</code></pre>
+            </div>
+            
+            <div class="info-box good">
+              <div>
+                <strong>Good Practice:</strong> Sadece bir nesnenin şeklini tanımlıyorsanız <code style="color:var(--accent)">Interface</code>, eğer alt sınıflara ortak metot/özellik miras bırakmak istiyorsanız <code style="color:var(--accent)">Abstract Class</code> kullanın.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Polimorfik "this" Tipi</h3>
+            <p>Akıcı (fluent) API tasarımlarında, metotların geriye dönük kendi sınıflarını (this) döndürmesi <code style="color:var(--accent)">this</code> dönüş tipiyle güvenle yapılır.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>polymorphic-this.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>class QueryBuilder {
+  protected query: string = "";
+  
+  select(fields: string): this {
+    this.query += `SELECT ${fields} `;
+    return this; // Alt sınıfta çağrılırsa alt sınıfı döner
+  }
+}
+
+class ExtendedQueryBuilder extends QueryBuilder {
+  where(condition: string): this {
+    this.query += `WHERE ${condition}`;
+    return this;
+  }
+}
+
+// Zincirleme kullanım (Fluent API)
+const q = new ExtendedQueryBuilder()
+  .select("*")
+  .where("id = 1"); // İki metot da doğru tipte çalışır</code></pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- S08 -->
+      <section class="section" id="s08">
+        <h2><span class="sec-num">08</span> Advanced Decorators (TS 5.0+)</h2>
+        <div class="content-box">
+          <p>TypeScript 5.0 ile birlikte <span class="term-highlight">Decorators</span> (Dekoratörler) deneysel (experimental) yapıdan çıkıp <strong>standart ECMAScript Decorators</strong> spesifikasyonuna uygun hale geldi. Dekoratörler, class'ların, metotların veya özelliklerin davranışlarını runtime'da sarmalayarak (wrap) değiştirmeyi sağlar.</p>
+
+          <div class="sub">
+            <h3>Dekoratör Mimarisi ve İmzalar (Signatures)</h3>
+            <p>Yeni standartta dekoratörler, hedef öğeyi ve öğe hakkındaki metadataları (context) parametre olarak alan fonksiyonlardır.</p>
+
+            <div class="card">
+              <h4>Dekoratör Tipleri</h4>
+              <ul>
+                <li><strong>Class Decorator:</strong> Sınıf tanımını sarmalar, sınıf constructor'ını değiştirebilir.</li>
+                <li><strong>Method Decorator:</strong> Bir sınıf metodunu sarmalar. Loglama, yetkilendirme (Auth) veya performans ölçümü (Timing) için çok yaygındır.</li>
+                <li><strong>Property Decorator:</strong> Sınıfın bir özelliğini izlemek veya varsayılan değer atamak için kullanılır.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Metot Dekoratörü Örneği: Otomatik Loglama (Logger)</h3>
+            <p>Aşağıdaki örnekte bir metoda yapılan çağrıları, aldığı argümanları ve çalışma süresini otomatik kaydeden bir metot dekoratörü yazıyoruz.</p>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>logger-decorator.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>// Method Decorator (TS 5.0 Standard)
+function loggedMethod&lt;This, Args extends any[], Return&gt;(
+  target: (this: This, ...args: Args) =&gt; Return,
+  context: ClassMethodDecoratorContext&lt;This, (this: This, ...args: Args) =&gt; Return&gt;
+) {
+  const methodName = String(context.name);
+
+  // Orijinal metodu saran yeni bir metot döndürüyoruz
+  return function (this: This, ...args: Args): Return {
+    console.log(`[LOG]: ${methodName} metodu çağrıldı. Parametreler:`, args);
+    const start = performance.now();
+    
+    // Orijinal metodu çalıştır
+    const result = target.call(this, ...args);
+    
+    const end = performance.now();
+    console.log(`[LOG]: ${methodName} tamamlandı. Süre: ${(end - start).toFixed(2)}ms`);
+    
+    return result;
+  };
+}
+
+class Calculator {
+  @loggedMethod
+  multiply(a: number, b: number): number {
+    return a * b;
+  }
+}
+
+const calc = new Calculator();
+calc.multiply(5, 10);
+// Çıktı:
+// [LOG]: multiply metodu çağrıldı. Parametreler: [5, 10]
+// [LOG]: multiply tamamlandı. Süre: 0.15ms</code></pre>
+            </div>
+            
+            <div class="info-box warn">
+              <div>
+                <strong>TypeScript 5.0 Öncesi:</strong> Eski projelerde dekoratörleri kullanmak için <code>tsconfig.json</code> dosyasında <code style="color:var(--accent)">"experimentalDecorators": true</code> açık olmalıydı. Yeni standartta bu zorunluluk kalktı, ancak eski dekoratör framework'leri (Örn: NestJS, Angular) hala experimental modüle ihtiyaç duyabilir.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Çalışma Zamanı (Runtime) Sıralaması</h3>
+            <p>Dekoratörlerin çalışma sırası aşağıdan yukarıya ve içten dışa doğrudur (Matruşka bebekleri gibi). Birden fazla dekoratör eklendiğinde değerlendirme (evaluation) yukarıdan aşağı, çalıştırma (execution) aşağıdan yukarıdır.</p>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- S09 -->
+      <section class="section" id="s09">
+        <h2><span class="sec-num">09</span> tsconfig.json Optimizasyonları & Strict Mod</h2>
+        <div class="content-box">
+          <p>TypeScript derleyicisini (compiler) doğru yapılandırmak, hem geliştirici deneyimi (DX) hem de üretim ortamı güvenliği için kritiktir. <code>tsconfig.json</code> dosyasındaki ayarlar, projenizin tip gücünü belirler.</p>
+
+          <div class="sub">
+            <h3>"strict": true ve Alt Kuralları</h3>
+            <p>Projenizde <code>"strict": true</code> bayrağını açmak, TypeScript'in tam potansiyelini kullanmanın ilk şartıdır. Bu bayrak aslında birden fazla sıkı kuralı aynı anda aktifleştirir.</p>
+            
+            <div class="card">
+              <h4>Strict Mod Alt Kuralları</h4>
+              <ul>
+                <li><code style="color:var(--cyan)">noImplicitAny</code>: Tiplerin açıkça belirtilmediği durumlarda derleyicinin "any" atamasına izin vermez.</li>
+                <li><code style="color:var(--cyan)">strictNullChecks</code>: <code>null</code> ve <code>undefined</code> değerlerinin diğer tiplerin alt kümesi olmasını engeller (Billion dollar mistake'i önler).</li>
+                <li><code style="color:var(--cyan)">strictFunctionTypes</code>: Fonksiyon parametrelerinin "bivariant" yerine "contravariant" olarak sıkı kontrol edilmesini sağlar.</li>
+              </ul>
+            </div>
+            
+            <div class="info-box good">
+              <div>
+                <strong>Production Tip:</strong> Mevcut büyük bir projeye TS entegre ediyorsanız, strict modları kademeli olarak (önce strictNullChecks, sonra noImplicitAny) açarak refactoring yükünü dağıtabilirsiniz.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Derleme Performansı Ayarları</h3>
+            <p>Devasa monorepo projelerinde derleme (build) sürelerini kısaltmak için özel ayarlar yapılandırılmalıdır.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>tsconfig.json</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>{
+  "compilerOptions": {
+    "target": "ES2022",     // Modern motorlar için daha az polyfill üretir
+    "module": "ESNext",     // Bundler'lar (Vite, Webpack) için Tree Shaking sağlar
+    "incremental": true,    // .tsbuildinfo dosyası ile sadece değişenleri derler (Hız x10)
+    "skipLibCheck": true    // node_modules içindeki devasa .d.ts dosyalarını kontrol etmeyi atlar
+  }
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Path Mapping (Temiz Import Yolları)</h3>
+            <p>Büyük projelerde <code>../../../../components/Button</code> gibi "relative" yollardan kurtulmak için <code>paths</code> ayarı kullanılır.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>tsconfig.paths.json</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@/components/*": ["src/components/*"],
+      "@/utils/*": ["src/utils/*"],
+      "@/api/*": ["src/api/*"]
+    }
+  }
+}</code></pre>
+            </div>
+            <div class="info-box warn">
+              <div>
+                <strong>Compiler Note:</strong> TypeScript derleyicisi path mapping'i JavaScript dosyalarına (runtime paths) çevirmez! Bunu bundler'ınıza (Örn: Webpack'te <code>resolve.alias</code>, Vite'ta <code>vite-tsconfig-paths</code>) ayrıca öğretmeniz gerekir.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- S10 -->
+      <section class="section" id="s10">
+        <h2><span class="sec-num">10</span> Asenkron Tipler & Promises</h2>
+        <div class="content-box">
+          <p>TypeScript, asenkron JavaScript konseptlerini (Promises, async/await, async generators) yönetmek için özel yerleşik tipler ve güçlü bir çıkarım mekanizması sunar.</p>
+
+          <div class="sub">
+            <h3>Promise&lt;T&gt; Jenerik Yapısı</h3>
+            <p>Asenkron bir fonksiyon her zaman bir <code>Promise</code> döner. Dönüş tipini kontrol etmek, hatasız zincirleme (chaining) yapabilmek için kritiktir.</p>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>async-types.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>interface UserData {
+  id: string;
+  name: string;
+}
+
+// Dönüş tipi explicit olarak Promise&lt;UserData&gt; belirlendi
+async function fetchUser(id: string): Promise&lt;UserData&gt; {
+  const response = await fetch(`/api/users/${id}`);
+  if (!response.ok) throw new Error("Ağ hatası");
+  return response.json(); // Implicit olarak any dönebilir, Promise&lt;UserData&gt; bunu korur
+}</code></pre>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Awaited&lt;T&gt; ile İç İçe Promiseleri Düzleştirme (Unwrapping)</h3>
+            <p><span class="term-highlight">Awaited</span> yardımcı tipi, bir Promise'in çözüleceği (resolve olacağı) en son saf (raw) değeri tip olarak almanızı sağlar. İç içe (nested) Promise'leri bile tek seferde düzleştirir.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>awaited-type.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>type NestedPromise = Promise&lt;Promise&lt;string&gt;&gt;;
+
+// T1 = string olur
+type T1 = Awaited&lt;NestedPromise&gt;; 
+
+// Pratik Kullanım: Bir fonksiyonun çözülmüş dönüş tipini alma
+type FetchUserReturnType = ReturnType&lt;typeof fetchUser&gt;; // Promise&lt;UserData&gt;
+type UnwrappedUserData = Awaited&lt;ReturnType&lt;typeof fetchUser&gt;&gt;; // UserData</code></pre>
+            </div>
+            
+            <div class="info-box good">
+              <div>
+                <strong>Good Practice:</strong> Harici bir kütüphaneden gelen asenkron bir fonksiyonun dönüş değerini lokal bir tipte saklamak isterseniz her zaman <code>Awaited&lt;ReturnType&lt;typeof ...&gt;&gt;</code> kullanın.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Async Generators (Streams) Tiplenmesi</h3>
+            <p>Veri akışlarında (örneğin WebSockets veya Pagination streamleri) <code>AsyncGenerator</code> tipi kullanılır.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>async-generator.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>// AsyncGenerator&lt;VeriTipi, ReturnTipi, NextParametresi&gt;
+async function* fetchAllPages(): AsyncGenerator&lt;string[], void, unknown&gt; {
+  let page = 1;
+  while (true) {
+    const data = await fetch(`/api/items?page=${page}`).then(r =&gt; r.json());
+    if (data.length === 0) break;
+    yield data;
+    page++;
+  }
+}
+
+// Kullanımı
+(async () =&gt; {
+  for await (const chunk of fetchAllPages()) {
+    console.log(chunk); // chunk tipi: string[]
+  }
+})();</code></pre>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- S11 -->
+      <section class="section" id="s11">
+        <h2><span class="sec-num">11</span> Runtime (Çalışma Zamanı) Tip Doğrulama</h2>
+        <div class="content-box">
+          <p>TypeScript mükemmel bir statik analiz aracıdır, ancak çalışma zamanında (runtime) tip garantisi sunmaz. Güvenli kod için statik tipleri runtime doğrulaması ile birleştirmek şarttır.</p>
+
+          <div class="sub">
+            <h3>Type Erasure ve Güvenlik Açığı</h3>
+            <p><span class="term-highlight">Type Erasure</span> (Tip Silinmesi), TS kodunuz JS'ye çevrildiğinde tüm tip (interface, type) bilgilerinin kaybolmasıdır. Ağdan veya kullanıcıdan gelen bozuk bir veri, TS tarafından yakalanamaz.</p>
+            
+            <div class="info-box bad">
+              <div>
+                <strong>Production Risk:</strong> <code>const user = await response.json() as User;</code> gibi bir Type Assertion kullandığınızda, API size sayılar yerine string dönse bile sistem çökmeyip sessizce bozulmaya (silent bug) devam edebilir.
+              </div>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Çözüm: Şema Tabanlı Doğrulama (Schema Validation)</h3>
+            <p>Veriyi doğrulamak ve bu doğrulamadan bir TypeScript tipi türetmek için Zod, Yup veya TypeBox gibi kütüphaneler kullanılır. Buna endüstride "Parse, don't validate" yaklaşımı denir.</p>
+            
+            <div class="card">
+              <h4>"Parse, don't validate" Prensibi</h4>
+              <p>Veriyi sadece "doğru mu?" diye kontrol etmek yerine, veriyi güvenli olduğunu bildiğiniz kesin bir yapıya parse edip o güvenli objeyi dönersiniz.</p>
+            </div>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>zod-validation.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>import { z } from "zod";
+
+// 1. Runtime Şemasını Tanımla
+const UserSchema = z.object({
+  id: z.string().uuid(),
+  username: z.string().min(3).max(20),
+  email: z.string().email(),
+  isActive: z.boolean().default(true)
+});
+
+// 2. Statik Tipi Şemadan Türet (Dry Prensibi - Tipleri iki kere yazma!)
+type User = z.infer&lt;typeof UserSchema&gt;;
+
+// 3. Güvenli API Fonksiyonu
+async function fetchSafeUser(userId: string): Promise&lt;User&gt; {
+  const response = await fetch(`/api/users/${userId}`);
+  const rawData = await response.json();
+  
+  // Eğer veri şemaya uymazsa runtime hatası (ZodError) fırlatır
+  // Uyarsa güvenli ve tam tiplemeli objeyi döner
+  const safeData = UserSchema.parse(rawData);
+  
+  return safeData;
+}</code></pre>
+            </div>
+            
+            <div class="info-box good">
+              <div>
+                <strong>Architecture Tip:</strong> Zod gibi kütüphaneleri dışarıya açık tüm sistem sınırlarına (API Payload'ları, Form verileri, LocalStorage okumaları, Env değişkenleri) yerleştirin.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- S12 -->
+      <section class="section" id="s12">
+        <h2><span class="sec-num">12</span> Monorepo, Deklarasyon Dosyaları (.d.ts) ve Dağıtım</h2>
+        <div class="content-box">
+          <p>TypeScript projeleri büyüdükçe kütüphane dağıtımı, saf JS paketlerine tip yazımı ve büyük mimarilerin yapılandırılması konuları devreye girer.</p>
+
+          <div class="sub">
+            <h3>.d.ts (Declaration Files) Dosyaları ve "declare"</h3>
+            <p>Deklarasyon dosyaları, çalışma zamanında (runtime) kod içermeyen, sadece derleyiciye "Burada bir şeyler var ve tipleri bunlardır" demeye yarayan saf tip dosyalarıdır.</p>
+            
+            <div class="code-container">
+              <div class="code-header">
+                <span>global.d.ts</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>// Tip desteği olmayan eski bir jQuery kütüphanesine tip yazma
+declare module "legacy-jquery" {
+  export function $(selector: string): any;
+  export const version: string;
+}
+
+// Global (Window) nesnesine özel değişken ekleme
+declare global {
+  interface Window {
+    __ANALYTICS_ID__: string;
+  }
+}
+// global.d.ts dosyasının bir modül olması için boş export
+export {};</code></pre>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Module Resolution (Modül Çözümleme)</h3>
+            <p>Derleyicinin bir <code>import</code> gördüğünde dosyayı nasıl bulacağını belirler. <code>tsconfig.json</code> dosyasındaki <code>moduleResolution</code> ayarı hayati önem taşır.</p>
+
+            <div class="card">
+              <h4>Modern Çözümleme Stratejileri</h4>
+              <ul>
+                <li><code style="color:var(--cyan)">NodeNext / Node16</code>: Projenizi doğrudan Node.js'te (Native ESM) çalıştıracaksanız veya kütüphane yayınlıyorsanız kullanılır. <code>import { Foo } from "./foo.js";</code> gibi uzantı belirtilmesini zorunlu kılar.</li>
+                <li><code style="color:var(--cyan)">Bundler</code>: Vite, esbuild veya Webpack gibi paketleyiciler kullanıyorsanız en ideal ve güncel ayardır. Paketlerin <code>package.json</code>'daki "exports" kurallarını doğru okur.</li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="sub">
+            <h3>Monorepo ve Project References (composite)</h3>
+            <p>Devasa (100k+ satır) projelerde, tüm projeyi tek seferde derlemek hafıza sorunlarına ve uzun sürelere neden olur. <code style="color:var(--accent)">Project References</code> ile proje alt paketlere bölünür.</p>
+
+            <div class="code-container">
+              <div class="code-header">
+                <span>packages/backend/tsconfig.json</span>
+                <button class="copy-btn">Copy</button>
+              </div>
+              <pre><code>{
+  "compilerOptions": {
+    "composite": true,       // Referanslanabilir bir paket olduğunu belirtir
+    "declaration": true,     // Ortak projelerin tipleri görebilmesi için .d.ts üretir
+    "outDir": "./dist"
+  },
+  "references": [
+    // Ortak (shared) kütüphaneye bağımlılığı belirtir
+    { "path": "../shared" }
+  ]
+}</code></pre>
+            </div>
+            
+            <div class="info-box warn">
+              <div>
+                <strong>Compiler Note:</strong> Project References kurulan bir monorepo'da, projeyi derlemek için <code>tsc</code> komutu yerine <code>tsc -b</code> (build mod) kullanılmalıdır. Bu mod sadece değişen paketleri (incremental) sırayla derler.
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </section>
+
+    </main>
+
+    <!-- ==========================================
+         BOTTOM PROGRESS BAR
+         ========================================== -->
+    <div class="bottom-progress" id="progressBar">
+      <div class="bp-track">
+        <div class="bp-fill" id="bpFill"></div>
+      </div>
+      <div class="bp-info">
+        <span class="bp-num" id="bpNum">01</span>
+        <span class="bp-title" id="bpTitle">Introduction to Advanced Types</span>
+      </div>
+      <span class="bp-percent" id="bpPercent">%0</span>
+    </div>
+  </div> <!-- /.main-wrapper -->
+
+  <!-- ==========================================
+       SCROLL TOP BUTTON
+       ========================================== -->
+  <button class="scroll-top" id="scrollTopBtn" aria-label="Yukarı Çık">
+    <svg class="progress-ring" width="48" height="48">
+      <circle class="progress-ring__circle" r="23" cx="24" cy="24"/>
+    </svg>
+    <svg class="icon" viewBox="0 0 24 24"><path d="M18 15l-6-6-6 6"/></svg>
+  </button>
+
+  <!-- ==========================================
+       JAVASCRIPT ENGINE
+       ========================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      
+      // --------------------------------------------------
+      // 1. THEME TOGGLE
+      // --------------------------------------------------
+      const themeToggle = document.getElementById('themeToggle');
+      const body = document.body;
+      let isLightMode = false;
+
+      themeToggle.addEventListener('click', () => {
+        isLightMode = !isLightMode;
+        if (isLightMode) {
+          body.classList.add('light-mode');
+          themeToggle.textContent = '☀️';
+        } else {
+          body.classList.remove('light-mode');
+          themeToggle.textContent = '🌙';
+        }
+      });
+
+      // --------------------------------------------------
+      // 2. DYNAMIC TOC (SIDEBAR) GENERATOR
+      // --------------------------------------------------
+      const sections = document.querySelectorAll('.section');
+      const tocContainer = document.getElementById('toc');
+      const tocItems = [];
+
+      // Prism.js init
+      document.querySelectorAll('.code-container pre code').forEach(block => {
+        block.classList.add('language-typescript');
+      });
+      if (window.Prism) Prism.highlightAll();
+
+      // AOS DOM atamalarından sonra başlatılacak
+
+      sections.forEach((sec, index) => {
+        sec.setAttribute('data-aos', 'fade-up');
+        sec.setAttribute('data-aos-duration', '600');
+        const numStr = String(index + 1).padStart(2, '0');
+        const heading = sec.querySelector('h2');
+        // Extract title excluding the number span
+        let title = '';
+        heading.childNodes.forEach(node => {
+          if (node.nodeType === Node.TEXT_NODE) {
+            title += node.textContent;
+          }
+        });
+        title = title.trim();
+        const id = sec.id;
+
+        const li = document.createElement('li');
+        const a = document.createElement('a');
+        a.href = `#${id}`;
+        a.className = 'toc-item';
+        a.innerHTML = `
+          <span class="toc-num">${numStr}</span>
+          <span class="toc-text">${title}</span>
+          <div class="toc-dot"></div>
+        `;
+        li.appendChild(a);
+        tocContainer.appendChild(li);
+        
+        tocItems.push({ a, sec, numStr, title });
+
+        // Smooth scroll implementation
+        a.addEventListener('click', (e) => {
+          e.preventDefault();
+          sec.scrollIntoView({ behavior: 'smooth' });
+        });
+      });
+
+      // AOS'u DOM hazırlandıktan sonra başlat
+      AOS.init({ once: true, offset: 50 });
+
+      // --------------------------------------------------
+      // 3. SCROLLSPY, PROGRESS BAR & SCROLL TOP RING
+      // --------------------------------------------------
+      const bpFill = document.getElementById('bpFill');
+      const bpNum = document.getElementById('bpNum');
+      const bpTitle = document.getElementById('bpTitle');
+      const bpPercent = document.getElementById('bpPercent');
+
+      const progressCircle = document.querySelector('.progress-ring__circle');
+      const scrollTopBtn = document.getElementById('scrollTopBtn');
+      
+      // Setup Progress Ring Math
+      const ringRadius = progressCircle.r.baseVal.value;
+      const ringCircumference = ringRadius * 2 * Math.PI;
+      progressCircle.style.strokeDasharray = `${ringCircumference} ${ringCircumference}`;
+      progressCircle.style.strokeDashoffset = ringCircumference;
+
+      const updateScrollEngines = () => {
+        const scrollY = window.scrollY;
+        const windowHeight = window.innerHeight;
+        
+        // 3.1. Overall Page Progress (Scroll Top Button)
+        const docHeight = document.documentElement.scrollHeight - windowHeight;
+        const scrollPerc = docHeight > 0 ? (scrollY / docHeight) : 0;
+        
+        if (scrollY > 300) {
+          scrollTopBtn.classList.add('visible');
+        } else {
+          scrollTopBtn.classList.remove('visible');
+        }
+
+        progressCircle.style.strokeDashoffset = ringCircumference - (scrollPerc * ringCircumference);
+
+        // 3.2. Section ScrollSpy & Inner Progress
+        let activeIndex = 0;
+        
+        sections.forEach((sec, index) => {
+          const rect = sec.getBoundingClientRect();
+          // If section top is above or near the middle of viewport, it's active
+          if (rect.top <= windowHeight / 2.5 && rect.bottom > 0) {
+            activeIndex = index;
+          }
+        });
+
+        const activeItem = tocItems[activeIndex];
+        const activeSec = activeItem.sec;
+
+        // Update active class on Sidebar
+        tocItems.forEach(item => item.a.classList.remove('active'));
+        activeItem.a.classList.add('active');
+
+        // Update Bottom Bar Meta Info
+        bpNum.textContent = activeItem.numStr;
+        bpTitle.textContent = activeItem.title;
+
+        // 3.3. Calculate Section Internal Progress
+        const secRect = activeSec.getBoundingClientRect();
+        const secHeight = activeSec.offsetHeight;
+        
+        // Scrolled distance within the section
+        const secScrollPassed = -secRect.top + (windowHeight / 2.5);
+        let secPercent = 0;
+
+        if (secScrollPassed <= 0) {
+          secPercent = 0;
+        } else if (secScrollPassed >= secHeight) {
+          secPercent = 100;
+        } else {
+          secPercent = Math.round((secScrollPassed / secHeight) * 100);
+        }
+
+        // Sayfa sonuna gelindiğinde %100 tamamlama garantisi
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight - 20) {
+          secPercent = 100;
+        }
+
+        bpPercent.textContent = `%${secPercent}`;
+        bpFill.style.width = `${secPercent}%`;
+      };
+
+      window.addEventListener('scroll', updateScrollEngines, { passive: true });
+      window.addEventListener('resize', updateScrollEngines);
+      
+      // Initial trigger
+      updateScrollEngines();
+
+      scrollTopBtn.addEventListener('click', () => {
+        let activeIndex = 0;
+        const windowHeight = window.innerHeight;
+        sections.forEach((sec, index) => {
+          const rect = sec.getBoundingClientRect();
+          if (rect.top <= windowHeight / 2.5 && rect.bottom > 0) {
+            activeIndex = index;
+          }
+        });
+        
+        const activeSec = sections[activeIndex];
+        const rect = activeSec.getBoundingClientRect();
+        
+        // Eğer bulunduğumuz modülün epey altındaysak, kendi başına dön
+        if (rect.top < -50) {
+          activeSec.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } 
+        // Eğer başındaysak ve önceki bir modül varsa ona dön
+        else if (activeIndex > 0) {
+          sections[activeIndex - 1].scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } 
+        // En tepedeysek en başa dön
+        else {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+      });
+
+      // --------------------------------------------------
+      // 4. SEARCH ENGINE
+      // --------------------------------------------------
+      const searchInput = document.getElementById('searchInput');
+      searchInput.addEventListener('input', (e) => {
+        const query = e.target.value.toLowerCase().trim();
+        
+        tocItems.forEach(item => {
+          // Arama algoritması: Başlıkta veya section içeriğinde arar
+          const secText = item.sec.innerText.toLowerCase();
+          const match = item.title.toLowerCase().includes(query) || item.numStr.includes(query) || secText.includes(query);
+          
+          item.a.parentElement.style.display = match ? 'block' : 'none';
+          
+          if (match) {
+            item.sec.style.display = 'block';
+          } else {
+            item.sec.style.display = 'none';
+          }
+        });
+        
+        // DOM değişikliği sonrası animasyon ve Scroll bar'ı yenile
+        AOS.refresh();
+        setTimeout(updateScrollEngines, 50);
+      });
+
+      // --------------------------------------------------
+      // 6. TOOLTIP & DICTIONARY SYSTEM
+      // --------------------------------------------------
+      const tsDictionary = {
+        'Generics': 'Türleri (tipleri) parametre olarak alıp tekrar kullanılabilir ve esnek yapılar oluşturmayı sağlayan TS özelliği.',
+        'Structural Typing': 'Nesnelerin isimlerine (nominal) değil, yapılarına (sahip oldukları üyelere) bakarak tür uyumluluğunu belirleyen sistem (Duck Typing).',
+        'Discriminated Unions': 'Ortak bir literal "ayrıştırıcı" özellik (örn: type, kind) üzerinden birleşim türlerini güvenli şekilde daraltma yöntemi.',
+        'Mapped Types': 'Mevcut bir türün (Interface/Type) her bir key\'i üzerinden geçerek (in keyof) yeni bir tür yaratma özelliği.',
+        'Conditional Types': 'T extends U ? X : Y formatında, tipler üzerinde mantıksal sorgular çalıştıran ve duruma göre tip dönen yapı.',
+        'Type Erasure': 'TypeScript kodunun JavaScript\'e derlenirken tüm tip bilgilerinin silinmesi ve çalışma zamanında (runtime) yer almaması prensibi.'
+      };
+
+      tippy('.term-highlight', {
+        content(reference) {
+          const term = reference.textContent.trim();
+          return tsDictionary[term] || 'Sözlükte bulunamadı.';
+        },
+        theme: 'ts-theme',
+        animation: 'shift-away',
+        placement: 'top',
+        arrow: true,
+      });
+
+      // --------------------------------------------------
+      // 7. COPY TO CLIPBOARD ENGINE
+      // --------------------------------------------------
+      document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', async (e) => {
+          const container = e.target.closest('.code-container');
+          const codeBlock = container.querySelector('code');
+          const textToCopy = codeBlock.innerText;
+
+          try {
+            await navigator.clipboard.writeText(textToCopy);
+            const originalText = e.target.textContent;
+            e.target.textContent = 'Kopyalandı!';
+            e.target.style.backgroundColor = 'var(--cyan)';
+            e.target.style.color = '#0B0F19';
+            e.target.style.borderColor = 'var(--cyan)';
+            
+            if (window.confetti) {
+              const rect = e.target.getBoundingClientRect();
+              const x = (rect.left + rect.width / 2) / window.innerWidth;
+              const y = (rect.top + rect.height / 2) / window.innerHeight;
+              confetti({ particleCount: 40, spread: 60, origin: { x, y }, colors: ['#3178C6', '#00E5FF', '#ffffff'], zIndex: 9999 });
+            }
+            
+            setTimeout(() => {
+              e.target.textContent = originalText;
+              e.target.style.backgroundColor = '';
+              e.target.style.color = '';
+              e.target.style.borderColor = '';
+            }, 2000);
+          } catch (err) {
+            console.error('Kopyalama başarısız:', err);
+            e.target.textContent = 'Hata!';
+          }
+        });
+      });
+
+      // --------------------------------------------------
+      // 8. INTERACTIVE FUN ADDITIONS
+      // --------------------------------------------------
+
+
+      if (typeof VanillaTilt !== 'undefined') {
+        VanillaTilt.init(document.querySelectorAll(".card"), { max: 4, speed: 400, glare: true, "max-glare": 0.15 });
+      }
+
+      document.querySelectorAll('.content-box').forEach(box => {
+        box.addEventListener('mousemove', e => {
+          const rect = box.getBoundingClientRect();
+          const x = e.clientX - rect.left;
+          const y = e.clientY - rect.top;
+          box.style.setProperty('--mouse-x', `${x}px`);
+          box.style.setProperty('--mouse-y', `${y}px`);
+        });
+      });
+
+    });
+  </script>
+</body>
+</html>

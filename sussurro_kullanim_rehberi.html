@@ -1,0 +1,478 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--font-mono);background:#0d1117;color:#c9d1d9;font-size:14px;line-height:1.6}
+.wrap{max-width:700px;margin:0 auto;padding:1rem}
+.header{border-bottom:1px solid #30363d;padding-bottom:1rem;margin-bottom:1.5rem}
+.header h1{font-size:20px;font-weight:500;color:#e6edf3;font-family:var(--font-sans)}
+.header p{color:#8b949e;font-size:13px;margin-top:4px;font-family:var(--font-sans)}
+.nav{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:1.5rem}
+.nav-btn{background:#161b22;border:0.5px solid #30363d;color:#8b949e;padding:4px 10px;border-radius:6px;cursor:pointer;font-size:12px;font-family:var(--font-mono);transition:all 0.15s}
+.nav-btn:hover,.nav-btn.active{background:#1f6feb22;border-color:#1f6feb;color:#58a6ff}
+.section{display:none}
+.section.active{display:block}
+.sec-title{font-size:16px;font-weight:500;color:#e6edf3;font-family:var(--font-sans);margin-bottom:1rem;padding-bottom:8px;border-bottom:0.5px solid #30363d;display:flex;align-items:center;gap:8px}
+.sec-title i{font-size:18px;color:#58a6ff}
+.cmd-block{background:#161b22;border:0.5px solid #30363d;border-radius:8px;margin:12px 0;overflow:hidden}
+.cmd-label{background:#1c2128;padding:6px 12px;font-size:11px;color:#8b949e;border-bottom:0.5px solid #30363d;display:flex;justify-content:space-between;align-items:center}
+.copy-btn{background:none;border:none;color:#58a6ff;cursor:pointer;font-size:11px;font-family:var(--font-mono);padding:0}
+.copy-btn:hover{color:#79c0ff}
+.cmd-code{padding:12px 14px;overflow-x:auto}
+.cmd-code pre{color:#e6edf3;font-size:13px;line-height:1.7;white-space:pre;font-family:var(--font-mono)}
+.comment{color:#6e7681}
+.kw{color:#ff7b72}
+.str{color:#a5d6ff}
+.flag{color:#79c0ff}
+.note{background:#1c2128;border-left:3px solid #1f6feb;border-radius:0 6px 6px 0;padding:10px 14px;margin:12px 0;font-size:13px;font-family:var(--font-sans)}
+.note.warn{border-color:#d29922}
+.note.tip{border-color:#3fb950}
+.note-icon{margin-right:6px}
+.table-wrap{margin:12px 0;overflow-x:auto}
+table{width:100%;border-collapse:collapse;font-size:13px;font-family:var(--font-sans)}
+th{background:#1c2128;color:#8b949e;padding:8px 12px;text-align:left;border:0.5px solid #30363d;font-weight:500;font-size:12px}
+td{padding:8px 12px;border:0.5px solid #30363d;color:#c9d1d9;vertical-align:top}
+tr:hover td{background:#1c2128}
+.badge{display:inline-block;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:500}
+.badge-blue{background:#1f6feb33;color:#58a6ff;border:0.5px solid #1f6feb55}
+.badge-green{background:#3fb95033;color:#3fb950;border:0.5px solid #3fb95055}
+.badge-amber{background:#d2992233;color:#d29922;border:0.5px solid #d2992255}
+.badge-red{background:#f8514933;color:#f85149;border:0.5px solid #f8514955}
+.kbd{display:inline-block;background:#1c2128;border:0.5px solid #484f58;border-radius:5px;padding:2px 8px;font-family:var(--font-mono);font-size:12px;color:#c9d1d9;margin:1px}
+.step{display:flex;gap:12px;margin:10px 0;align-items:flex-start}
+.step-num{background:#1f6feb;color:#fff;border-radius:50%;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:500;flex-shrink:0;margin-top:2px}
+.step-body{font-family:var(--font-sans);font-size:13px;flex:1}
+.step-body strong{color:#e6edf3;font-weight:500}
+.output-block{background:#0d1117;border:0.5px solid #21262d;border-radius:6px;padding:10px 14px;margin:8px 0;font-size:12px;color:#7ee787;font-family:var(--font-mono)}
+.output-label{font-size:10px;color:#6e7681;margin-bottom:4px}
+</style>
+
+<div class="wrap">
+<div class="header">
+  <h1><i class="ti ti-microphone" aria-hidden="true"></i> Sussurro Kullanım Rehberi</h1>
+  <p>Tamamen offline çalışan açık kaynaklı speech-to-text aracı • macOS</p>
+</div>
+
+<div class="nav">
+  <button class="nav-btn active" onclick="show('nedir')">Sussurro Nedir?</button>
+  <button class="nav-btn" onclick="show('kurulum')">Kurulum (macOS)</button>
+  <button class="nav-btn" onclick="show('linux')">Linux Kurulumu</button>
+  <button class="nav-btn" onclick="show('model')">Model Seçimi</button>
+  <button class="nav-btn" onclick="show('dikte')">Canlı Dikte</button>
+  <button class="nav-btn" onclick="show('transkript')">Transkripsiyon</button>
+  <button class="nav-btn" onclick="show('format')">Çıktı Formatları</button>
+  <button class="nav-btn" onclick="show('uzun')">Uzun Dosyalar</button>
+  <button class="nav-btn" onclick="show('toplu')">Toplu İşlem</button>
+  <button class="nav-btn" onclick="show('sorun')">Sorun Giderme</button>
+  <button class="nav-btn" onclick="show('kaynakca')">Kaynakça</button>
+</div>
+
+<div id="nedir" class="section active">
+  <div class="sec-title"><i class="ti ti-info-circle" aria-hidden="true"></i> Sussurro Nedir?</div>
+  
+  <p style="margin-bottom: 12px;">Sussurro (İtalyanca'da "fısıltı" anlamına gelir), konuşmanı temiz, biçimlendirilmiş ve bağlama duyarlı metne dönüştüren, tamamen yerel (offline) çalışan açık kaynaklı bir ses-metin sistemidir. Temel işlevi şu şekilde özetlenebilir: mikrofona konuşursun, Sussurro metni işler ve o an aktif olan uygulamaya doğrudan yazar.</p>
+
+  <h3 style="color:#e6edf3;font-size:14px;margin:16px 0 8px;">Çift Katmanlı AI Mimarisi</h3>
+  <ul style="list-style:none;margin-left:0;margin-bottom:16px;">
+    <li style="margin-bottom:8px;">▸ <strong>Whisper.cpp</strong> — OpenAI'nin Whisper modelinin C++ ile yeniden yazılmış, son derece optimize edilmiş versiyonu. Sesi metne bu motor dönüştürür.</li>
+    <li>▸ <strong>Qwen 3 Sussurro</strong> — Projenin geliştiricisi tarafından ince ayar yapılmış bir dil modeli. Ham transkripsiyonu alır, dolgu kelimelerini temizler, kendini düzeltmeleri düzenler ve cümleleri okunabilir hale getirir.</li>
+  </ul>
+  <div class="note"><span class="note-icon">ℹ️</span> Bu iki aşamalı mimari sayesinde çıktı, ham bir transkripsiyon yerine neredeyse yazı diline yakın bir metin olur. Konuşma dili bozuklukları, tereddütler ve dolgu sesleri otomatik olarak giderilir.</div>
+
+  <h3 style="color:#e6edf3;font-size:14px;margin:16px 0 8px;">Tamamen Offline Çalışmanın Avantajları</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Avantaj</th><th>Açıklama</th></tr>
+      <tr><td>Gizlilik</td><td>Ses verisi hiçbir zaman sunucuya gönderilmez. Doktor notu, hukuki görüşme, ticari sır fark etmez.</td></tr>
+      <tr><td>Ücretsiz & Sınırsız</td><td>Aylık kota, kredi sistemi veya abonelik ücreti yoktur. Modeli indirdikten sonra sınırsız kullanım.</td></tr>
+      <tr><td>İnternet Bağımsız</td><td>Uçakta, dağ başında, kesintili bağlantıda bile tam performansla çalışır.</td></tr>
+      <tr><td>⚡ Düşük Gecikme</td><td>Sunucu gidiş-dönüşü olmadığı için, özellikle Apple Silicon'da transkripsiyon neredeyse anlık gerçekleşir.</td></tr>
+    </table>
+  </div>
+
+  <h3 style="color:#e6edf3;font-size:14px;margin:16px 0 8px;">Sistem Gereksinimleri</h3>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Bileşen</th><th>Gereksinim</th></tr>
+      <tr><td>İşletim Sistemi</td><td>macOS veya Linux (Windows geliştirme aşamasında)</td></tr>
+      <tr><td>Runtime Dili</td><td>Go 1.24+</td></tr>
+      <tr><td>Lisans</td><td>GPL-3.0 (açık kaynak)</td></tr>
+      <tr><td>Mimari</td><td>x86-64 veya ARM64 (Apple Silicon dahil)</td></tr>
+      <tr><td>Disk</td><td>Whisper Small ~150 MB, Whisper Large v3 Turbo ~1.5 GB</td></tr>
+      <tr><td>RAM</td><td>Minimum 4 GB (8 GB önerilir)</td></tr>
+    </table>
+  </div>
+  
+  <h3 style="color:#e6edf3;font-size:14px;margin:16px 0 8px;">Akıllı Temizleme ve Metin Düzenleme</h3>
+  <p style="margin-bottom: 8px;">Ham transkripsiyon çoğu zaman konuşma dilinin bozukluklarını taşır. Sussurro'nun Qwen 3 tabanlı temizleme katmanı bunu okunabilir yazı diline dönüştürür.</p>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Ham Transkripsiyon</th><th>Sussurro Çıktısı</th></tr>
+      <tr><td>"Yani, şey, bugün eeee toplantıda dedim ki, yani aslında bu proje için, hmm, belki iki hafta, iki-üç hafta diyelim, yeterli olabilir gibi."</td><td>"Bugünkü toplantıda bu proje için iki-üç haftanın yeterli olabileceğini söyledim."</td></tr>
+    </table>
+  </div>
+</div>
+
+<div id="kurulum" class="section">
+  <div class="sec-title"><i class="ti ti-download" aria-hidden="true"></i> Kurulum (macOS)</div>
+
+  <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Sussurro'yu indirin</strong> — aşağıdaki komutu Terminal'e yapıştırın:</div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'cd ~/Downloads\ncurl -fsSL https://raw.githubusercontent.com/cesp99/sussurro/master/scripts/install.sh | bash')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="comment"># İndirme klasörüne geç</span>
+<span class="kw">cd</span> ~/Downloads
+
+<span class="comment"># Kurulum scriptini çalıştır</span>
+<span class="kw">curl</span> <span class="flag">-fsSL</span> https://raw.githubusercontent.com/cesp99/sussurro/master/scripts/install.sh | <span class="kw">bash</span></pre></div>
+  </div>
+
+  <div class="step"><div class="step-num">2</div><div class="step-body"><strong>İndirilen dosyaları kontrol edin:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'ls -la ~/Downloads/sussurro-macos-arm64')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">ls</span> <span class="flag">-la</span> ~/Downloads/sussurro-macos-arm64</pre></div>
+  </div>
+
+  <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Güvenlik iznini kaldırın</strong> — macOS bilinmeyen kaynaklara izin vermek için bu adım gereklidir:</div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'cd ~/Downloads/sussurro-macos-arm64\nxattr -d com.apple.quarantine sussurro')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">cd</span> ~/Downloads/sussurro-macos-arm64
+<span class="kw">xattr</span> <span class="flag">-d</span> com.apple.quarantine sussurro</pre></div>
+  </div>
+
+  <div class="note warn"><span class="note-icon">⚠️</span> Alternatif yöntem: Finder'da dosyayı <strong>sağ tıklayın → Aç → Aç</strong> seçeneğini seçin. Sistem uyarısı gelirse "Yine de Aç" deyin.</div>
+
+  <div class="step"><div class="step-num">4</div><div class="step-body"><strong>Programı başlatın ve model seçin:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'./sussurro')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">./sussurro</span></pre></div>
+  </div>
+  <div class="output-block">
+    <div class="output-label">Terminal çıktısı (örnek)</div>
+    [1] Whisper Small  (488 MB)  — hızlı<br>
+    [2] Whisper Large v3 Turbo (1.62 GB) — yüksek doğruluk<br>
+    <br>
+    Seçiminiz: _
+  </div>
+  <div class="note tip"><span class="note-icon">💡</span> Uzun dosyalar için <strong>2</strong> yazın. Hız önceliğinizse <strong>1</strong> yazın. Model bir kez indirilir, sonra offline çalışır.</div>
+</div>
+
+<div id="linux" class="section">
+  <div class="sec-title"><i class="ti ti-brand-linux" aria-hidden="true"></i> Linux Kurulumu</div>
+  <p style="margin-bottom: 12px;">macOS ile aynı tek satırlık kurulum betiği Linux için de geçerlidir. Ancak Linux'ta birkaç ek bağımlılık gerekebilir.</p>
+  
+  <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Arch Linux / Manjaro için Bağımlılıklar:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'sudo pacman -S gtk3 webkit2gtk-4.1 libappindicator-gtk3 gtk-layer-shell wl-clipboard xdotool xorg-xprop')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="comment"># Temel UI bağımlılıkları</span>
+<span class="kw">sudo</span> pacman -S gtk3 webkit2gtk-4.1 libappindicator-gtk3
+<span class="comment"># Wayland için gerçek overlay desteği (opsiyonel)</span>
+<span class="kw">sudo</span> pacman -S gtk-layer-shell
+<span class="comment"># Wayland pano desteği</span>
+<span class="kw">sudo</span> pacman -S wl-clipboard
+<span class="comment"># X11 için yardımcı araçlar</span>
+<span class="kw">sudo</span> pacman -S xdotool xorg-xprop</pre></div>
+  </div>
+
+  <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Debian / Ubuntu için Bağımlılıklar:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'sudo apt install libgtk-3-dev libwebkit2gtk-4.1-dev libayatana-appindicator3-dev xdotool')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sudo</span> apt install libgtk-3-dev libwebkit2gtk-4.1-dev \
+libayatana-appindicator3-dev xdotool</pre></div>
+  </div>
+
+  <div class="note warn"><span class="note-icon">⚠️</span> <strong>Wayland Notu:</strong> Wayland kullanıcıları için: Kurulum sonrası hotkey'i masaüstü ortamından (GNOME, KDE, Sway) elle bağlamalısın. Detaylı talimatlar için projenin docs/wayland.md dosyasına bakabilirsin.</div>
+  
+  <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Kurulum scriptini çalıştırın:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'curl -fsSL https://raw.githubusercontent.com/cesp99/sussurro/master/scripts/install.sh | bash')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">curl</span> <span class="flag">-fsSL</span> https://raw.githubusercontent.com/cesp99/sussurro/master/scripts/install.sh | <span class="kw">bash</span></pre></div>
+  </div>
+</div>
+
+<div id="model" class="section">
+  <div class="sec-title"><i class="ti ti-cpu" aria-hidden="true"></i> Model Seçimi ve Değiştirme</div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Model</th><th>Boyut</th><th>Hız</th><th>Doğruluk</th><th>Kullanım</th></tr>
+      <tr><td>Whisper Small</td><td><span class="badge badge-green">488 MB</span></td><td>Hızlı</td><td>İyi</td><td>Kısa notlar, günlük dikte</td></tr>
+      <tr><td>Whisper Large v3 Turbo</td><td><span class="badge badge-amber">1.62 GB</span></td><td>Orta</td><td>Yüksek</td><td>Toplantı, röportaj, 100+ dk dosya</td></tr>
+    </table>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Small modelle başlat <button class="copy-btn" onclick="cp(this,'./sussurro --whisper small')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">./sussurro</span> <span class="flag">--whisper</span> small</pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Large v3 Turbo ile başlat <button class="copy-btn" onclick="cp(this,'./sussurro --whisper large-v3-turbo')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">./sussurro</span> <span class="flag">--whisper</span> large-v3-turbo</pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Kurulu modelleri listele <button class="copy-btn" onclick="cp(this,'ls -lh ~/.sussurro/models/')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">ls</span> <span class="flag">-lh</span> ~/.sussurro/models/</pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Sürüm bilgisi <button class="copy-btn" onclick="cp(this,'./sussurro --version')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">./sussurro</span> <span class="flag">--version</span></pre></div>
+  </div>
+</div>
+
+<div id="dikte" class="section">
+  <div class="sec-title"><i class="ti ti-keyboard" aria-hidden="true"></i> Canlı Dikte</div>
+
+  <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Sussurro'yu başlatın:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'cd ~/Downloads/sussurro-macos-arm64\n./sussurro')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">cd</span> ~/Downloads/sussurro-macos-arm64
+<span class="kw">./sussurro</span></pre></div>
+  </div>
+  <div class="note tip"><span class="note-icon">💡</span> Ekranın altında küçük yuvarlak bir kapsül belirir. Göremiyorsanız diğer pencerelerin arkasına bakın.</div>
+
+  <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Arka planda çalıştırma</strong> (kapsül olmadan):</div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'./sussurro --no-ui &')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">./sussurro</span> <span class="flag">--no-ui</span> &</pre></div>
+  </div>
+
+  <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Sussurro'yu durdurun:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal (arka plan) <button class="copy-btn" onclick="cp(this,'pkill sussurro')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">pkill</span> sussurro</pre></div>
+  </div>
+
+  <div class="table-wrap" style="margin-top:1rem">
+    <table>
+      <tr><th>İşlev</th><th>Tuş Kombinasyonu</th><th>Açıklama</th></tr>
+      <tr><td>Dikte başlat (Push to Talk)</td><td><span class="kbd">⌘ Cmd</span> <span class="kbd">⇧ Shift</span> <span class="kbd">Space</span></td><td>Basılı tut → konuş → bırak</td></tr>
+      <tr><td>Dikte başlat (Toggle)</td><td><span class="kbd">⌘ Cmd</span> <span class="kbd">⇧ Shift</span> <span class="kbd">Space</span></td><td>Bir kere bas → konuş → tekrar bas</td></tr>
+      <tr><td>Modu değiştir</td><td>Kapsül → Sağ tık → Settings</td><td>Push to Talk ↔ Toggle arası geçiş</td></tr>
+      <tr><td>Sussurro'yu kapat</td><td>Kapsül → Sağ tık → Quit</td><td>veya terminalde Ctrl+C</td></tr>
+    </table>
+  </div>
+
+  <div class="note"><span class="note-icon">ℹ️</span> İlk dikted modeliniz RAM'e yükleneceğinden 5–10 saniye beklemeniz normal. Sonraki kullanımlarda anında tepki verir.</div>
+</div>
+
+<div id="transkript" class="section">
+  <div class="sec-title"><i class="ti ti-file-text" aria-hidden="true"></i> Ses Dosyası Transkripsiyonu</div>
+
+  <div class="step"><div class="step-num">1</div><div class="step-body"><strong>Transcribe aracını kurun</strong> (bir kez yapılır):</div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'curl -fsSL https://raw.githubusercontent.com/cesp99/sussurro/master/scripts/install-transcribe.sh | bash')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">curl</span> <span class="flag">-fsSL</span> https://raw.githubusercontent.com/cesp99/sussurro/master/scripts/install-transcribe.sh | <span class="kw">bash</span></pre></div>
+  </div>
+
+  <div class="step"><div class="step-num">2</div><div class="step-body"><strong>Kurulum kontrolü:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Terminal <button class="copy-btn" onclick="cp(this,'which sussurro-transcribe')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">which</span> sussurro-transcribe</pre></div>
+  </div>
+
+  <div class="step"><div class="step-num">3</div><div class="step-body"><strong>Temel transkripsiyon:</strong></div></div>
+  <div class="cmd-block">
+    <div class="cmd-label">Basit kullanım <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -o "cikti.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-o</span> <span class="str">"cikti.txt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Türkçe dil seçimi <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -lang tr -o "cikti.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-lang</span> tr <span class="flag">-o</span> <span class="str">"cikti.txt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Dolgu kelimelerini temizle (-clean) <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -lang tr -clean -o "cikti.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-lang</span> tr <span class="flag">-clean</span> <span class="flag">-o</span> <span class="str">"cikti.txt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Large v3 Turbo + Türkçe + temizle (önerilen) <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -model large-v3-turbo -lang tr -clean -o "cikti.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> \
+  <span class="flag">-model</span> large-v3-turbo \
+  <span class="flag">-lang</span> tr \
+  <span class="flag">-clean</span> \
+  <span class="flag">-o</span> <span class="str">"cikti.txt"</span></pre></div>
+  </div>
+
+  <div class="note tip"><span class="note-icon">💡</span> Dosya yolunu bilmiyorsanız: terminale <code>sussurro-transcribe -i </code> yazdıktan sonra MP3 dosyasını Finder'dan terminale <strong>sürükleyip bırakın</strong>. Yol otomatik yapışır.</div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Zaman damgalı çıktı <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -lang tr -timestamps -o "zamanli.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-lang</span> tr <span class="flag">-timestamps</span> <span class="flag">-o</span> <span class="str">"zamanli.txt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Konuşmacı ayırt etme (toplantı kaydı için) <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "toplanti.mp3" -diarize -lang tr -o "konusmacili.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"toplanti.mp3"</span> <span class="flag">-diarize</span> <span class="flag">-lang</span> tr <span class="flag">-o</span> <span class="str">"konusmacili.txt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Tüm parametreleri görüntüle <button class="copy-btn" onclick="cp(this,'sussurro-transcribe --help')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">--help</span></pre></div>
+  </div>
+</div>
+
+<div id="format" class="section">
+  <div class="sec-title"><i class="ti ti-file-export" aria-hidden="true"></i> Çıktı Formatları</div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Format</th><th>Uzantı</th><th>Kullanım Alanı</th></tr>
+      <tr><td><span class="badge badge-blue">txt</span></td><td>.txt</td><td>Düz metin, varsayılan</td></tr>
+      <tr><td><span class="badge badge-green">srt</span></td><td>.srt</td><td>Video altyazısı (Premiere, Final Cut)</td></tr>
+      <tr><td><span class="badge badge-amber">vtt</span></td><td>.vtt</td><td>Web videoları için WebVTT</td></tr>
+      <tr><td><span class="badge badge-red">json</span></td><td>.json</td><td>Programatik işleme, API entegrasyonu</td></tr>
+    </table>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Düz metin (.txt) <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -format txt -o "cikti.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-format</span> txt <span class="flag">-o</span> <span class="str">"cikti.txt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">SRT altyazı dosyası <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -format srt -o "altyazi.srt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-format</span> srt <span class="flag">-o</span> <span class="str">"altyazi.srt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">WebVTT (web videoları) <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -format vtt -o "altyazi.vtt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-format</span> vtt <span class="flag">-o</span> <span class="str">"altyazi.vtt"</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">JSON çıktı <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -format json -o "cikti.json"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> <span class="flag">-format</span> json <span class="flag">-o</span> <span class="str">"cikti.json"</span></pre></div>
+  </div>
+</div>
+
+<div id="uzun" class="section">
+  <div class="sec-title"><i class="ti ti-clock" aria-hidden="true"></i> 100 Dakikalık Dosyalar İçin Optimize Komut</div>
+
+  <div class="note warn"><span class="note-icon">⚠️</span> Uzun dosyalarda Mac'i <strong>prize takın</strong>. Large v3 Turbo modeli M1/M2/M3 donanım hızlandırmasını kullanır — arka plan uygulamalarını kapatın.</div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Önerilen komut — 100 dk dosya için <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "uzun_dosya.mp3" -model large-v3-turbo -lang tr -clean -timestamps -o "transkript.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"uzun_dosya.mp3"</span> \
+  <span class="flag">-model</span> large-v3-turbo \
+  <span class="flag">-lang</span> tr \
+  <span class="flag">-clean</span> \
+  <span class="flag">-timestamps</span> \
+  <span class="flag">-o</span> <span class="str">"transkript.txt"</span></pre></div>
+  </div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Parametre</th><th>Ne İşe Yarar?</th></tr>
+      <tr><td><code>-model large-v3-turbo</code></td><td>En yüksek doğruluk, M-serisi Apple Silicon'da hızlı</td></tr>
+      <tr><td><code>-lang tr</code></td><td>Dil tahmini yerine doğrudan Türkçe seç → daha hızlı</td></tr>
+      <tr><td><code>-clean</code></td><td>"Yani", "şey", "uh" gibi dolgu kelimeleri LLM ile temizler</td></tr>
+      <tr><td><code>-timestamps</code></td><td>Her cümlenin başına 00:04:32 formatında zaman damgası ekler</td></tr>
+    </table>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Yüksek hassasiyet modu (daha yavaş ama daha doğru) <button class="copy-btn" onclick="cp(this,'sussurro-transcribe -i "dosya.mp3" -model large-v3-turbo -lang tr -clean -beam-size 5 -best-of 5 -o "cikti.txt"')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"dosya.mp3"</span> \
+  <span class="flag">-model</span> large-v3-turbo \
+  <span class="flag">-lang</span> tr <span class="flag">-clean</span> \
+  <span class="flag">-beam-size</span> 5 <span class="flag">-best-of</span> 5 \
+  <span class="flag">-o</span> <span class="str">"cikti.txt"</span></pre></div>
+  </div>
+</div>
+
+<div id="toplu" class="section">
+  <div class="sec-title"><i class="ti ti-stack-2" aria-hidden="true"></i> Toplu İşlem (Batch Processing)</div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Mevcut klasördeki tüm MP3'leri çevir <button class="copy-btn" onclick="cp(this,'for file in *.mp3; do\n  sussurro-transcribe -i "$file" -lang tr -clean -o "${file%.mp3}.txt"\ndone')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">for</span> file in *.mp3; <span class="kw">do</span>
+  <span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"$file"</span> <span class="flag">-lang</span> tr <span class="flag">-clean</span> <span class="flag">-o</span> <span class="str">"${file%.mp3}.txt"</span>
+<span class="kw">done</span></pre></div>
+  </div>
+
+  <div class="note"><span class="note-icon">ℹ️</span> Bu komut, mevcut klasördeki her <code>.mp3</code> dosyası için aynı isimde bir <code>.txt</code> oluşturur. Örn: <code>toplanti.mp3</code> → <code>toplanti.txt</code></div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Belirli bir klasördeki tüm dosyaları çevir <button class="copy-btn" onclick="cp(this,'find ~/Desktop/sesler -name "*.mp3" -exec sussurro-transcribe -i {} -lang tr -clean -o {}.txt \\;')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">find</span> ~/Desktop/sesler <span class="flag">-name</span> <span class="str">"*.mp3"</span> \
+  <span class="flag">-exec</span> <span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> {} <span class="flag">-lang</span> tr <span class="flag">-clean</span> <span class="flag">-o</span> {}.txt \;</pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">M4A ve WAV dahil tüm formatları çevir <button class="copy-btn" onclick="cp(this,'for file in *.mp3 *.wav *.m4a; do\n  [ -f "$file" ] || continue\n  sussurro-transcribe -i "$file" -lang tr -clean -o "${file%.*}.txt"\ndone')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">for</span> file in *.mp3 *.wav *.m4a; <span class="kw">do</span>
+  [ <span class="flag">-f</span> <span class="str">"$file"</span> ] || <span class="kw">continue</span>
+  <span class="kw">sussurro-transcribe</span> <span class="flag">-i</span> <span class="str">"$file"</span> <span class="flag">-lang</span> tr <span class="flag">-clean</span> <span class="flag">-o</span> <span class="str">"${file%.*}.txt"</span>
+<span class="kw">done</span></pre></div>
+  </div>
+</div>
+
+<div id="sorun" class="section">
+  <div class="sec-title"><i class="ti ti-tool" aria-hidden="true"></i> Sorun Giderme</div>
+
+  <div class="table-wrap">
+    <table>
+      <tr><th>Sorun</th><th>Sebep</th><th>Çözüm</th></tr>
+      <tr><td>"sussurro açılmıyor"</td><td>macOS güvenlik uyarısı</td><td><code>xattr -d com.apple.quarantine sussurro</code></td></tr>
+      <tr><td>"ffmpeg not found"</td><td>ffmpeg kurulu değil</td><td><code>brew install ffmpeg</code></td></tr>
+      <tr><td>Model indirme hatası</td><td>İnternet bağlantısı</td><td>Bağlantıyı kontrol et, <code>./sussurro</code> tekrar çalıştır</td></tr>
+      <tr><td>Kapsül görünmüyor</td><td>Pencere arkasında kaldı</td><td><span class="kbd">⌘ Cmd</span> <span class="kbd">Tab</span> ile uygulama listesini tara</td></tr>
+      <tr><td>Yüksek RAM kullanımı</td><td>Large model yüklü</td><td><code>./sussurro --whisper small</code></td></tr>
+    </table>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">ffmpeg yoksa kur (Homebrew gerekir) <button class="copy-btn" onclick="cp(this,'brew install ffmpeg')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">brew</span> install ffmpeg</pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Ayarları sıfırla (baştan başlamak için) <button class="copy-btn" onclick="cp(this,'rm -rf ~/.sussurro\n# Sonra ./sussurro ile yeniden kurulum yap')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">rm</span> <span class="flag">-rf</span> ~/.sussurro
+<span class="comment"># Sonra tekrar ./sussurro çalıştır</span></pre></div>
+  </div>
+
+  <div class="cmd-block">
+    <div class="cmd-label">Konfigürasyon dosyasını düzenle <button class="copy-btn" onclick="cp(this,'nano ~/.sussurro/config.yaml')">kopyala</button></div>
+    <div class="cmd-code"><pre><span class="kw">nano</span> ~/.sussurro/config.yaml</pre></div>
+  </div>
+
+  <div class="note warn"><span class="note-icon">⚠️</span> Homebrew kurulu değilse önce şunu çalıştırın: <code>/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"</code></div>
+</div>
+
+<div id="kaynakca" class="section">
+  <div class="sec-title"><i class="ti ti-link" aria-hidden="true"></i> Kaynakça ve Bağlantılar</div>
+  <div class="table-wrap">
+    <table>
+      <tr><th>Kaynak</th><th>Adres</th></tr>
+      <tr><td>GitHub Deposu</td><td><a href="https://github.com/cesp99/sussurro" style="color:#58a6ff;text-decoration:none;">github.com/cesp99/sussurro</a></td></tr>
+      <tr><td>Releases (indirme)</td><td><a href="https://github.com/cesp99/sussurro/releases" style="color:#58a6ff;text-decoration:none;">github.com/cesp99/sussurro/releases</a></td></tr>
+      <tr><td>DeepWiki Dokümantasyon</td><td><a href="https://deepwiki.com/cesp99/sussurro" style="color:#58a6ff;text-decoration:none;">deepwiki.com/cesp99/sussurro</a></td></tr>
+      <tr><td>Wayland Kurulum Rehberi</td><td><a href="https://github.com/cesp99/sussurro/blob/master/docs/wayland.md" style="color:#58a6ff;text-decoration:none;">github.com/cesp99/sussurro/blob/master/docs/wayland.md</a></td></tr>
+      <tr><td>Bilinen Sorunlar (KNOWN_ISSUES)</td><td><a href="https://github.com/cesp99/sussurro/blob/master/KNOWN_ISSUES.md" style="color:#58a6ff;text-decoration:none;">github.com/cesp99/sussurro/blob/master/KNOWN_ISSUES.md</a></td></tr>
+      <tr><td>Değişiklik Günlüğü (CHANGELOG)</td><td><a href="https://github.com/cesp99/sussurro/blob/master/CHANGELOG.md" style="color:#58a6ff;text-decoration:none;">github.com/cesp99/sussurro/blob/master/CHANGELOG.md</a></td></tr>
+    </table>
+  </div>
+  <div class="note"><span class="note-icon">ℹ️</span> Sürüm Notu (v2.3): Sussurro aktif geliştirme sürecindedir. "Start at Login" özelliği Settings ekranında görünmesine rağmen henüz tam olarak uygulanmamıştır; ilerleyen sürümlerde gelecektir. Windows desteği de yapım aşamasındadır.</div>
+</div>
+
+</div>
+
+<script>
+function show(id){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  event.target.classList.add('active');
+}
+function cp(btn,text){
+  navigator.clipboard.writeText(text).then(()=>{
+    const orig=btn.textContent;
+    btn.textContent='✓ kopyalandı';
+    setTimeout(()=>btn.textContent=orig,1500);
+  });
+}
+</script>

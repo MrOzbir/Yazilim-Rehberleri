@@ -1,0 +1,997 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Modern Mobil Uygulama Geliştirme: Masterclass Referans Rehberi</title>
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js CSS (Okaidia theme for dark mode) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.css" rel="stylesheet" />
+    
+    <!-- Tippy.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/shift-away.css"/>
+    
+    <style>
+        :root {
+            --bg: #050505;
+            --bg2: #0E0E0E;
+            --bg3: #181818;
+            --bg4: #222222;
+            --border: #2C2C2C;
+            --border-hover: #4A4A4A;
+            --accent: #FF5722;
+            --accent-dark: #E64A19;
+            --accent-glow: rgba(255, 87, 34, 0.15);
+            --blue: #29B6F6;
+            --blue-dark: #0288D1;
+            --blue-glow: rgba(41, 182, 246, 0.15);
+            --purple: #AB47BC;
+            --purple-glow: rgba(171, 71, 188, 0.15);
+            --green: #66BB6A;
+            --text-main: #EDEDED;
+            --text-muted: #9E9E9E;
+            --sidebar-width: 360px;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            scrollbar-width: thin;
+            scrollbar-color: var(--border-hover) var(--bg2);
+        }
+
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--border-hover);
+            border-radius: 4px;
+        }
+
+        body {
+            font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            display: flex;
+            min-height: 100vh;
+            overflow-x: hidden;
+            line-height: 1.8;
+            font-size: 1.05rem;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--bg2);
+            border-right: 1px solid var(--border);
+            position: fixed;
+            height: 100vh;
+            padding: 3rem 2rem;
+            overflow-y: auto;
+            z-index: 100;
+        }
+
+        .sidebar h1 {
+            font-size: 1.8rem;
+            font-weight: 900;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, var(--accent), var(--blue), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            line-height: 1.2;
+            letter-spacing: -1px;
+        }
+        
+        .sidebar p.subtitle {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            margin-bottom: 3rem;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+        }
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .nav-item a {
+            display: flex;
+            flex-direction: column;
+            padding: 1rem 1.2rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: 12px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-weight: 600;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+            background-color: rgba(255, 255, 255, 0.02);
+        }
+
+        .nav-item a span {
+            font-size: 0.8rem;
+            color: #666;
+            font-weight: 500;
+            margin-top: 0.3rem;
+        }
+
+        .nav-item a:hover {
+            background-color: var(--bg3);
+            color: var(--text-main);
+            border-color: var(--border);
+            transform: translateX(5px);
+        }
+
+        .nav-item a.active {
+            background-color: var(--accent-glow);
+            color: var(--accent);
+            border-left: 4px solid var(--accent);
+            border-color: var(--border-hover);
+            border-left-color: var(--accent);
+        }
+        
+        .nav-item a.active span {
+            color: var(--accent-dark);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 5rem 6rem;
+            width: calc(100% - var(--sidebar-width));
+            max-width: 1700px;
+        }
+
+        .section-header {
+            margin-bottom: 5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .section-header h2 {
+            font-size: 3.5rem;
+            color: #fff;
+            margin-bottom: 1.5rem;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            line-height: 1.1;
+        }
+
+        .section-header p {
+            color: var(--text-muted);
+            font-size: 1.25rem;
+            max-width: 900px;
+            font-weight: 400;
+        }
+
+        .content-block {
+            margin-bottom: 8rem;
+        }
+
+        /* Content Box */
+        .content-box {
+            background-color: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 4rem;
+            position: relative;
+            overflow: hidden;
+            margin-bottom: 4rem;
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.5s ease;
+        }
+
+        .content-box::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: radial-gradient(1000px circle at var(--mouse-x) var(--mouse-y), rgba(255, 255, 255, 0.04), transparent 40%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .content-box:hover::before {
+            opacity: 1;
+        }
+
+        .content-box:hover {
+            border-color: var(--border-hover);
+        }
+
+        .content-box.highlight-accent { border-top: 4px solid var(--accent); }
+        .content-box.highlight-blue { border-top: 4px solid var(--blue); }
+        .content-box.highlight-purple { border-top: 4px solid var(--purple); }
+        
+        .content-box-inner {
+            position: relative;
+            z-index: 2;
+        }
+
+        .badge-container {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.5rem 1.2rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+        }
+
+        .badge.mimari { background-color: var(--bg3); color: var(--purple); border: 1px solid var(--border); }
+        .badge.performans { background-color: var(--bg3); color: var(--accent); border: 1px solid var(--border); }
+        .badge.network { background-color: var(--bg3); color: var(--blue); border: 1px solid var(--border); }
+        .badge.native { background-color: var(--bg3); color: var(--green); border: 1px solid var(--border); }
+
+        .content-box h3 {
+            font-size: 2.2rem;
+            margin-bottom: 2rem;
+            color: #fff;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        .content-box h4 {
+            font-size: 1.5rem;
+            margin-top: 3rem;
+            margin-bottom: 1.5rem;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            font-weight: 700;
+        }
+        
+        .content-box h4::before {
+            content: '';
+            display: block;
+            width: 12px;
+            height: 12px;
+            background-color: var(--blue);
+            border-radius: 50%;
+            margin-right: 15px;
+        }
+        
+        .highlight-accent h4::before { background-color: var(--accent); }
+        .highlight-purple h4::before { background-color: var(--purple); }
+
+        .content-box p {
+            margin-bottom: 1.8rem;
+            color: var(--text-muted);
+        }
+
+        .content-box ul, .content-box ol {
+            margin-bottom: 2rem;
+            margin-left: 1.5rem;
+            color: var(--text-muted);
+        }
+
+        .content-box li {
+            margin-bottom: 1rem;
+            padding-left: 0.5rem;
+        }
+
+        .content-box li::marker {
+            color: var(--border-hover);
+        }
+
+        .content-box strong {
+            color: #FFF;
+            font-weight: 600;
+        }
+
+        /* Code Blocks */
+        pre[class*="language-"] {
+            background-color: var(--bg3) !important;
+            border: 1px solid var(--border) !important;
+            border-radius: 16px !important;
+            padding: 2rem !important;
+            font-family: 'JetBrains Mono', monospace !important;
+            font-size: 0.95rem !important;
+            overflow-x: auto;
+            margin-top: 2rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            line-height: 1.6 !important;
+        }
+
+        code[class*="language-"] {
+            font-family: 'JetBrains Mono', monospace !important;
+            text-shadow: none !important;
+        }
+
+        .line-numbers .line-numbers-rows {
+            border-right: 1px solid var(--border) !important;
+            padding-right: 15px !important;
+        }
+
+        /* Inline code */
+        p code, li code {
+            background-color: var(--bg3);
+            color: var(--accent);
+            padding: 0.2rem 0.6rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            border: 1px solid var(--border);
+        }
+
+        /* Tooltip term highlights */
+        .term {
+            color: var(--blue);
+            border-bottom: 1px dashed var(--blue);
+            cursor: help;
+            font-weight: 600;
+            transition: all 0.2s;
+            padding-bottom: 2px;
+        }
+
+        .term:hover {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* Deep Dive Alert Boxes */
+        .deep-dive {
+            background-color: rgba(41, 182, 246, 0.05);
+            border: 1px solid rgba(41, 182, 246, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            margin: 3rem 0;
+            position: relative;
+        }
+
+        .deep-dive::before {
+            content: 'DEEP DIVE';
+            position: absolute;
+            top: -12px;
+            left: 24px;
+            background-color: var(--bg2);
+            color: var(--blue);
+            padding: 0 10px;
+            font-size: 0.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
+        }
+
+        .deep-dive h5 {
+            color: #fff;
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Footer Progress Tracker */
+        .progress-container {
+            position: fixed;
+            bottom: 0;
+            left: var(--sidebar-width);
+            width: calc(100% - var(--sidebar-width));
+            height: 5px;
+            background-color: transparent;
+            z-index: 1000;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background: linear-gradient(90deg, var(--blue), var(--purple), var(--accent));
+            width: 0%;
+            transition: width 0.1s ease;
+            box-shadow: 0 -2px 15px var(--accent-glow);
+        }
+        
+        .tippy-box[data-theme~='custom'] {
+            background-color: var(--bg4);
+            color: var(--text-main);
+            border: 1px solid var(--border-hover);
+            border-radius: 12px;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            padding: 1rem;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+            line-height: 1.6;
+            max-width: 350px !important;
+        }
+        
+        .tippy-box[data-theme~='custom'][data-placement^='top'] > .tippy-arrow::before {
+            border-top-color: var(--border-hover);
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .main-content { padding: 4rem; }
+        }
+
+        @media (max-width: 1000px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; width: 100%; }
+            .progress-container { left: 0; width: 100%; }
+        }
+    </style>
+</head>
+<body class="line-numbers">
+
+    <!-- Sidebar -->
+    <nav class="sidebar">
+        <h1>MASTERCLASS<br>REFERANS</h1>
+        <p class="subtitle">Mobil Mimaride İleri Seviye Konseptler</p>
+        <ul class="nav-links">
+            <li class="nav-item">
+                <a href="#sec-01" class="nav-link">
+                    01. UI & Rendering Mimarisi
+                    <span>Layout Phase, BoxConstraints, Compose Side Effects</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#sec-02" class="nav-link">
+                    02. İleri State Management
+                    <span>Freezed, Riverpod, DI (GetIt)</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#sec-03" class="nav-link">
+                    03. Asenkron & Veritabanı
+                    <span>WebSockets, SQLite WAL Modu, Memory GC</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#sec-04" class="nav-link">
+                    04. Native Sistemler & FFI
+                    <span>C/C++ Bağlantıları, Swift ARC, Biyometrik</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="#sec-05" class="nav-link">
+                    05. DevOps, Güvenlik & CI/CD
+                    <span>V3 Imza, ProGuard Rules, GitHub Actions</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- SECTION 01: UI & Rendering -->
+        <section id="sec-01" class="content-block">
+            <div class="section-header">
+                <h2>01. İleri Seviye UI Mimarisi ve Rendering Matematiği</h2>
+                <p>Ekranda gördüğümüz piksellerin arkasındaki Layout Phase, Constraints, ve Side Effect mekanizmalarının işletim sistemiyle olan ilişkisi.</p>
+            </div>
+
+            <div class="content-box highlight-blue" data-tilt data-tilt-max="1" data-tilt-speed="1000" data-tilt-perspective="2000">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge mimari">Flutter Engine</span>
+                        <span class="badge performans">Layout Constraints</span>
+                    </div>
+                    <h3>Flutter Rendering Engine: Build, Layout, Paint</h3>
+                    <p>Bir uygulamanın akıcı (60/120 FPS) çalışması için Flutter her bir kareyi (frame) 16 milisaniye içinde çizmeli. Bu çizim 4 ana fazda gerçekleşir:</p>
+                    
+                    <ol>
+                        <li><strong>Build Phase:</strong> Konfigürasyonların (Widget ağacının) yaratılması. En ucuz fazdır.</li>
+                        <li><strong>Layout Phase (En Kritik Faz):</strong> Kimin nerede ve ne kadar büyük olacağına karar verildiği aşamadır. Kural şudur: <em>"Aşağı doğru Constraint (Kısıtlama) iner, yukarı doğru Size (Boyut) çıkar."</em> Ata (Parent) widget çocuğuna <code>BoxConstraints(minWidth, maxWidth, minHeight, maxHeight)</code> gönderir. Çocuk bu sınırlar içinde kendi boyutunu belirler ve atasına bildirir.</li>
+                        <li><strong>Paint Phase:</strong> Boyutlar belirlendikten sonra `Canvas` üzerine pikseller çizilir.</li>
+                        <li><strong>Compositing:</strong> Farklı katmanların (örn: Opacity, Transform) GPU'ya gönderilmeden önce birleştirilmesidir. <code>RepaintBoundary</code> kullanılarak gereksiz paint işlemleri engellenir.</li>
+                    </ol>
+
+                    <div class="deep-dive">
+                        <h5>BoxConstraints Çakışmaları (Unbounded Errors)</h5>
+                        <p>Genellikle ListView'i bir Column içine koyduğunuzda <code>Vertical viewport was given unbounded height</code> hatası alırsınız. Bunun sebebi Column'un çocuklarına <strong>Sonsuz (Infinity)</strong> yükseklik limiti vermesi, ListView'in ise olabildiğince genişlemek istemesidir (Infinity boyut talebi). Çözüm: ListView'i <code>Expanded</code> veya <code>Flexible</code> içine sararak, Column'un ona "sadece kalan alanı al" constraint'i göndermesini sağlamaktır.</p>
+                    </div>
+
+<pre><code class="language-dart">// Custom RenderObject Yazmak (En Üst Düzey Performans)
+// Sadece Canvas üzerine saf çizim yapan ve Widget maliyeti olmayan yaklaşım
+class MyCustomRenderBox extends RenderBox {
+  @override
+  void performLayout() {
+    // Parent'ın constraint'lerine uymak ZORUNLUDUR
+    size = constraints.constrain(const Size(100, 100));
+  }
+
+  @override
+  void paint(PaintingContext context, Offset offset) {
+    final paint = Paint()..color = Colors.red;
+    // GPU'ya doğrudan çizim komutu
+    context.canvas.drawRect(offset & size, paint);
+  }
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="content-box highlight-accent" data-tilt data-tilt-max="1" data-tilt-speed="1000" data-tilt-perspective="2000">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge mimari">Jetpack Compose</span>
+                    </div>
+                    <h3>Compose Side Effects (Yan Etkiler) Mimarisi</h3>
+                    <p>Declarative UI (Compose) fonksiyonları her state değişiminde yeniden çalışır (Recomposition). Eğer bir Composable fonksiyonun içine doğrudan API isteği yazarsanız, her harf yazışınızda state değiştiği için API'ye yüzlerce istek gider. Composable fonksiyonlar <strong>Pure (Saf)</strong> olmalıdır. Yan etkiler (API çağrısı, Timer, Veritabanı okuması) <em>Effect API'leri</em> ile kontrol edilir.</p>
+
+                    <ul>
+                        <li><strong>LaunchedEffect:</strong> Sadece belirli bir "Key" değiştiğinde tetiklenen Coroutine başlatır. Composable yaşam döngüsüne bağlıdır, ekran kapanırsa istek otomatik iptal edilir.</li>
+                        <li><strong>DisposableEffect:</strong> Event listener, Broadcast receiver gibi kapanışta (Dispose) bellekten silinmesi (unregister) gereken işlemlerde kullanılır.</li>
+                        <li><strong>rememberCoroutineScope:</strong> Buton tıklaması gibi callback'ler içinden Coroutine başlatmak için kullanılır.</li>
+                    </ul>
+
+<pre><code class="language-kotlin">@Composable
+fun SensorScreen(sensorManager: SensorManager) {
+    var sensorValue by remember { mutableStateOf(0f) }
+
+    // DisposableEffect: Ekran açıldığında Listener kaydeder, 
+    // ekran kapanınca (onDispose) Listener'ı silerek Memory Leak'i önler.
+    DisposableEffect(sensorManager) {
+        val listener = object : SensorEventListener {
+            override fun onSensorChanged(event: SensorEvent?) {
+                sensorValue = event?.values?.get(0) ?: 0f
+            }
+            override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {}
+        }
+        
+        sensorManager.registerListener(listener, sensorManager.getDefaultSensor(Sensor.TYPE_LIGHT), SensorManager.SENSOR_DELAY_NORMAL)
+        
+        onDispose {
+            sensorManager.unregisterListener(listener) // Bellek Sızıntısını Önler!
+        }
+    }
+
+    Text("Işık Sensörü Değeri: $sensorValue")
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 02: State Management -->
+        <section id="sec-02" class="content-block">
+            <div class="section-header">
+                <h2>02. İleri Seviye State Management ve Dependency Injection</h2>
+                <p>Güçlü tip güvenliği (Type Safety), değişmezlik (Immutability) ve Bağımlılık Enjeksiyonu prensipleri ile kurumsal yapılandırma.</p>
+            </div>
+
+            <div class="content-box highlight-purple" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge mimari">Immutability</span>
+                        <span class="badge mimari">Freezed & BLoC</span>
+                    </div>
+                    <h3>State Immutability (Değişmezlik) ve Freezed Paketleri</h3>
+                    <p>State Management sistemlerinin arayüzü güncelleyebilmesi için objelerin bellekteki adreslerinin (Reference) değişmesi gerekir. <code>user.name = "Ali"</code> demek objenin referansını değiştirmez. Bunun yerine objenin kopyasını almalıyız (<code>copyWith</code>). Dart'ta bunu manuel yapmak çok hataya açıktır. Bu yüzden <strong>Freezed</strong> ve <strong>Equatable</strong> gibi Code Generation araçları kullanılır.</p>
+
+                    <h4>Union Types ve Freezed Pattern Matching</h4>
+                    <p>Freezed sayesinde state'in sadece belirli formlarda (Loading, Loaded, Error) olmasını sağlayabiliriz. UI tarafında <code>when()</code> metodu kullanarak eksik state kontrolü bırakılmasının önüne geçeriz (Derleme zamanı hatası verir).</p>
+
+<pre><code class="language-dart">// 1. Freezed ile State Tanımlaması
+@freezed
+class ProductState with _$ProductState {
+  const factory ProductState.initial() = _Initial;
+  const factory ProductState.loading() = _Loading;
+  // Başarılı durumda ürün listesi gelir
+  const factory ProductState.loaded(List&lt;Product&gt; products) = _Loaded;
+  // Hata durumunda mesaj gelir
+  const factory ProductState.error(String message) = _Error;
+}
+
+// 2. UI Tarafında Tüketimi (Pattern Matching)
+Widget build(BuildContext context) {
+  final state = context.watch&lt;ProductBloc&gt;().state;
+
+  // Freezed'in 'when' metodu, tüm durumları ele almamızı zorunlu kılar.
+  // Bir durumu bile unutursanız IDE kızarır ve derlenmez.
+  return state.when(
+    initial: () =&gt; Text('Arama yapın'),
+    loading: () =&gt; CircularProgressIndicator(),
+    loaded: (products) =&gt; ListView.builder(
+      itemCount: products.length,
+      itemBuilder: (_, i) =&gt; Text(products[i].name),
+    ),
+    error: (msg) =&gt; Text('Hata: $msg', style: TextStyle(color: Colors.red)),
+  );
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="content-box highlight-blue" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge mimari">Riverpod 2.0</span>
+                        <span class="badge mimari">DI Container</span>
+                    </div>
+                    <h3>Riverpod ve Dependency Injection (GetIt/Injectable)</h3>
+                    <p>Provider'ın eksikliklerini kapatan <strong>Riverpod 2.0</strong>, global olarak tanımlanan ama test edilebilir, context'ten bağımsız çalışan bir mimaridir. Riverpod'da özellikle asenkron veriler <code>AsyncNotifierProvider</code> ile çekilir. Kendi içinde Caching, Auto-dispose (ekran kapanınca hafızayı silme) yetenekleri vardır.</p>
+
+                    <div class="deep-dive">
+                        <h5>GetIt ile Bağımlılıkların Enjekte Edilmesi (DI)</h5>
+                        <p>SOLID prensiplerinden 'Dependency Inversion' gereği sınıflar birbirlerini `new` ile yaratmamalıdır. Bunun yerine <strong>GetIt</strong> gibi bir Service Locator kullanılır. Büyük projelerde bu locatorları elle yazmak yerine <code>injectable</code> paketi kullanılarak annotation'lar (<code>@injectable</code>, <code>@singleton</code>, <code>@lazySingleton</code>) üzerinden bağımlılık grafiği (Dependency Graph) build_runner ile otomatik oluşturulur.</p>
+                    </div>
+
+<pre><code class="language-dart">// INJECTABLE KURULUMU (Dependency Injection)
+@module
+abstract class RegisterModule {
+  // Dio instance'ı uygulama boyunca tekil (Singleton)
+  @lazySingleton
+  Dio get dio =&gt; Dio();
+}
+
+@lazySingleton
+class ApiRepository {
+  final Dio dio;
+  // Dio, GetIt tarafından otomatik olarak buraya enjekte edilir!
+  ApiRepository(this.dio); 
+  
+  Future&lt;User&gt; fetchUser() async { ... }
+}
+
+// RIVERPOD 2.0 ile Async State
+@riverpod
+class UserNotifier extends _$UserNotifier {
+  @override
+  FutureOr&lt;User&gt; build() async {
+    // get_it üzerinden repository'e eriş ve ilk veriyi yükle
+    return getIt&lt;ApiRepository&gt;().fetchUser();
+  }
+
+  Future&lt;void&gt; updateUser(String newName) async {
+    state = const AsyncValue.loading();
+    state = await AsyncValue.guard(() async {
+      await getIt&lt;ApiRepository&gt;().updateName(newName);
+      return getIt&lt;ApiRepository&gt;().fetchUser();
+    });
+  }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 03: Asenkron & Veritabanı -->
+        <section id="sec-03" class="content-block">
+            <div class="section-header">
+                <h2>03. İleri Seviye Ağ İletişimi, Veritabanı Motorları ve Bellek Yönetimi</h2>
+                <p>Gerçek zamanlı protokoller, SQLite kilitlenmeleri ve GC (Garbage Collector) çalışma prensipleri.</p>
+            </div>
+
+            <div class="content-box highlight-accent" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge network">WebSockets</span>
+                        <span class="badge network">gRPC</span>
+                    </div>
+                    <h3>REST'in Ötesi: GraphQL, WebSockets ve gRPC</h3>
+                    <p>Modern mobil uygulamalar sadece REST API (HTTP GET/POST) ile sınırlı kalamaz. Borsa, sohbet veya canlı konum takibi yapan uygulamalar çok daha efektif protokollere ihtiyaç duyar.</p>
+
+                    <ul>
+                        <li><strong>WebSockets:</strong> Sürekli açık bir TCP bağlantısıdır. Sunucu istemciye, istemci hiçbir şey sormadan veri itebilir (Push). HTTP overhead'i (header'lar) olmadığı için ultra hızlıdır.</li>
+                        <li><strong>GraphQL:</strong> "Under-fetching" ve "Over-fetching" sorununu çözer. Mobil uygulama (istemci), devasa bir JSON yerine *sadece* ihtiyacı olan alanları (örn: sadece isim ve resim) bir Query ile sunucudan talep eder. Veri tasarrufu sağlar.</li>
+                        <li><strong>gRPC (Protocol Buffers):</strong> Google'ın geliştirdiği RPC framework'üdür. Veriyi JSON (metin) yerine Binary (ikili) formatta iletir. Serileştirme maliyeti JSON'a göre %80 daha azdır, payload boyutu inanılmaz küçüktür. Özellikle mikroservisler ve yüksek performanslı mobil bağlantılar için geleceğin standardıdır.</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div class="content-box highlight-blue" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge performans">SQLite WAL Mode</span>
+                        <span class="badge performans">Garbage Collection</span>
+                    </div>
+                    <h3>SQLite WAL Modu ve Concurrency (Eşzamanlılık)</h3>
+                    <p>Mobil veritabanlarında (SQLite/Room/sqflite) sık yapılan hata, arka plan Isolate'i veritabanına devasa bir JSON kaydederken, Main Thread'in o veriyi okumaya çalışmasıdır. SQLite varsayılan olarak <em>Journaling</em> modunda çalışır ve yazma işlemi sırasında tüm veritabanını <strong>kilitler (Database Locked Exception)</strong>.</p>
+                    <p>Bunu çözmek için veritabanı bağlantısı açılırken <strong>WAL (Write-Ahead Logging)</strong> modu aktif edilmelidir. WAL modu, eşzamanlı olarak 1 okuyucu ve 1 yazıcının veritabanını aynı anda kilitlemeden kullanmasına izin verir. Veriler ana DB dosyası yerine .wal uzantılı geçici bir dosyaya yazılır.</p>
+
+                    <div class="deep-dive">
+                        <h5>Bellek Yönetimi: Dart GC vs Swift ARC</h5>
+                        <p><strong>Dart/Kotlin (Garbage Collector):</strong> Dart <em>Generational GC</em> kullanır. Bellek ikiye ayrılır: Young Space (Kısa ömürlü objeler, her frame atılır) ve Old Space (Uzun ömürlü, uygulamanın state'i). GC, referansı kalmayan objeleri arkaplanda temizler.</p>
+                        <p><strong>Swift (ARC - Automatic Reference Counting):</strong> GC yoktur. Derleyici compile zamanında objelerin referans sayılarını hesaplar, referans 0 olunca hemen RAM'den siler. Ancak A B'yi, B de A'yı tutarsa (Retain Cycle) referanslar asla 0 olmaz ve kalıcı Memory Leak oluşur. Çözümü <code>weak</code> veya <code>unowned</code> keyword'lerini kullanmaktır.</p>
+                    </div>
+
+<pre><code class="language-swift">// SWIFT: ARC ve Retain Cycle Çözümü (Memory Leak Engelleme)
+class User {
+    var device: Device?
+    deinit { print("User silindi") }
+}
+
+class Device {
+    // EĞER WEAK YAZMAZSAK: User ve Device birbirini güçlü tutar, 
+    // ekran kapansa bile RAM'den silinmezler (Memory Leak).
+    weak var owner: User? 
+    deinit { print("Device silindi") }
+}
+
+// Closure içinde weak self kullanımı
+fetchDataFromServer { [weak self] data in
+    // Eğer istek tamamlanana kadar ekran kapatılırsa, self 'nil' olur 
+    // ve crash yaşanmaz, bellek sızıntısı olmaz.
+    guard let self = self else { return }
+    self.updateUI(data)
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 04: Native & FFI -->
+        <section id="sec-04" class="content-block">
+            <div class="section-header">
+                <h2>04. İleri Native Bağlantılar: FFI ve C++ Entegrasyonu</h2>
+                <p>Mobil işlemcinin maksimum gücünü (CPU/GPU) kullanmak için MethodChannel'ı atlayıp donanım diline (C/C++/Rust) direkt inmek.</p>
+            </div>
+
+            <div class="content-box highlight-purple" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge native">Dart FFI</span>
+                        <span class="badge native">C++ Entegrasyonu</span>
+                    </div>
+                    <h3>Dart FFI (Foreign Function Interface) Mimarisi</h3>
+                    <p>MethodChannel, mesajları JSON benzeri bir formata serileştirip/deserileştirip yollar (Overhead). Eğer saniyede 60 kare video işleyeceksek, bir OpenCV C++ algoritmasına ihtiyacımız varsa, MethodChannel saniyede 60 devasa array yollarken tıkanır.</p>
+                    
+                    <p><strong>Dart FFI</strong>, serileştirme yapmaz. Dart ile C++ aynı bellek adresini (RAM Pointer) paylaşır. Dart kodu doğrudan C struct'larına ve Pointer'larına erişir. Sıfır overhead, %100 CPU performansı.</p>
+
+<pre><code class="language-dart">// 1. C/C++ Tarafında Yazılan Fonksiyon (OpenCV Blur örneği)
+// extern "C" __attribute__((visibility("default"))) __attribute__((used))
+// void apply_blur(uint8_t* image_data, int width, int height) { ... }
+
+// 2. Dart Tarafında FFI Tanımlamaları ve Eşleştirme
+import 'dart:ffi' as ffi;
+import 'dart:io';
+
+// C dilindeki pointer imzasını tanımla
+typedef ApplyBlurC = ffi.Void Function(ffi.Pointer&lt;ffi.Uint8&gt;, ffi.Int32, ffi.Int32);
+// Dart dilindeki karşılığını tanımla
+typedef ApplyBlurDart = void Function(ffi.Pointer&lt;ffi.Uint8&gt;, int, int);
+
+class ImageProcessor {
+  late final ApplyBlurDart _applyBlur;
+
+  ImageProcessor() {
+    // Dinamik kütüphaneyi (.so veya .framework) belleğe yükle
+    final dylib = Platform.isAndroid
+        ? ffi.DynamicLibrary.open('libimage_processor.so')
+        : ffi.DynamicLibrary.process(); // iOS statically linked
+
+    // Fonksiyonu bellekteki adresinden bul ve Dart fonksiyonuna çevir
+    _applyBlur = dylib.lookupFunction&lt;ApplyBlurC, ApplyBlurDart&gt;('apply_blur');
+  }
+
+  void processImage(ffi.Pointer&lt;ffi.Uint8&gt; memoryPointer, int width, int height) {
+    // SIFIR GECİKME: Doğrudan C++ kodu çalışır!
+    _applyBlur(memoryPointer, width, height);
+  }
+}</code></pre>
+
+                    <div class="deep-dive">
+                        <h5>iOS Swift Bridging Header</h5>
+                        <p>Objective-C tabanlı eski ve güçlü kütüphaneleri (veya FFI export'larını) Swift tarafında kullanabilmek için <code>Runner-Bridging-Header.h</code> isimli özel bir dosya kullanılır. Bu dosya, C tabanlı kodların Swift derleyicisi tarafından "anlaşılabilir" class/struct'lara dönüştürülmesini sağlayan çevirmendir.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 05: DevOps & Performans -->
+        <section id="sec-05" class="content-block">
+            <div class="section-header">
+                <h2>05. Güvenlik İmzaları, ProGuard Matematigi ve CI/CD Pipelines</h2>
+                <p>Hassas kurumsal uygulamaları yayına hazırlamanın zorlu süreçleri: Kod karartma hataları, Uygulama İmzaları ve GitHub Actions YAML yapılandırması.</p>
+            </div>
+
+            <div class="content-box highlight-accent" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge mimari">App Signing</span>
+                        <span class="badge mimari">ProGuard</span>
+                    </div>
+                    <h3>App Signing (V2/V3) ve ProGuard Exception'ları</h3>
+                    
+                    <h4>Keystore ve V2/V3 İmzaları</h4>
+                    <p>Android uygulamaları (APK/AAB) yayınlanmadan önce Keystore (.jks) ile imzalanır. V1 imzası (JAR signing) kolaylıkla kırılabilirken, <strong>APK Signature Scheme v2 ve v3</strong> tüm APK bloğunu kriptografik olarak korur. Eğer APK içine kötü niyetli biri tarafından tek bir byte kod dahi eklenirse imza bozulur ve işletim sistemi "Paket ayrıştırma hatası" vererek kurulumu reddeder.</p>
+
+                    <h4>ProGuard Karartma Hataları (Reflection Crashes)</h4>
+                    <p>ProGuard kodu küçültürken kullanılmayan fonksiyonları siler (Tree Shaking). Ancak <code>GSON</code> veya <code>Moshi</code> gibi JSON parse kütüphaneleri, kodun içinde fonksiyonları "Reflection (Yansıma)" ile string isimleri üzerinden bulur. ProGuard bu model isimlerini `a.b.c` yapınca, kütüphane class'ı bulamaz ve uygulama Release modda çöker (Debug modda çalışır).</p>
+                    <p><strong>Çözüm:</strong> <code>proguard-rules.pro</code> dosyasına, modellerin ismini değiştirmemesi için "Keep" (tut) kuralı yazılır.</p>
+
+<pre><code class="language-bash"># proguard-rules.pro
+# Data sınıflarını (Modelleri) karartma (GSON Reflection için şart)
+-keep class com.company.app.models.** { *; }
+
+# Retrofit sınıflarını koru
+-keep class retrofit2.** { *; }
+-keepattributes Signature
+-keepattributes Exceptions</code></pre>
+                </div>
+            </div>
+
+            <div class="content-box highlight-blue" data-tilt data-tilt-max="1">
+                <div class="content-box-inner">
+                    <div class="badge-container">
+                        <span class="badge performans">CI/CD</span>
+                        <span class="badge performans">GitHub Actions</span>
+                    </div>
+                    <h3>DevOps: GitHub Actions ile Otomatik Dağıtım (CI/CD)</h3>
+                    <p>Büyük ekiplerde "Bilgisayarımdan build alıp Google Play'e atıyorum" devri kapandı. Her Pull Request (PR) açıldığında testlerin sunucuda otomatik koşması ve master branch'e merge edildiğinde uygulamanın markete yüklenmesi gerekir.</p>
+
+                    <p>Aşağıda tam teşekküllü bir GitHub Actions YAML konfigürasyonu yer almaktadır. Bu script sırasıyla; ortamı kurar, testleri koşar, güvenli keystore'u (base64) çözer, release APK üretir ve Firebase App Distribution / Google Play'e yükler.</p>
+
+<pre><code class="language-yaml"># .github/workflows/deploy.yml
+name: Android Release Build & Deploy
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Kodu Checkout Et
+        uses: actions/checkout@v3
+
+      - name: Java 17 Kurulumu
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Flutter Kurulumu
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.19.x'
+          channel: 'stable'
+
+      - name: Bağımlılıkları İndir (Pub Get)
+        run: flutter pub get
+
+      - name: Birim Testlerini Çalıştır (Unit Tests)
+        run: flutter test --no-pub
+
+      - name: Güvenli Keystore'u Çöz (Base64'ten .jks'ye)
+        run: echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+
+      - name: AAB Formatında Release Build Al
+        run: flutter build appbundle --release --obfuscate --split-debug-info=./debug
+        env:
+          KEY_STORE_PASSWORD: ${{ secrets.KEY_STORE_PASSWORD }}
+          KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+          ALIAS: ${{ secrets.ALIAS }}
+
+      - name: Google Play Console'a Yükle (Fastlane Action)
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.company.app
+          releaseFiles: build/app/outputs/bundle/release/app-release.aab
+          track: internal # Sadece iç test ekibine gönder</code></pre>
+
+                    <div class="deep-dive">
+                        <h5>Performans Analizi (Jank ve Leak Tespiti)</h5>
+                        <p>CI/CD sonrasında uygulama performans testine girer. Flutter DevTools kullanılarak iki şeye bakılır:</p>
+                        <ol>
+                            <li><strong>Performance Overlay (Timeline):</strong> UI Threat ve Raster Threat çubukları 16ms çizgisini aşarsa kırmızı olur (Jank). Çok fazla <code>SaveLayer</code> veya aşırı gölge (Shadow) kullanımı Raster thread'i patlatır.</li>
+                            <li><strong>Memory Leak (Expando):</strong> Uygulamada sayfalar arasında gezilir ve "Force GC" butonuna basılır. Eğer heap grafiği sürekli yukarı doğru tırmanıyorsa, kapatılan ekranların nesneleri silinemiyordur (Örn: Dispose edilmemiş AnimationController veya StreamSubscription).</li>
+                        </ol>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <div style="height: 100px;"></div>
+    </main>
+
+    <!-- Footer Progress Tracker -->
+    <div class="progress-container">
+        <div class="progress-bar" id="progressBar"></div>
+    </div>
+
+    <!-- Scripts -->
+    <!-- Prism.js for syntax highlighting -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-dart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-kotlin.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-swift.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/plugins/line-numbers/prism-line-numbers.min.js"></script>
+    
+    <!-- Popper.js and Tippy.js for Tooltips -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    
+    <!-- VanillaTilt.js for 3D card effects -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+
+    <script>
+        // Initialize Tooltips
+        tippy('[data-tippy-content]', {
+            theme: 'custom',
+            animation: 'shift-away',
+            placement: 'top',
+            maxWidth: 350,
+            interactive: true,
+        });
+
+        // Mouse-tracking glow coordinates inside .content-box
+        const contentBoxes = document.querySelectorAll('.content-box');
+        contentBoxes.forEach(box => {
+            box.addEventListener('mousemove', e => {
+                const rect = box.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                
+                box.style.setProperty('--mouse-x', `${x}px`);
+                box.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Sliding footer tracker and Sidebar highlight
+        const progressBar = document.getElementById('progressBar');
+        const sections = document.querySelectorAll('section');
+        const navLinks = document.querySelectorAll('.nav-link');
+        
+        window.addEventListener('scroll', () => {
+            // Update progress bar
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            const scrolled = (winScroll / height) * 100;
+            progressBar.style.width = scrolled + '%';
+
+            // Highlight active sidebar link
+            let current = '';
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                const sectionHeight = section.clientHeight;
+                if (winScroll >= (sectionTop - 400)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href').includes(current) && current !== '') {
+                    link.classList.add('active');
+                }
+            });
+        });
+
+        // Smooth scroll for sidebar links
+        document.querySelectorAll('.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const targetId = this.getAttribute('href');
+                const targetElement = document.querySelector(targetId);
+                
+                // Active class update explicitly for click
+                navLinks.forEach(link => link.classList.remove('active'));
+                this.classList.add('active');
+                
+                const offsetTop = targetElement.offsetTop - 80;
+                window.scrollTo({
+                    top: offsetTop,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        // Trigger scroll event on load to highlight correct menu item
+        window.dispatchEvent(new Event('scroll'));
+    </script>
+</body>
+</html>

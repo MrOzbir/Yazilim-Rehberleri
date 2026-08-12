@@ -1,0 +1,2904 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>JavaScript Developer Reference</title>
+<!-- PrismJS CSS -->
+<link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" id="prism-theme" />
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&amp;family=JetBrains+Mono:wght@400;500&amp;family=Plus+Jakarta+Sans:wght@600;700;800&amp;display=swap" rel="stylesheet"/>
+<style>
+        /* 1. JAVASCRIPT RENK PALETİ & TIPOGRAFİ */
+        :root {
+            --bg: #0F0F0F;
+            --bg2: #141414;
+            --bg3: #1A1A1A;
+            --bg4: #1F1F1F;
+            --border: #2A2A2A;
+            --border2: #333333;
+            --accent: #F7DF1E;
+            --accent2: #D4C017;
+            --text: #E0E0E0;
+            --text-muted: #888888;
+            --accent-text: #000000;
+            --tooltip-bg: #222222;
+        }
+
+        body.light-mode {
+            --bg: #FAFAFA;
+            --bg2: #F0F0F0;
+            --bg3: #E4E4E4;
+            --bg4: #D9D9D9;
+            --border: #CCCCCC;
+            --border2: #BBBBBB;
+            --accent: #F7DF1E;
+            --accent2: #D4C017;
+            --text: #111111;
+            --text-muted: #555555;
+            --accent-text: #000000;
+            --tooltip-bg: #FFFFFF;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text);
+            font-family: 'Inter', sans-serif;
+            line-height: 1.6;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            margin-bottom: 1rem;
+            color: var(--text);
+        }
+
+        a {
+            color: var(--accent);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+
+        a:hover {
+            color: var(--accent2);
+        }
+
+        /* 4. DİNAMİK YAN MENÜ (Sidebar / TOC) */
+        #sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100vh;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            overflow-y: auto;
+            padding: 2rem 0;
+            z-index: 50;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+
+        .sidebar-header {
+            padding: 0 1.5rem 1.5rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-header h2 {
+            font-size: 1.2rem;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin: 0;
+        }
+
+        .toc-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.8rem 1.5rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+
+        .toc-item:hover {
+            background: var(--bg3);
+            color: var(--text);
+        }
+
+        .toc-item.active {
+            color: var(--accent-text);
+            background: var(--accent);
+            font-weight: 600;
+        }
+
+        /* Active olduğu an sola kayma animasyonu */
+        .toc-item.active.toc-entering {
+            animation: slideInLeft 0.3s ease forwards;
+        }
+
+        @keyframes slideInLeft {
+            0% { transform: translateX(10px); opacity: 0; }
+            100% { transform: translateX(0); opacity: 1; }
+        }
+
+        .toc-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--border2);
+            transition: all 0.3s;
+        }
+
+        /* Nokta büyüme/parlama animasyonu */
+        .toc-item.active .toc-dot {
+            background: var(--bg);
+            animation: dotPulse 1.5s infinite;
+        }
+
+        @keyframes dotPulse {
+            0% { transform: scale(1); box-shadow: 0 0 0px var(--bg); }
+            50% { transform: scale(1.5); box-shadow: 0 0 8px var(--bg); }
+            100% { transform: scale(1); box-shadow: 0 0 0px var(--bg); }
+        }
+
+        /* Main Content Layout */
+        #main-content {
+            margin-left: 280px;
+            padding: 2rem 4rem 6rem 4rem;
+            max-width: 1100px;
+        }
+
+        /* Header / Top Bar */
+        .top-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 4rem;
+            background: rgba(20, 20, 20, 0.6);
+            padding: 1rem 2rem;
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            position: sticky;
+            top: 20px;
+            z-index: 40;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+        
+        body.light-mode .top-bar {
+            background: rgba(240, 240, 240, 0.7);
+        }
+
+        .top-stats {
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9rem;
+        }
+
+        .search-hint {
+            background: var(--bg4);
+            padding: 6px 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border2);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .search-hint:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+        
+        .theme-toggle:hover {
+            transform: scale(1.15) rotate(15deg);
+        }
+
+        /* 6. JAVASCRIPT İÇERİK İSKELETİ (01-15) */
+        .section {
+            margin-bottom: 6rem;
+            scroll-margin-top: 140px; /* Offset for sticky header */
+        }
+
+        .section-header {
+            border-bottom: 2px solid var(--border);
+            padding-bottom: 1rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .section-header h2 {
+            font-size: 2.4rem;
+            color: var(--text);
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .section-header h2 span {
+            color: var(--accent);
+            font-weight: 800;
+        }
+
+        .sub {
+            font-size: 1.05rem;
+        }
+
+        /* 3. SQUIRCLE GRID & CARD MİMARİSİ */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+            margin: 2rem 0;
+        }
+
+        .card {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 16px; /* Squircle efekti */
+            padding: 1.8rem;
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.25s;
+        }
+        
+        .card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 12px 30px rgba(0,0,0,0.3);
+            border-color: var(--border2);
+        }
+
+        body.light-mode .card:hover {
+            box-shadow: 0 12px 30px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            color: var(--accent);
+            font-size: 1.3rem;
+            margin-bottom: 1rem;
+        }
+
+        /* Info Boxes (Note, Tip, Warn) */
+        .info-box {
+            padding: 1.2rem 1.5rem;
+            border-radius: 12px;
+            margin: 2rem 0;
+            border-left: 5px solid transparent;
+            background: var(--bg2);
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            border-top: 1px solid var(--border);
+            border-right: 1px solid var(--border);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .info-box.note { border-left-color: #3B82F6; }
+        .info-box.tip { border-left-color: #10B981; }
+        .info-box.warn { border-left-color: #EF4444; }
+
+        .info-box strong {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            letter-spacing: 1.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .info-box.note strong { color: #3B82F6; }
+        .info-box.tip strong { color: #10B981; }
+        .info-box.warn strong { color: #EF4444; }
+
+        /* Code Blocks & Copy Button */
+        pre[class*="language-"],
+        pre {
+            background: var(--bg4) !important;
+            border: 1px solid var(--border);
+            padding: 1.5rem !important;
+            border-radius: 12px;
+            overflow-x: auto;
+            position: relative;
+            margin: 2rem 0 !important;
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.2);
+        }
+        
+        body.light-mode pre {
+            box-shadow: inset 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        code[class*="language-"],
+        code {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            color: #E6E6E6;
+            background: transparent !important;
+            text-shadow: none !important;
+        }
+        
+        body.light-mode code {
+            color: #222222;
+        }
+
+        .inline-code {
+            background: var(--bg4);
+            padding: 0.2rem 0.5rem;
+            border-radius: 6px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.9em;
+            color: var(--accent);
+            border: 1px solid var(--border);
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            color: var(--text);
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .copy-btn:hover {
+            background: var(--accent);
+            color: var(--accent-text);
+            border-color: var(--accent);
+        }
+
+        /* 2. STICKY HEADER & SECTIONS PROGRESS BAR (Alt İlerleme Çubuğu) */
+        #progressBar {
+            position: fixed;
+            bottom: 0;
+            left: 280px; /* Offset for sidebar */
+            right: 0;
+            height: 50px;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 3rem;
+            z-index: 100;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.95rem;
+            transition: left 0.3s ease, background-color 0.3s ease;
+        }
+
+        .prog-fill {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: var(--accent);
+            width: 0%;
+            box-shadow: 0 0 15px var(--accent);
+            transition: width 0.1s ease-out;
+        }
+
+        .prog-text {
+            z-index: 2;
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            align-items: center;
+        }
+
+        .prog-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .prog-info span:first-child {
+            color: var(--accent-text);
+            background: var(--accent);
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        #prog-percent {
+            font-weight: 600;
+            color: var(--text-muted);
+        }
+
+        /* 5. GELİŞMİŞ JAVASCRIPT MOTORLARI */
+        
+        /* Arama Motoru Modal */
+        #search-modal {
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0, 0, 0, 0.4); /* Arka plan daha şeffaf */
+            backdrop-filter: blur(2px); /* Blur azaltıldı, sonuçlar görünsün */
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 15vh;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+
+        #search-modal.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .search-container {
+            width: 650px;
+            max-width: 90%;
+            background: var(--bg2);
+            border-radius: 16px;
+            border: 1px solid var(--border);
+            box-shadow: 0 25px 50px rgba(0,0,0,0.5);
+            display: flex;
+            align-items: center;
+            padding: 0.5rem;
+        }
+
+        .search-container svg {
+            width: 24px;
+            height: 24px;
+            fill: var(--text-muted);
+            margin: 0 1rem;
+        }
+
+        #search-input {
+            width: 100%;
+            padding: 1.2rem 0;
+            background: transparent;
+            border: none;
+            color: var(--text);
+            font-size: 1.3rem;
+            font-family: 'Inter', sans-serif;
+            outline: none;
+        }
+        
+        #search-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        mark.search-highlight {
+            background: var(--accent);
+            color: var(--accent-text);
+            padding: 0 2px;
+            border-radius: 3px;
+            box-shadow: 0 0 5px var(--accent);
+        }
+
+        /* Tooltip & Dictionary Sistemi */
+        .tooltip {
+            border-bottom: 2px dashed var(--accent);
+            cursor: help;
+            position: relative;
+            color: var(--text);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        
+        .tooltip:hover {
+            color: var(--accent);
+        }
+
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 120%;
+            left: 50%;
+            transform: translateX(-50%) translateY(10px);
+            background: var(--tooltip-bg);
+            color: var(--text);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 10;
+            border: 1px solid var(--border);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.3);
+            font-weight: 400;
+        }
+
+        .tooltip:hover::after {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Yukarı Çık Scroll Progress Ring */
+        #scrollTop {
+            position: fixed;
+            bottom: 80px;
+            right: 40px;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            z-index: 99;
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.8) translateY(20px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+        }
+
+        #scrollTop.show {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1) translateY(0);
+        }
+        
+        #scrollTop:hover {
+            background: var(--bg3);
+            transform: scale(1.1) translateY(-4px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+        }
+
+        #scrollTop svg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            transform: rotate(-90deg);
+        }
+
+        #scrollTop circle.bg {
+            fill: none;
+            stroke: var(--border);
+            stroke-width: 4;
+        }
+
+        #scrollTop circle.progress {
+            fill: none;
+            stroke: var(--accent);
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-dasharray: 163.36; /* 2 * PI * 26 */
+            stroke-dashoffset: 163.36;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+        
+        .arrow-up {
+            color: var(--text);
+            font-size: 1.3rem;
+            font-weight: bold;
+            z-index: 2;
+        }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            #sidebar { transform: translateX(-100%); }
+            #main-content { margin-left: 0; padding: 2rem 2rem 5rem 2rem; }
+            #progressBar { left: 0; padding: 0 1.5rem; }
+            #scrollTop { bottom: 70px; right: 20px; }
+        }
+    </style>
+</head>
+<body class="dark-mode">
+<!-- Dinamik Yan Menü (Sidebar) -->
+<aside id="sidebar">
+<div class="sidebar-header">
+<h2><span style="color:var(--text);">JS</span> Reference</h2>
+</div>
+<nav id="toc"><a class="toc-item" href="#s01"><span>01. Veri Tipleri (Primitive Types)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s02"><span>02. Değişkenler (var, let, const)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s03"><span>03. Operatörler</span><div class="toc-dot"></div></a><a class="toc-item" href="#s04"><span>04. Kontrol Yapıları</span><div class="toc-dot"></div></a><a class="toc-item" href="#s05"><span>05. String Metotları</span><div class="toc-dot"></div></a><a class="toc-item" href="#s06"><span>06. Arrays (Diziler)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s07"><span>07. Objects (Nesneler)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s08"><span>08. Functions (Fonksiyonlar)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s09"><span>09. Scope &amp; Closure (Kapsam ve Kapatma)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s10"><span>10. Closure (Kapatma)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s11"><span>11. This Keyword</span><div class="toc-dot"></div></a><a class="toc-item" href="#s12"><span>12. OOP (Nesne Yönelimli Programlama)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s13"><span>13. Error Handling (Hata Yönetimi)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s14"><span>14. Promises (Sözler)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s15"><span>15. Async &amp; Await</span><div class="toc-dot"></div></a><a class="toc-item" href="#s16"><span>16. Generators (Üreticiler)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s17"><span>17. Modules (Modüller)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s18"><span>18. Map &amp; Set Yapıları</span><div class="toc-dot"></div></a><a class="toc-item" href="#s19"><span>19. Symbol Veri Tipi</span><div class="toc-dot"></div></a><a class="toc-item" href="#s20"><span>20. Date (Zaman Yönetimi)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s21"><span>21. RegExp (Düzenli İfadeler)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s22"><span>22. DOM Manipülasyonu</span><div class="toc-dot"></div></a><a class="toc-item" href="#s23"><span>23. Fetch API</span><div class="toc-dot"></div></a><a class="toc-item" href="#s24"><span>24. JSON Nesnesi</span><div class="toc-dot"></div></a><a class="toc-item" href="#s25"><span>25. Web Storage (Local/Session Storage)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s26"><span>26. Event Loop (Olay Döngüsü)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s27"><span>27. Prototypes (Prototip Yapısı)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s28"><span>28. Memory Management (Bellek Yönetimi)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s29"><span>29. Modern Özellikler (ES10+)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s30"><span>30. Web Components</span><div class="toc-dot"></div></a><a class="toc-item" href="#s31"><span>31. Proxy &amp; Reflect</span><div class="toc-dot"></div></a><a class="toc-item" href="#s32"><span>32. Intl (Uluslararasılaştırma API'si)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s33"><span>33. Security (Güvenlik Önlemleri)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s34"><span>34. Testing (Birim Testi Mantığı)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s35"><span>35. Build Araçları Mantığı</span><div class="toc-dot"></div></a><a class="toc-item" href="#s36"><span>36. Node.js Çevresi</span><div class="toc-dot"></div></a><a class="toc-item" href="#s37"><span>37. Debugging (Hata Ayıklama)</span><div class="toc-dot"></div></a><a class="toc-item" href="#s38"><span>38. Bonus İpuçları (Debounce &amp; Throttle)</span><div class="toc-dot"></div></a></nav>
+</aside>
+<main id="main-content">
+<!-- Sticky Header & İstatistikler -->
+<header class="top-bar">
+<div class="top-stats">
+
+<span class="search-hint" onclick="document.dispatchEvent(new KeyboardEvent('keydown', {key: 'k', metaKey: true}))">
+                    Cmd + K Ara
+                </span>
+</div>
+<button class="theme-toggle" id="theme-btn" title="Temayı Değiştir">☀️</button>
+</header>
+<div id="content-body"><section class="section" id="s01"><div class="section-header"><h2><span>01. </span>Veri Tipleri (Primitive Types)</h2></div><div class="sub">
+
+<h3>1. string</h3>
+<p>Metinsel veri tipidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let name = "JavaScript";
+                console.log(typeof name); // "string"
+            </code></pre>
+<h3>2. number</h3>
+<p>Sayısal veri tipidir (tam sayılar, ondalıklı sayılar, Infinity, NaN).</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let sayi = 42;
+                console.log(typeof sayi); // "number"
+            </code></pre>
+<h3>3. boolean</h3>
+<p>Mantıksal değerlerdir (true veya false).</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let durum = true;
+                console.log(typeof durum); // "boolean"
+            </code></pre>
+<h3>4. undefined vs null</h3>
+<p><code>undefined</code> tanımlanmamış bir değişkeni temsil eder, <code>null</code> ise boş veya nesne olmayan bir değeri temsil eder.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let tanimsiz;
+                console.log(typeof tanimsiz); // "undefined"
+        
+                let bos = null;
+                console.log(typeof bos); // "object" (hata)
+            </code></pre>
+<h3>5. symbol</h3>
+<p>Benzersiz ve değiştirilemez bir değerdir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let simge = Symbol('simge');
+                console.log(typeof simge); // "symbol"
+            </code></pre>
+<h3>6. bigint</h3>
+<p>Büyük sayılar için kullanılan veri tipidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let buyukSayi = 123456789012345678901234567890n;
+                console.log(typeof buyukSayi); // "bigint"
+            </code></pre>
+<h3>7. typeof operatörü</h3>
+<p>Değerin veri tipini döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                console.log(typeof 42); // "number"
+                console.log(typeof 'Merhaba'); // "string"
+                console.log(typeof true); // "boolean"
+            </code></pre>
+<h3>8. type conversion</h3>
+<p>Veri tiplerini açıkça veya otomatik olarak dönüştürme.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Explicit conversion
+                let strSayi = Number('123');
+                console.log(strSayi); // 123
+        
+                let numStr = String(456);
+                console.log(numStr); // "456"
+        
+                let boolNum = Boolean(1);
+                console.log(boolNum); // true
+        
+                // Implicit conversion
+                let toplam = '5' + 3;
+                console.log(toplam); // "53"
+        
+                let toplam2 = '5' - 3;
+                console.log(toplam2); // 2
+            </code></pre>
+</div></section><section class="section" id="s02"><div class="section-header"><h2><span>02. </span>Değişkenler (var, let, const)</h2></div><div class="sub">
+
+<h3>1. var</h3>
+<p><code>var</code> fonksiyon-scoped bir değişken tanımlar ve hoisting yapar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function example() {
+                    console.log(x); // undefined (hoisting)
+                    var x = 10;
+                }
+                example();
+            </code></pre>
+<h3>2. let</h3>
+<p><code>let</code> blok-scoped bir değişken tanımlar ve Temporal Dead Zone (TDZ) vardır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                if (true) {
+                    console.log(y); // ReferenceError: Cannot access 'y' before initialization
+                    let y = 20;
+                }
+            </code></pre>
+<h3>3. const</h3>
+<p><code>const</code> blok-scoped bir değişken tanımlar ve sabit bir değer alır, ancak nesne veya dizi gibi referans tipleri değiştirilebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                const pi = 3.14;
+                // pi = 3.15; // TypeError: Assignment to constant variable.
+        
+                const obj = { key: 'value' };
+                obj.key = 'new value'; // Geçerli
+            </code></pre>
+<h3>4. Hoisting karşılaştırması</h3>
+<p><code>var</code> hoist edilir, ancak <code>let</code> ve <code>const</code> hoist edilmez ancak TDZ içinde.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                console.log(z); // undefined
+                var z = 30;
+        
+                // console.log(w); // ReferenceError: Cannot access 'w' before initialization
+                let w = 40;
+            </code></pre>
+<h3>5. Global object (window/globalThis) ile ilişkisi</h3>
+<p>Global değişkenler, <code>window</code> veya <code>globalThis</code> nesnesi üzerinden erişilebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                var globalVar = 'I am a global variable';
+                console.log(window.globalVar); // "I am a global variable"
+                console.log(globalThis.globalVar); // "I am a global variable"
+            </code></pre>
+</div></section><section class="section" id="s03"><div class="section-header"><h2><span>03. </span>Operatörler</h2></div><div class="sub">
+
+<h3>1. Aritmetik Operatörler</h3>
+<p>Aritmetik operatörler sayısal değerleri işler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let a = 10;
+                let b = 3;
+                console.log(a + b); // 13
+                console.log(a - b); // 7
+                console.log(a * b); // 30
+                console.log(a / b); // 3.3333333333333335
+                console.log(a % b); // 1
+                console.log(2 ** 3); // 8
+            </code></pre>
+<h3>2. Atama Operatörleri</h3>
+<p>Değişkenlere değer atar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let x = 5;
+                x += 3; // x = x + 3
+                console.log(x); // 8
+        
+                let y = 10;
+                y -= 4; // y = y - 4
+                console.log(y); // 6
+        
+                let z = 2;
+                z *= 3; // z = z * 3
+                console.log(z); // 6
+        
+                let w = 10;
+                w /= 2; // w = w / 2
+                console.log(w); // 5
+        
+                let v = 3;
+                v **= 2; // v = v ** 2
+                console.log(v); // 9
+            </code></pre>
+<h3>3. Karşılaştırma Operatörleri</h3>
+<p>Değerleri karşılaştırır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let num1 = 5;
+                let num2 = '5';
+                console.log(num1 == num2); // true (loose equality)
+                console.log(num1 === num2); // false (strict equality)
+        
+                let str1 = 'hello';
+                let str2 = 'world';
+                console.log(str1 &gt; str2); // true (lexicographical comparison)
+        
+                let a = 10;
+                let b = 20;
+                console.log(a &lt; b); // true
+            </code></pre>
+<h3>4. Mantıksal Operatörler</h3>
+<p>Mantıksal değerleri işler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let p = true;
+                let q = false;
+        
+                console.log(p &amp;&amp; q); // false
+                console.log(p || q); // true
+                console.log(!p); // false
+        
+                let r;
+                console.log(r ?? 'default'); // "default" (nullish coalescing)
+            </code></pre>
+<h3>5. Ternary Operatörü</h3>
+<p>Koşula göre farklı değerler döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let age = 18;
+                let message = (age &gt;= 18) ? 'Adult' : 'Minor';
+                console.log(message); // "Adult"
+            </code></pre>
+<h3>6. Optional Chaining</h3>
+<p>Nesnelerin özelliklerini güvenli bir şekilde erişir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                const user = {
+                    name: 'John',
+                    address: {
+                        city: 'New York'
+                    }
+                };
+        
+                console.log(user?.address?.city); // "New York"
+                console.log(user?.address?.zip); // undefined
+            </code></pre>
+<h3>7. Spread Operatörü</h3>
+<p>Dizi veya nesneleri genişletir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr1 = [1, 2, 3];
+                let arr2 = [...arr1, 4, 5];
+                console.log(arr2); // [1, 2, 3, 4, 5]
+        
+                let obj1 = { a: 1, b: 2 };
+                let obj2 = { ...obj1, c: 3 };
+                console.log(obj2); // { a: 1, b: 2, c: 3 }
+            </code></pre>
+<h3>8. Rest Operatörü</h3>
+<p>Fonksiyon parametrelerini bir diziye dönüştürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function sum(...numbers) {
+                    return numbers.reduce((acc, num) =&gt; acc + num, 0);
+                }
+        
+                console.log(sum(1, 2, 3, 4)); // 10
+            </code></pre>
+</div></section><section class="section" id="s04"><div class="section-header"><h2><span>04. </span>Kontrol Yapıları</h2></div><div class="sub">
+
+<h3>1. if-else if-else (zincirleme örnek)</h3>
+<p>Koşullara göre farklı işlemler yapar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let sayi = 10;
+                if (sayi &gt; 0) {
+                    console.log('Pozitif');
+                } else if (sayi &lt; 0) {
+                    console.log('Negatif');
+                } else {
+                    console.log('Sıfır');
+                }
+            </code></pre>
+<h3>2. switch-case (fallthrough, multiple cases)</h3>
+<p>Bir değere göre farklı işlemler yapar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let gun = 'Pazartesi';
+                switch (gun) {
+                    case 'Pazartesi':
+                        console.log('Hafta başı');
+                        break;
+                    case 'Cuma':
+                    case 'Cumartesi':
+                        console.log('Hafta sonu');
+                        break;
+                    default:
+                        console.log('Geçerli bir gün değil');
+                }
+            </code></pre>
+<h3>3. for (klasik, break/continue)</h3>
+<p>Döngü kurar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                for (let i = 0; i &lt; 5; i++) {
+                    if (i === 3) {
+                        continue; // 3'ü atla
+                    }
+                    console.log(i); // 0, 1, 2, 4
+                }
+        
+                for (let i = 0; i &lt; 5; i++) {
+                    if (i === 3) {
+                        break; // 3'e kadar döngü
+                    }
+                    console.log(i); // 0, 1, 2
+                }
+            </code></pre>
+<h3>4. for...of (array iteration)</h3>
+<p>Dizi üzerinde döngü kurar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3, 4, 5];
+                for (let item of arr) {
+                    console.log(item); // 1, 2, 3, 4, 5
+                }
+            </code></pre>
+<h3>5. for...in (object iteration, hasOwnProperty uyarısı)</h3>
+<p>Nesne üzerinde döngü kurar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = { a: 1, b: 2, c: 3 };
+                for (let key in obj) {
+                    if (obj.hasOwnProperty(key)) {
+                        console.log(key, obj[key]); // "a 1", "b 2", "c 3"
+                    }
+                }
+            </code></pre>
+<h3>6. while</h3>
+<p>Döngü kurar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let i = 0;
+                while (i &lt; 5) {
+                    console.log(i); // 0, 1, 2, 3, 4
+                    i++;
+                }
+            </code></pre>
+<h3>7. do-while</h3>
+<p>Döngü kurar ve en az bir kez çalışır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let i = 0;
+                do {
+                    console.log(i); // 0, 1, 2, 3, 4
+                    i++;
+                } while (i &lt; 5);
+            </code></pre>
+</div></section><section class="section" id="s05"><div class="section-header"><h2><span>05. </span>String Metotları</h2></div><div class="sub">
+
+<h3>1. length</h3>
+<p>Dizinin uzunluğunu döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba";
+                console.log(str.length); // 7
+            </code></pre>
+<h3>2. toUpperCase() / toLowerCase()</h3>
+<p>Diziyi büyük veya küçük harf yapar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba";
+                console.log(str.toUpperCase()); // "MERHABA"
+                console.log(str.toLowerCase()); // "merhaba"
+            </code></pre>
+<h3>3. trim()</h3>
+<p>Dizinin başındaki ve sonundaki boşlukları kaldırır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "   Merhaba   ";
+                console.log(str.trim()); // "Merhaba"
+            </code></pre>
+<h3>4. slice() / substring()</h3>
+<p>Dizinin belirli bir kısmını döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba";
+                console.log(str.slice(1, 5)); // "erha"
+                console.log(str.substring(1, 5)); // "erha"
+            </code></pre>
+<h3>5. split() / join()</h3>
+<p>Diziyi belirli bir karaktere göre böler veya dizi oluşturur.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba,Dünya";
+                console.log(str.split(",")); // ["Merhaba", "Dünya"]
+        
+                let arr = ["Merhaba", "Dünya"];
+                console.log(arr.join(",")); // "Merhaba,Dünya"
+            </code></pre>
+<h3>6. replace() / replaceAll()</h3>
+<p>Diziyi belirli bir değeri başka bir değerle değiştirir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba Dünya";
+                console.log(str.replace("Dünya", "JavaScript")); // "Merhaba JavaScript"
+        
+                let str2 = "Merhaba Dünya";
+                console.log(str2.replaceAll("a", "o")); // "Merohbo Duwro"
+            </code></pre>
+<h3>7. includes() / startsWith() / endsWith()</h3>
+<p>Dizinin belirli bir değeri içerip içermediğini kontrol eder.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba Dünya";
+                console.log(str.includes("Dünya")); // true
+                console.log(str.startsWith("Merhaba")); // true
+                console.log(str.endsWith("Dünya")); // true
+            </code></pre>
+<h3>8. indexOf() / lastIndexOf()</h3>
+<p>Dizinin belirli bir değeri ilk veya son olarak hangi indeksde olduğunu döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba Dünya";
+                console.log(str.indexOf("Dünya")); // 7
+                console.log(str.lastIndexOf("a")); // 10
+            </code></pre>
+<h3>9. padStart() / padEnd()</h3>
+<p>Dizinin belirli bir uzunlukta olması için başındaki veya sonundaki karakterleri ekler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "123";
+                console.log(str.padStart(5, '0')); // "00123"
+                console.log(str.padEnd(5, '0')); // "12300"
+            </code></pre>
+<h3>10. repeat()</h3>
+<p>Diziyi belirli bir sayıda tekrar eder.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let str = "Merhaba ";
+                console.log(str.repeat(3)); // "Merhaba Merhaba Merhaba "
+            </code></pre>
+<h3>11. Template literals (``) - interpolation, multi-line, tagged templates</h3>
+<p>String ifadeleri daha esnek ve okunabilir hale getirir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let name = "John";
+                let age = 30;
+                console.log(`My name is ${name} and I am ${age} years old.`); // "My name is John and I am 30 years old."
+        
+                let str = `
+                    Bu
+                    çoklu
+                    satırlı
+                    bir
+                    stringdir.
+                `;
+                console.log(str);
+        
+                function tag(strings, ...values) {
+                    return strings.reduce((acc, str, i) =&gt; acc + str + (i &lt; values.length ? values[i] : ''), '');
+                }
+        
+                let message = tag`Hello, ${name}! You are ${age} years old.`;
+                console.log(message); // "Hello, John! You are 30 years old."
+            </code></pre>
+</div></section><section class="section" id="s06"><div class="section-header"><h2><span>06. </span>Arrays (Diziler)</h2></div><div class="sub">
+
+<h3>1. Array oluşturma</h3>
+<p>Dizileri oluşturmak için farklı yöntemler kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr1 = [1, 2, 3];
+                let arr2 = new Array(4, 5, 6);
+                let arr3 = Array.of(7, 8, 9);
+                let arr4 = Array.from('abc');
+            </code></pre>
+<h3>2. CRUD</h3>
+<p>Dizileri ekleme, silme ve güncelleme işlemleri.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3];
+                arr.push(4); // [1, 2, 3, 4]
+                console.log(arr);
+        
+                arr.pop(); // [1, 2, 3]
+                console.log(arr);
+        
+                arr.unshift(0); // [0, 1, 2, 3]
+                console.log(arr);
+        
+                arr.shift(); // [1, 2, 3]
+                console.log(arr);
+            </code></pre>
+<h3>3. splice (ekleme/silme/güncelleme), slice (kopyalama)</h3>
+<p>Dizileri belirli bir konumda ekleme, silme veya güncelleme yapar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3];
+                arr.splice(1, 0, 'a', 'b'); // [1, 'a', 'b', 2, 3]
+                console.log(arr);
+        
+                let arrCopy = arr.slice(1, 4); // ['a', 'b', 2]
+                console.log(arrCopy);
+            </code></pre>
+<h3>4. concat (birleştirme)</h3>
+<p>Dizileri birleştirir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr1 = [1, 2];
+                let arr2 = [3, 4];
+                let mergedArr = arr1.concat(arr2); // [1, 2, 3, 4]
+                console.log(mergedArr);
+            </code></pre>
+<h3>5. Iteration</h3>
+<p>Dizileri döngü ile işlemek için farklı metotlar kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3];
+        
+                // forEach
+                arr.forEach(item =&gt; console.log(item)); // 1, 2, 3
+        
+                // map
+                let doubled = arr.map(item =&gt; item * 2); // [2, 4, 6]
+                console.log(doubled);
+        
+                // filter
+                let even = arr.filter(item =&gt; item % 2 === 0); // [2, 4]
+                console.log(even);
+        
+                // reduce
+                let sum = arr.reduce((acc, item) =&gt; acc + item, 0); // 6
+                console.log(sum);
+        
+                // reduceRight
+                let sumRight = arr.reduceRight((acc, item) =&gt; acc + item, 0); // 6
+                console.log(sumRight);
+            </code></pre>
+<h3>6. find, findIndex, some, every</h3>
+<p>Dizileri belirli bir koşula göre arama ve kontrol yapar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3];
+        
+                // find
+                let found = arr.find(item =&gt; item === 2); // 2
+                console.log(found);
+        
+                // findIndex
+                let foundIndex = arr.findIndex(item =&gt; item === 2); // 1
+                console.log(foundIndex);
+        
+                // some
+                let hasEven = arr.some(item =&gt; item % 2 === 0); // true
+                console.log(hasEven);
+        
+                // every
+                let allPositive = arr.every(item =&gt; item &gt; 0); // true
+                console.log(allPositive);
+            </code></pre>
+<h3>7. flat, flatMap</h3>
+<p>Dizileri iç içe yapıları düzleştirmek veya dönüştürmek için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, [3, 4]];
+                let flatArr = arr.flat(); // [1, 2, 3, 4]
+                console.log(flatArr);
+        
+                let arr2 = [1, 2, 3];
+                let flatMapArr = arr2.flatMap(item =&gt; [item * 2]); // [2, 4, 6]
+                console.log(flatMapArr);
+            </code></pre>
+<h3>8. sort, reverse</h3>
+<p>Dizileri sıralamak veya tersine çevirmek için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [3, 1, 2];
+                arr.sort((a, b) =&gt; a - b); // [1, 2, 3]
+                console.log(arr);
+        
+                arr.reverse(); // [3, 2, 1]
+                console.log(arr);
+            </code></pre>
+<h3>9. includes, indexOf</h3>
+<p>Dizileri belirli bir değeri içerip içermediğini kontrol etmek veya indeksini bulmak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3];
+                console.log(arr.includes(2)); // true
+                console.log(arr.indexOf(4)); // -1
+            </code></pre>
+<h3>10. Array destructuring</h3>
+<p>Dizileri değişkenlere atarak kullanmak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr = [1, 2, 3];
+                let [a, b, c] = arr;
+                console.log(a, b, c); // 1, 2, 3
+            </code></pre>
+<h3>11. Spread ile kopyalama ve birleştirme</h3>
+<p>Dizileri kopyalamak veya birleştirmek için spread operatörü kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let arr1 = [1, 2, 3];
+                let arr2 = [...arr1]; // [1, 2, 3]
+                console.log(arr2);
+        
+                let arr3 = [...arr1, 4, 5]; // [1, 2, 3, 4, 5]
+                console.log(arr3);
+            </code></pre>
+</div></section><section class="section" id="s07"><div class="section-header"><h2><span>07. </span>Objects (Nesneler)</h2></div><div class="sub">
+
+<h3>1. Object literal ve constructor</h3>
+<p>Nesneleri oluşturmak için farklı yöntemler kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Object literal
+                let obj1 = {
+                    name: "John",
+                    age: 30
+                };
+        
+                // Object constructor
+                function Person(name, age) {
+                    this.name = name;
+                    this.age = age;
+                }
+                let obj2 = new Person("Jane", 25);
+            </code></pre>
+<h3>2. Property access (dot, bracket, optional chaining)</h3>
+<p>Nesnelerin özelliklerine erişmek için farklı yöntemler kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = {
+                    name: "John",
+                    age: 30
+                };
+        
+                // Dot notation
+                console.log(obj.name); // "John"
+        
+                // Bracket notation
+                console.log(obj['age']); // 30
+        
+                // Optional chaining
+                let obj2 = null;
+                console.log(obj2?.name); // undefined
+            </code></pre>
+<h3>3. Shorthand property, computed property names</h3>
+<p>Nesnelerin özelliklerini daha kolay ve dinamik olarak oluşturmak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let name = "John";
+                let age = 30;
+        
+                // Shorthand property
+                let obj1 = { name, age };
+        
+                // Computed property names
+                let key = "name";
+                let obj2 = { [key]: "John" };
+            </code></pre>
+<h3>4. Object.keys(), Object.values(), Object.entries()</h3>
+<p>Nesnelerin özelliklerini ve değerlerini dizi olarak almak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = {
+                    name: "John",
+                    age: 30
+                };
+        
+                // Object.keys()
+                console.log(Object.keys(obj)); // ["name", "age"]
+        
+                // Object.values()
+                console.log(Object.values(obj)); // ["John", 30]
+        
+                // Object.entries()
+                console.log(Object.entries(obj)); // [["name", "John"], ["age", 30]]
+            </code></pre>
+<h3>5. Object.assign() (shallow copy)</h3>
+<p>Nesneleri kopyalamak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj1 = { a: 1, b: 2 };
+                let obj2 = Object.assign({}, obj1);
+                console.log(obj2); // { a: 1, b: 2 }
+            </code></pre>
+<h3>6. Object.freeze(), Object.seal()</h3>
+<p>Nesneleri sabit veya kilitlemek için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = { a: 1, b: 2 };
+        
+                // Object.freeze()
+                Object.freeze(obj);
+                obj.a = 3; // No effect
+                console.log(obj); // { a: 1, b: 2 }
+        
+                // Object.seal()
+                obj.b = 4; // Allowed
+                obj.c = 5; // Not allowed
+                console.log(obj); // { a: 1, b: 4 }
+            </code></pre>
+<h3>7. Object destructuring (default values, alias, nested)</h3>
+<p>Nesneleri değişkenlere atarak kullanmak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = {
+                    name: "John",
+                    age: 30,
+                    address: {
+                        city: "New York"
+                    }
+                };
+        
+                // Default values
+                let { name, age = 25 } = obj;
+                console.log(name, age); // "John" 30
+        
+                // Alias
+                let { name: userName } = obj;
+                console.log(userName); // "John"
+        
+                // Nested
+                let { address: { city } } = obj;
+                console.log(city); // "New York"
+            </code></pre>
+<h3>8. Spread ile kopyalama ve birleştirme</h3>
+<p>Nesneleri kopyalamak veya birleştirmek için spread operatörü kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj1 = { a: 1, b: 2 };
+                let obj2 = { ...obj1 }; // { a: 1, b: 2 }
+                console.log(obj2);
+        
+                let obj3 = { ...obj1, c: 3 }; // { a: 1, b: 2, c: 3 }
+                console.log(obj3);
+            </code></pre>
+<h3>9. Getters ve Setters</h3>
+<p>Nesnelerin özelliklerine erişim ve ayarlama işlemlerini kontrol etmek için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = {
+                    _name: "John",
+                    get name() {
+                        return this._name;
+                    },
+                    set name(value) {
+                        if (value.length &gt; 3) {
+                            this._name = value;
+                        } else {
+                            console.log("Name must be at least 4 characters long.");
+                        }
+                    }
+                };
+        
+                obj.name = "Jane"; // "Name must be at least 4 characters long."
+                console.log(obj.name); // "John"
+            </code></pre>
+<h3>10. Optional chaining (?.) ile güvenli erişim</h3>
+<p>Nesnelerin özelliklerine güvenli bir şekilde erişmek için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let obj = null;
+                console.log(obj?.name); // undefined
+            </code></pre>
+</div></section><section class="section" id="s08"><div class="section-header"><h2><span>08. </span>Functions (Fonksiyonlar)</h2></div><div class="sub">
+
+<h3>1. Function declaration vs expression vs arrow function</h3>
+<p>Fonksiyonları farklı şekillerde tanımlayabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Function declaration
+                function add(a, b) {
+                    return a + b;
+                }
+        
+                // Function expression
+                let multiply = function(a, b) {
+                    return a * b;
+                };
+        
+                // Arrow function
+                let subtract = (a, b) =&gt; a - b;
+            </code></pre>
+<h3>2. Default parameters</h3>
+<p>Fonksiyonlara varsayılan parametreler ekleyebilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function greet(name = "Guest") {
+                    return `Hello, ${name}!`;
+                }
+        
+                console.log(greet()); // "Hello, Guest!"
+                console.log(greet("Alice")); // "Hello, Alice!"
+            </code></pre>
+<h3>3. Rest parameters (...args)</h3>
+<p>Fonksiyona değişken sayıda parametre geçebilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function sum(...numbers) {
+                    return numbers.reduce((acc, num) =&gt; acc + num, 0);
+                }
+        
+                console.log(sum(1, 2, 3)); // 6
+                console.log(sum(4, 5, 6, 7)); // 22
+            </code></pre>
+<h3>4. Return values (early return)</h3>
+<p>Fonksiyonlarda erken döndürme yapabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function checkAge(age) {
+                    if (age &lt; 18) {
+                        return "Too young";
+                    }
+                    return "Welcome!";
+                }
+        
+                console.log(checkAge(15)); // "Too young"
+                console.log(checkAge(20)); // "Welcome!"
+            </code></pre>
+<h3>5. IIFE (Immediately Invoked Function Expression)</h3>
+<p>Anında çalıştırılan fonksiyonlar oluşturabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                (function() {
+                    console.log("This is an IIFE!");
+                })();
+            </code></pre>
+<h3>6. Higher-order functions (function return function)</h3>
+<p>Fonksiyonlar diğer fonksiyonları döndürebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createMultiplier(factor) {
+                    return function(number) {
+                        return number * factor;
+                    };
+                }
+        
+                let double = createMultiplier(2);
+                console.log(double(5)); // 10
+            </code></pre>
+<h3>7. Callback functions (setTimeout, forEach)</h3>
+<p>Fonksiyonları geri çağırmak için kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                setTimeout(() =&gt; {
+                    console.log("This runs after 1 second");
+                }, 1000);
+        
+                let numbers = [1, 2, 3];
+                numbers.forEach(number =&gt; {
+                    console.log(number);
+                });
+            </code></pre>
+<h3>8. call(), apply(), bind() (explicit this binding)</h3>
+<p>Fonksiyonların this bağlamını belirleyebilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let person = {
+                    name: "Alice",
+                    greet: function() {
+                        console.log(`Hello, ${this.name}!`);
+                    }
+                };
+        
+                person.greet.call({ name: "Bob" }); // "Hello, Bob!"
+                person.greet.apply({ name: "Charlie" }); // "Hello, Charlie!"
+        
+                let greetPerson = person.greet.bind({ name: "David" });
+                greetPerson(); // "Hello, David!"
+            </code></pre>
+<h3>9. Arrow function'da this farkını gösteren örnek</h3>
+<p>Arrow fonksiyonları this bağlamını kaplamazlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let person = {
+                    name: "Alice",
+                    greet: function() {
+                        setTimeout(() =&gt; {
+                            console.log(`Hello, ${this.name}!`);
+                        }, 1000);
+                    }
+                };
+        
+                person.greet(); // "Hello, Alice!" (1 saniye sonra)
+            </code></pre>
+<h3>10. bind ile partial application örneği</h3>
+<p>bind fonksiyonu parial application yapabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function greet(greeting, name) {
+                    return `${greeting}, ${name}!`;
+                }
+        
+                let greetHello = greet.bind(null, "Hello");
+                console.log(greetHello("Alice")); // "Hello, Alice!"
+            </code></pre>
+</div></section><section class="section" id="s09"><div class="section-header"><h2><span>09. </span>Scope &amp; Closure (Kapsam ve Kapatma)</h2></div><div class="sub">
+
+<h3>1. Global scope</h3>
+<p>Kodun tümüne erişilebilen kapsam.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let globalVar = "I am a global variable";
+        
+                function checkScope() {
+                    console.log(globalVar); // "I am a global variable"
+                }
+            </code></pre>
+<h3>2. Function scope</h3>
+<p>Fonksiyon içinde tanımlanan değişkenler sadece o fonksiyonun içinden erişilebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function checkScope() {
+                    let localVar = "I am a local variable";
+                    console.log(localVar); // "I am a local variable"
+                }
+            </code></pre>
+<h3>3. Block scope (let/const)</h3>
+<p>{ } blokları içinde tanımlanan değişkenler sadece o blok içinden erişilebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                if (true) {
+                    let blockVar = "I am a block variable";
+                    console.log(blockVar); // "I am a block variable"
+                }
+            </code></pre>
+<h3>4. Lexical scoping (static scope)</h3>
+<p>Fonksiyonların kapsamları, tanımlandıkları yerde belirlenir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let outerVar = "I am an outer variable";
+        
+                function outerFunction() {
+                    console.log(outerVar); // "I am an outer variable"
+                }
+            </code></pre>
+<h3>5. Closure tanımı ve nasıl çalıştığı</h3>
+<p>Kapalımlar, iç fonksiyonun dış fonksiyonun değişkenlerine erişim sağlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createCounter() {
+                    let count = 0;
+                    return function() {
+                        count++;
+                        console.log(count);
+                    };
+                }
+        
+                let counter = createCounter();
+                counter(); // 1
+                counter(); // 2
+            </code></pre>
+<h3>6. Closure ile private variable (counter örneği)</h3>
+<p>Closurelar, değişkenleri dışarıdan erişimini kısıtlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createCounter() {
+                    let count = 0;
+                    return {
+                        increment: function() {
+                            count++;
+                            console.log(count);
+                        },
+                        decrement: function() {
+                            count--;
+                            console.log(count);
+                        }
+                    };
+                }
+        
+                let counter = createCounter();
+                counter.increment(); // 1
+                counter.decrement(); // 0
+            </code></pre>
+<h3>7. Closure ile function factory</h3>
+<p>Closurelar, işlev fabrikaları oluşturmak için kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createMultiplier(factor) {
+                    return function(number) {
+                        return number * factor;
+                    };
+                }
+        
+                let double = createMultiplier(2);
+                console.log(double(5)); // 10
+            </code></pre>
+<h3>8. Closure ile event handler</h3>
+<p>Closurelar, event handler'ları oluşturmak için kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function setupButton() {
+                    let count = 0;
+                    document.getElementById('myButton').addEventListener('click', function() {
+                        count++;
+                        console.log(count);
+                    });
+                }
+        
+                setupButton();
+            </code></pre>
+<h3>9. Closure'da memory leak uyarısı</h3>
+<p>Closurelar, dış fonksiyonun değişkenlerine erişim sağladıkları için memory leak olabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createMemoryLeak() {
+                    let largeArray = new Array(1000000).fill('x');
+                    return function() {
+                        console.log(largeArray.length);
+                    };
+                }
+        
+                let leak = createMemoryLeak();
+                // largeArray artık erişilemez, ancak bellek üzerinde hala tutulur
+            </code></pre>
+</div></section><section class="section" id="s10"><div class="section-header"><h2><span>10. </span>Closure (Kapatma)</h2></div><div class="sub">
+
+<h3>1. Lexical scoping nedir?</h3>
+<p>Kapalımlar, iç fonksiyonun dış fonksiyonun değişkenlerine erişim sağlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function outerFunction() {
+                    let outerVar = "I am from outer";
+                    return function innerFunction() {
+                        console.log(outerVar);
+                    };
+                }
+        
+                let myClosure = outerFunction();
+                myClosure(); // "I am from outer"
+            </code></pre>
+<h3>2. Closure tanımı (iç fonksiyonun dış fonksiyonun değişkenlerine erişmesi)</h3>
+<p>Kapalımlar, iç fonksiyonun dış fonksiyonun değişkenlerine erişim sağlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createCounter() {
+                    let count = 0;
+                    return function() {
+                        count++;
+                        console.log(count);
+                    };
+                }
+        
+                let counter = createCounter();
+                counter(); // 1
+                counter(); // 2
+            </code></pre>
+<h3>3. Private variable (counter örneği - her çağrıda artan)</h3>
+<p>Closurelar, değişkenleri dışarıdan erişimini kısıtlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createCounter() {
+                    let count = 0;
+                    return {
+                        increment: function() {
+                            count++;
+                            console.log(count);
+                        },
+                        decrement: function() {
+                            count--;
+                            console.log(count);
+                        }
+                    };
+                }
+        
+                let counter = createCounter();
+                counter.increment(); // 1
+                counter.decrement(); // 0
+            </code></pre>
+<h3>4. Function factory (parametreye göre fonksiyon üretme)</h3>
+<p>Closurelar, işlev fabrikaları oluşturmak için kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createMultiplier(factor) {
+                    return function(number) {
+                        return number * factor;
+                    };
+                }
+        
+                let double = createMultiplier(2);
+                console.log(double(5)); // 10
+            </code></pre>
+<h3>5. Closure ile event handler (döngüde var hatası ve let/closure çözümü)</h3>
+<p>Closurelar, döngülerde var hatası olmamak için kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                for (let i = 0; i &lt; 3; i++) {
+                    setTimeout(() =&gt; {
+                        console.log(i);
+                    }, 1000 * i);
+                }
+            </code></pre>
+<h3>6. Module pattern (IIFE + closure)</h3>
+<p>Closurelar, modül deseni oluşturmak için kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let module = (function() {
+                    let privateVar = "I am private";
+                    return {
+                        getPrivateVar: function() {
+                            return privateVar;
+                        },
+                        setPrivateVar: function(value) {
+                            privateVar = value;
+                        }
+                    };
+                })();
+        
+                console.log(module.getPrivateVar()); // "I am private"
+                module.setPrivateVar("New value");
+                console.log(module.getPrivateVar()); // "New value"
+            </code></pre>
+<h3>7. Memory leak uyarısı (gereksiz closure)</h3>
+<p>Closurelar, dış fonksiyonun değişkenlerine erişim sağladıkları için memory leak olabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function createMemoryLeak() {
+                    let largeArray = new Array(1000000).fill('x');
+                    return function() {
+                        console.log(largeArray.length);
+                    };
+                }
+        
+                let leak = createMemoryLeak();
+                // largeArray artık erişilemez, ancak bellek üzerinde hala tutulur
+            </code></pre>
+</div></section><section class="section" id="s11"><div class="section-header"><h2><span>11. </span>This Keyword</h2></div><div class="sub">
+
+<h3>1. Default binding (global/window, strict mode: undefined)</h3>
+<p>This'in varsayılan bağlamı global veya window nesnesidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function showThis() {
+            console.log(this);
+        }
+
+        showThis(); // global/window nesnesi (Node.js'de 'global' olur)
+    </code></pre>
+<h3>2. Implicit binding (object method call)</h3>
+<p>This, fonksiyonu çağıran nesne olarak bağlanır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        let obj = {
+            name: "Alice",
+            greet: function() {
+                console.log(`Hello, ${this.name}!`);
+            }
+        };
+
+        obj.greet(); // "Hello, Alice!"
+    </code></pre>
+<h3>3. Explicit binding: call() (tek tek parametre)</h3>
+<p>This'i belirli bir nesne olarak bağlamak için call() yöntemini kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function greet(greeting) {
+            console.log(`${greeting}, ${this.name}!`);
+        }
+
+        let obj = { name: "Alice" };
+        greet.call(obj, "Hello"); // "Hello, Alice!"
+    </code></pre>
+<h3>4. Explicit binding: apply() (array parametre)</h3>
+<p>This'i belirli bir nesne olarak bağlamak için apply() yöntemini kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function greet(greeting) {
+            console.log(`${greeting}, ${this.name}!`);
+        }
+
+        let obj = { name: "Alice" };
+        greet.apply(obj, ["Hello"]); // "Hello, Alice!"
+    </code></pre>
+<h3>5. Explicit binding: bind() (kalıcı bağlama, partial application)</h3>
+<p>This'i belirli bir nesne olarak bağlamak için bind() yöntemini kullanabilirsiniz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function greet(greeting) {
+            console.log(`${greeting}, ${this.name}!`);
+        }
+
+        let obj = { name: "Alice" };
+        let greetObj = greet.bind(obj);
+        greetObj("Hello"); // "Hello, Alice!"
+    </code></pre>
+<h3>6. New binding (constructor)</h3>
+<p>This, yeni oluşturulan nesne olarak bağlanır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function Person(name) {
+            this.name = name;
+        }
+
+        let alice = new Person("Alice");
+        console.log(alice.name); // "Alice"
+    </code></pre>
+<h3>7. Arrow function lexical this (this'i miras alır)</h3>
+<p>Arrow fonksiyonları this bağlamını miras alır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        let obj = {
+            name: "Alice",
+            greet: () =&gt; {
+                console.log(`Hello, ${this.name}!`);
+            }
+        };
+
+        obj.greet(); // "Hello, undefined!" (this.name 'undefined' çünkü arrow fonksiyonu this'i miras alır)
+    </code></pre>
+<h3>8. Event handler'larda this (addEventListener içinde)</h3>
+<p>This, event handler'ı çağıran nesne olarak bağlanır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        let button = document.getElementById('myButton');
+        button.addEventListener('click', function() {
+            console.log(this); // button nesnesi
+        });
+    </code></pre>
+<h3>9. Common pitfalls ve çözümleri</h3>
+<p>This'in bağlamı değişebilir, bu yüzden dikkatli olmak önemlidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        let obj = {
+            name: "Alice",
+            greet: function() {
+                setTimeout(function() {
+                    console.log(`Hello, ${this.name}!`);
+                }, 1000);
+            }
+        };
+
+        obj.greet(); // "Hello, undefined!" (this.name 'undefined' çünkü setTimeout içindeki fonksiyon this'i global nesne olarak bağlar)
+
+        // Çözüm: bind() veya arrow function kullanmak
+        let obj2 = {
+            name: "Alice",
+            greet: function() {
+                setTimeout(() =&gt; {
+                    console.log(`Hello, ${this.name}!`);
+                }, 1000);
+            }
+        };
+
+        obj2.greet(); // "Hello, Alice!" (this.name 'Alice' çünkü arrow function this'i miras alır)
+    </code></pre>
+<h3>10. call vs apply farkını göster (parametre geçişi)</h3>
+<p>call() ve apply() arasındaki fark, parametre geçişini şeklindedir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function greet(greeting, name) {
+            console.log(`${greeting}, ${name}!`);
+        }
+
+        let obj = { name: "Alice" };
+
+        greet.call(obj, "Hello"); // "Hello, Alice!"
+        greet.apply(obj, ["Hello"]); // "Hello, Alice!"
+    </code></pre>
+<h3>11. bind ile partial application örneği</h3>
+<p>bind() fonksiyonu parial application yapabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function greet(greeting, name) {
+            console.log(`${greeting}, ${name}!`);
+        }
+
+        let greetHello = greet.bind(null, "Hello");
+        console.log(greetHello("Alice")); // "Hello, Alice!"
+    </code></pre>
+</div></section><section class="section" id="s12"><div class="section-header"><h2><span>12. </span>OOP (Nesne Yönelimli Programlama)</h2></div><div class="sub">
+
+<h3>1. Class tanımı (class keyword)</h3>
+<p>Classlar, ES6 ile birlikte JavaScript'te nesne yönelimli programlamayı destekler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+        }
+
+        let alice = new Person("Alice", 30);
+        console.log(alice.name); // "Alice"
+    </code></pre>
+<h3>2. Constructor ve this</h3>
+<p>Constructor, yeni nesneleri başlatmak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+        }
+
+        let alice = new Person("Alice", 30);
+        console.log(alice.name); // "Alice"
+    </code></pre>
+<h3>3. Instance methods</h3>
+<p>Nesnelerin metotları (instance methods) tanımlanabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+
+            greet() {
+                console.log(`Hello, my name is ${this.name} and I am ${this.age} years old.`);
+            }
+        }
+
+        let alice = new Person("Alice", 30);
+        alice.greet(); // "Hello, my name is Alice and I am 30 years old."
+    </code></pre>
+<h3>4. Static methods ve properties</h3>
+<p>Static metotlar ve özellikler, sınıfın tüm örnekleri tarafından kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+
+            static greet() {
+                console.log("Hello from Person class!");
+            }
+        }
+
+        Person.greet(); // "Hello from Person class!"
+    </code></pre>
+<h3>5. Private fields (#) ve private methods</h3>
+<p>Private fields ve methods, JavaScript 2019 ile birlikte geldi.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            #privateField = "I am private";
+
+            getPrivateField() {
+                return this.#privateField;
+            }
+
+            #privateMethod() {
+                console.log("This is a private method.");
+            }
+        }
+
+        let alice = new Person();
+        console.log(alice.getPrivateField()); // "I am private"
+        // alice.#privateMethod(); // Hata fırlatır, dışarıdan erişilemez.
+    </code></pre>
+<h3>6. Getter ve Setter</h3>
+<p>Getter ve setter, nesnelerin özelliklerine erişimi kontrol edebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this._name = name;
+                this._age = age;
+            }
+
+            get name() {
+                return this._name;
+            }
+
+            set name(value) {
+                if (typeof value === "string") {
+                    this._name = value;
+                } else {
+                    throw new Error("Name must be a string.");
+                }
+            }
+
+            get age() {
+                return this._age;
+            }
+
+            set age(value) {
+                if (typeof value === "number" &amp;&amp; value &gt;= 0) {
+                    this._age = value;
+                } else {
+                    throw new Error("Age must be a non-negative number.");
+                }
+            }
+        }
+
+        let alice = new Person("Alice", 30);
+        console.log(alice.name); // "Alice"
+        alice.name = "Bob";
+        console.log(alice.name); // "Bob"
+    </code></pre>
+<h3>7. Inheritance (extends)</h3>
+<p>Inheritance, sınıfların miras alması için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+
+            greet() {
+                console.log(`Hello, my name is ${this.name} and I am ${this.age} years old.`);
+            }
+        }
+
+        class Student extends Person {
+            constructor(name, age, grade) {
+                super(name, age);
+                this.grade = grade;
+            }
+
+            greet() {
+                console.log(`Hello, my name is ${this.name}, I am ${this.age} years old and I am in grade ${this.grade}.`);
+            }
+        }
+
+        let alice = new Student("Alice", 30, "A");
+        alice.greet(); // "Hello, my name is Alice, I am 30 years old and I am in grade A."
+    </code></pre>
+<h3>8. super() (parent constructor çağırma)</h3>
+<p>super(), parent sınıfın constructor'ını çağırmak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            constructor(name, age) {
+                this.name = name;
+                this.age = age;
+            }
+        }
+
+        class Student extends Person {
+            constructor(name, age, grade) {
+                super(name, age);
+                this.grade = grade;
+            }
+        }
+    </code></pre>
+<h3>9. Method overriding</h3>
+<p>Method overriding, parent sınıfın metotunu yeniden tanımlamak için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {
+            greet() { console.log("Hello!"); }
+        }
+
+        class Student extends Person {
+            greet() { console.log("Hello from Student!"); }
+        }
+    </code></pre>
+<h3>10. instanceof operatörü</h3>
+<p>instanceof, bir nesnin belirli bir sınıfın örneği olup olmadığını kontrol eder.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class Person {}
+        let alice = new Person();
+        console.log(alice instanceof Person); // true
+    </code></pre>
+<h3>11. Prototype tabanlı inheritance (ES5 yöntemi - kısa)</h3>
+<p>ES5'de, prototype tabanlı inheritance kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function Person(name, age) {
+            this.name = name;
+            this.age = age;
+        }
+
+        Person.prototype.greet = function() {
+            console.log(`Hello, my name is ${this.name}`);
+        };
+
+        function Student(name, age, grade) {
+            Person.call(this, name, age);
+            this.grade = grade;
+        }
+
+        Student.prototype = Object.create(Person.prototype);
+        Student.prototype.constructor = Student;
+    </code></pre>
+</div></section><section class="section" id="s13"><div class="section-header"><h2><span>13. </span>Error Handling (Hata Yönetimi)</h2></div><div class="sub">
+
+<h3>1. try-catch (temel kullanım)</h3>
+<p>try-catch blokları, hatalar oluşması durumunda kodun çalışmasını devam ettirmek için kullanılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        try {
+            let result = x / 0;
+        } catch (error) {
+            console.log("Bir hata yakalandı.");
+        }
+    </code></pre>
+<h3>2. catch'te error object (name, message, stack)</h3>
+<p>catch bloğunda, hata nesnesi (error object) kullanılarak hata hakkında bilgi alabiliriz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        try {
+            let result = y;
+        } catch (error) {
+            console.log(error.name); // ReferenceError
+            console.log(error.message); // y is not defined
+            console.log(error.stack); // Detaylı çağrı yığını
+        }
+    </code></pre>
+<h3>3. finally block (her durumda çalışır)</h3>
+<p>finally bloğu, try-catch blokları tamamlandıktan sonra her durumda çalışır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        try {
+            console.log("İşlem başarılı");
+        } catch (error) {
+            console.log(error);
+        } finally {
+            console.log("Burası her zaman çalışır.");
+        }
+    </code></pre>
+<h3>4. throw statement (kendi hatamızı fırlatma)</h3>
+<p>throw statement, kendi hatamızı fırlatabiliriz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        function checkAge(age) {
+            if (age &lt; 18) {
+                throw new Error("Yaşınız 18'den küçük olamaz.");
+            }
+        }
+    </code></pre>
+<h3>5. Custom error (extends Error)</h3>
+<p>Custom error, Error sınıfını extend ederek oluşturabiliriz.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        class ValidationError extends Error {
+            constructor(message) {
+                super(message);
+                this.name = "ValidationError";
+            }
+        }
+    </code></pre>
+<h3>6. Error types: SyntaxError, ReferenceError, TypeError, RangeError, URIError</h3>
+<p>JavaScript'de farklı türde hatalar mevcuttur.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        // ReferenceError: Tanımlanmamış değişken
+        // TypeError: Yanlış veri tipi işlemi
+        // RangeError: Sayısal sınırların aşılması
+    </code></pre>
+<h3>7. Multiple catch (if-else ile veya instanceof)</h3>
+<p>Bir hata birden fazla catch bloğuna düşebilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        try {
+            throw new TypeError("Hata");
+        } catch (error) {
+            if (error instanceof TypeError) {
+                console.log("Tip hatası yakalandı.");
+            }
+        }
+    </code></pre>
+</div></section><section class="section" id="s14"><div class="section-header"><h2><span>14. </span>Promises (Sözler)</h2></div><div class="sub">
+
+<h3>1. Promise states: pending, fulfilled, rejected</h3>
+<p>Promises, pending (bekliyor), fulfilled (tamamlandı) veya rejected (reddedildi) olabilirler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        let promise = new Promise((resolve, reject) =&gt; {
+            setTimeout(() =&gt; {
+                resolve("Promise is fulfilled!");
+            }, 1000);
+        });
+    </code></pre>
+<h3>2. Promise constructor (resolve, reject)</h3>
+<p>Promises, resolve ve reject fonksiyonları ile oluşturulur.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        const veriGetir = new Promise((resolve, reject) =&gt; {
+            let basarili = true;
+            if (basarili) resolve("Veri geldi");
+            else reject("Hata oluştu");
+        });
+    </code></pre>
+<h3>3. then() ile başarılı sonuç</h3>
+<p>then() metodu, Promise başarıyla tamamlandığında çağrılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        veriGetir.then(sonuc =&gt; console.log(sonuc));
+    </code></pre>
+<h3>4. catch() ile hata yakalama</h3>
+<p>catch() metodu, Promise reddedildiğinde veya hata fırlatıldığında çağrılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        veriGetir.catch(hata =&gt; console.log(hata));
+    </code></pre>
+<h3>5. finally() (her durumda çalışır)</h3>
+<p>finally() metodu, Promise tamamlandıktan sonra her durumda çalışır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        veriGetir.finally(() =&gt; console.log("İşlem bitti."));
+    </code></pre>
+<h3>6. Promise chaining (then zinciri)</h3>
+<p>Promises, zincir halinde kullanılabilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        veriGetir
+            .then(sonuc =&gt; sonuc + " işlendi")
+            .then(yeniSonuc =&gt; console.log(yeniSonuc));
+    </code></pre>
+<h3>7. Promise.all() (tüm promise'ler tamamlanınca)</h3>
+<p>Promise.all(), tüm Promise'lerin tamamlanmasını bekler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        Promise.all([p1, p2, p3]).then(sonuclar =&gt; console.log(sonuclar));
+    </code></pre>
+<h3>8. Promise.allSettled() (hepsi tamamlansın, başarısız olsa bile)</h3>
+<p>Promise.allSettled(), tüm Promise'lerin tamamlanmasını bekler, başarılı veya başarısız olsa bile.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        Promise.allSettled([p1, p2]).then(sonuclar =&gt; console.log(sonuclar));
+    </code></pre>
+<h3>9. Promise.race() (ilk biten)</h3>
+<p>Promise.race(), ilk tamamlanan Promise'yi döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        Promise.race([p1, p2]).then(ilkBiten =&gt; console.log(ilkBiten));
+    </code></pre>
+<h3>10. Promise.any() (ilk başarılı olan)</h3>
+<p>Promise.any(), ilk başarılı olan Promise'yi döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        Promise.any([p1, p2]).then(ilkBasarili =&gt; console.log(ilkBasarili));
+    </code></pre>
+<h3>11. Promise.resolve() / Promise.reject()</h3>
+<p>Promise.resolve(), bir Promise'yi resolve eder, Promise.reject(), bir Promise'yi reject eder.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+        let p = Promise.resolve("Hızlı Başarı");
+    </code></pre>
+</div></section><section class="section" id="s15"><div class="section-header"><h2><span>15. </span>Async &amp; Await</h2></div><div class="sub">
+
+<p>Asenkron programlamayı ardışık ve senkron bir kod yapısı gibi yazmayı sağlayan ES8 (ES2017) ile gelmiş bir mimaridir. Sözdizimsel şekerleme (Syntactic Sugar) olarak kabul edilir ve arka planda Promise yapısını kullanır.</p>
+<h3>1. Async Fonksiyon Yapısı</h3>
+<p>Bir fonksiyonun başına <code>async</code> eklendiğinde, o fonksiyon artık otomatik olarak bir Promise döndürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                async function merhaba() {
+                    return "Merhaba Dünya";
+                }
+                merhaba().then(sonuc =&gt; console.log(sonuc)); // "Merhaba Dünya"
+            </code></pre>
+<h3>2. Await Kullanımı ve Hata Yönetimi</h3>
+<p><code>await</code> anahtar kelimesi, yalnızca async fonksiyonlar içerisinde çalışır ve bir Promise çözülene kadar kodun yürütülmesini bekletir. try-catch blokları ile kombine edilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                async function veriIsle() {
+                    try {
+                        let veri = await fetch('https://api.example.com/data');
+                        let json = await veri.json();
+                        console.log(json);
+                    } catch(err) {
+                        console.error("Ağ hatası veya JSON hatası:", err);
+                    }
+                }
+            </code></pre>
+</div></section><section class="section" id="s16"><div class="section-header"><h2><span>16. </span>Generators (Üreticiler)</h2></div><div class="sub">
+
+<p>Çalışması tamamen duraklatılabilen (pause) ve daha sonra kaldığı yerden devam ettirilebilen (resume) özel bir fonksiyon türüdür. Yineleyici (Iterator) protokollerini zahmetsizce uygulamak için kullanılır.</p>
+<h3>1. yield ve next() Protokolü</h3>
+<p>Generator fonksiyonlar <code>function*</code> sözdizimi ile tanımlanır. Değer döndürmek ve fonksiyonu duraklatmak için <code>yield</code> kullanılır. Süreç <code>next()</code> metoduyla ilerletilir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function* sayici() {
+                    yield 1;
+                    yield 2;
+                    return 3;
+                }
+                let gen = sayici();
+                console.log(gen.next()); // { value: 1, done: false }
+                console.log(gen.next()); // { value: 2, done: false }
+                console.log(gen.next()); // { value: 3, done: true }
+            </code></pre>
+<h3>2. Sonsuz Döngülerde Veri Akışı</h3>
+<p>Belleği doldurmadan, talep edildikçe (on-demand) çalışan sonsuz veri akışları oluşturmak için idealdir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function* sonsuzIdUret() {
+                    let id = 1;
+                    while(true) {
+                        yield id++;
+                    }
+                }
+                const uretici = sonsuzIdUret();
+                console.log(uretici.next().value); // 1
+                console.log(uretici.next().value); // 2
+            </code></pre>
+</div></section><section class="section" id="s17"><div class="section-header"><h2><span>17. </span>Modules (Modüller)</h2></div><div class="sub">
+
+<p>Büyük kod tabanlarını mantıksal, bağımsız dosyalara bölerek export ve import etme mekanizmasıdır. Her modül kendi dosya kapsamına (Module Scope) sahiptir.</p>
+<h3>1. Named Export &amp; Import</h3>
+<p>Bir modülden birden fazla öğeyi kendi isimleriyle dışa aktarmak ve süslü parantez <code>{ }</code> kullanarak çağırmaktır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // matematik.js
+                export const PI = 3.14;
+                export function topla(a, b) { return a + b; }
+
+                // ana.js
+                import { topla, PI } from './matematik.js';
+                console.log(topla(2, PI));
+            </code></pre>
+<h3>2. Default Export &amp; Import</h3>
+<p>Her modülde yalnızca bir adet bulunan ve import edilirken süslü parantez gerektirmeyen varsayılan dışa aktarımdır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Araba.js
+                export default class Araba { start() { return "Vroom"; } }
+
+                // ana.js
+                import OzelIsimAraba from './Araba.js';
+            </code></pre>
+<h3>3. Dynamic Import</h3>
+<p>Modüllerin çalışma zamanında, sadece ihtiyaç duyulduğunda dinamik ve asenkron olarak yüklenmesini sağlar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                import('./matematik.js').then(mat =&gt; {
+                    console.log(mat.topla(5, 5));
+                });
+            </code></pre>
+</div></section><section class="section" id="s18"><div class="section-header"><h2><span>18. </span>Map &amp; Set Yapıları</h2></div><div class="sub">
+
+<p>ES6 ile gelen gelişmiş veri koleksiyonu yapılarıdır. Nesne ve dizilere güçlü alternatifler sunarlar.</p>
+<h3>1. Map (Anahtar - Değer Çiftleri)</h3>
+<p>Klasik nesnelerden (Object) farkı, anahtar (key) kısmında fonksiyonlar, nesneler dahil her türlü veri tipinin kullanılabilmesidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let harita = new Map();
+                let objKey = { id: 1 };
+                harita.set(objKey, 'Admin Verileri');
+                console.log(harita.get(objKey)); // 'Admin Verileri'
+                console.log(harita.has(objKey)); // true
+            </code></pre>
+<h3>2. Set (Tekil Değerler Kümesi)</h3>
+<p>İçerisinde sadece benzersiz (unique) değerleri barındırabilen dizi benzeri bir koleksiyondur. Mükemmel bir yinelenen veri temizleyicidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let tekilKume = new Set([1, 2, 2, 3, 3, 4]);
+                console.log(tekilKume.size); // 4 (Yinelenenler elendi)
+                tekilKume.add(5);
+                console.log(tekilKume.has(2)); // true
+            </code></pre>
+</div></section><section class="section" id="s19"><div class="section-header"><h2><span>19. </span>Symbol Veri Tipi</h2></div><div class="sub">
+
+<p>Nesne özelliklerinde (property) çakışmayı önlemek, koda özel meta veriler eklemek adına üretilen, tamamen benzersiz ve değiştirilemez (immutable) ilkel bir veri tipidir.</p>
+<h3>1. Benzersizlik İlkesi</h3>
+<p>Aynı açıklama ile oluşturulan semboller bile bellekte tamamen farklı kimliklere sahiptir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let sym1 = Symbol("anahtar");
+                let sym2 = Symbol("anahtar");
+                console.log(sym1 === sym2); // false
+            </code></pre>
+<h3>2. Gizli Nesne Özellikleri (Well-Known Symbols)</h3>
+<p>Sembol ile tanımlanan nesne anahtarları <code>for...in</code> döngülerinde veya <code>Object.keys()</code> çıktılarında görünmezler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                const gizliId = Symbol('id');
+                let user = {
+                    name: "Can",
+                    [gizliId]: 12345
+                };
+                console.log(Object.keys(user)); // ["name"]
+                console.log(user[gizliId]); // 12345
+            </code></pre>
+</div></section><section class="section" id="s20"><div class="section-header"><h2><span>20. </span>Date (Zaman Yönetimi)</h2></div><div class="sub">
+
+<p>JavaScript üzerinde tarih, saat, zaman dilimleri ve kronometre işlemlerini gerçekleştiren yerleşik nesnedir.</p>
+<h3>1. Tarih Oluşturma ve Metotlar</h3>
+<p>Mevcut zamanı yakalama, parse etme ve manipüle etme işlemleri.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let simdi = new Date();
+                console.log(simdi.getFullYear()); // Örn: 2026
+                console.log(simdi.getMonth()); // 0-11 arası indeks
+                console.log(simdi.toLocaleDateString('tr-TR')); // Yerel format
+            </code></pre>
+<h3>2. Unix Epoch ve Zaman Damgası (Timestamp)</h3>
+<p>1 Ocak 1970'ten bu yana geçen milisaniye cinsinden süreyi hesaplama işlemidir. Performans ölçümleri için idealdir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let zamanDamgasi = Date.now();
+                console.log(zamanDamgasi); // Milisaniye cinsinden büyük sayı
+            </code></pre>
+</div></section><section class="section" id="s21"><div class="section-header"><h2><span>21. </span>RegExp (Düzenli İfadeler)</h2></div><div class="sub">
+
+<p>Metin tabanlı veriler içerisinde kalıp arama (pattern matching), doğrulama (validation) ve veri değiştirme (replace) süreçlerini yürüten güçlü bir metin işleme motorudur.</p>
+<h3>1. Düzenli İfade Tanımlama ve Test Etme</h3>
+<p>Regex ifadeleri eğik çizgiler <code>/.../</code> arasında veya constructor ile tanımlanır. Modifiers (g, i, m) kullanımı yaygındır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let desen = /javascript/i; // i flag'i: case-insensitive (büyük/küçük harfe duyarsız)
+                let metin = "Modern JavaScript Öğreniyorum";
+                console.log(desen.test(metin)); // true
+            </code></pre>
+<h3>2. String Arama ve Eşleşmeleri Yakalama</h3>
+<p><code>match()</code> ve <code>exec()</code> metotları ile metin parçalama ve doğrulama.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let mailDeseni = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+                console.log(mailDeseni.test("ornek@mail.com")); // true
+            </code></pre>
+</div></section><section class="section" id="s22"><div class="section-header"><h2><span>22. </span>DOM Manipülasyonu</h2></div><div class="sub">
+
+<p>Document Object Model (Belge Nesnesi Modeli), tarayıcının yüklediği HTML sayfasını bir ağaç yapısına çevirir. JavaScript, DOM arabirimi sayesinde HTML öğelerini dinamik olarak yönetebilir.</p>
+<h3>1. Element Seçimi ve Stil Müdahalesi</h3>
+<p>DOM elementlerine erişip CSS stillerini ve metin içeriklerini manipüle etme.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let baslik = document.querySelector('h1');
+                baslik.textContent = "Güncellenmiş Başlık";
+                baslik.style.color = '#8a2be2';
+            </code></pre>
+<h3>2. Element Oluşturma ve Event Dinleyicileri</h3>
+<p>Dinamik olarak HTML etiketleri üretip sayfaya enjekte etme ve tıklama, kaydırma olaylarını dinleme.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let yeniButon = document.createElement('button');
+                yeniButon.textContent = "Tıkla";
+                yeniButon.addEventListener('click', () =&gt; {
+                    alert("Butona basıldı!");
+                });
+                document.body.appendChild(yeniButon);
+            </code></pre>
+</div></section><section class="section" id="s23"><div class="section-header"><h2><span>23. </span>Fetch API</h2></div><div class="sub">
+
+<p>Ağ üzerinden asenkron kaynak alımı (HTTP istekleri yapma) gerçekleştirmek için modern, Promise tabanlı esnek bir tarayıcı arayüzüdür. Eski <code>XMLHttpRequest</code> yapısının yerini almıştır.</p>
+<h3>1. GET İsteği ve JSON Çözümleme</h3>
+<p>Harici bir API üzerinden veri çekme ve işleme adımları.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                fetch('https://jsonplaceholder.typicode.com/users/1')
+                    .then(response =&gt; {
+                        if (!response.ok) throw new Error("Ağ hatası");
+                        return response.json(); // JSON verisini JS nesnesine çevirir
+                    })
+                    .then(user =&gt; console.log(user.name))
+                    .catch(error =&gt; console.error("Hata ayrıntısı:", error));
+            </code></pre>
+<h3>2. POST İsteği Gönderme</h3>
+<p>Sunucuya yeni veri kaydetmek için gövde (body) ve başlık (headers) ekleyerek istek yapma.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                fetch('https://api.example.com/posts', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ title: 'Yeni İçerik', userId: 1 })
+                })
+                .then(res =&gt; res.json())
+                .then(data =&gt; console.log("Kayıt Başarılı:", data));
+            </code></pre>
+</div></section><section class="section" id="s24"><div class="section-header"><h2><span>24. </span>JSON Nesnesi</h2></div><div class="sub">
+
+<p>JavaScript Object Notation, platformlar arası hafif bir veri değişim formatıdır. Yerleşik <code>JSON</code> global nesnesi, metin ile nesne dönüşümlerini yönetir.</p>
+<h3>1. JSON.stringify()</h3>
+<p>JavaScript nesnelerini, ağ üzerinden gönderilmeye veya depolanmaya hazır string (metin) formatına dönüştürür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let veriNesnesi = { isim: "Can", aktif: true };
+                let jsonMetni = JSON.stringify(veriNesnesi);
+                console.log(typeof jsonMetni); // "string"
+                console.log(jsonMetni); // '{"isim":"Can","aktif":true}'
+            </code></pre>
+<h3>2. JSON.parse()</h3>
+<p>Ağdan gelen veya depolanan geçerli bir JSON string metnini, tekrar kullanılabilir bir JavaScript nesnesine (Object) çevirir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let hamMetin = '{"kurs":"JS","sure":40}';
+                let jsObj = JSON.parse(hamMetin);
+                console.log(jsObj.kurs); // "JS"
+            </code></pre>
+</div></section><section class="section" id="s25"><div class="section-header"><h2><span>25. </span>Web Storage (Local/Session Storage)</h2></div><div class="sub">
+
+<p>Tarayıcıda, anahtar-değer (key-value) ilişkisiyle local veri saklamaya izin veren mekanizmalardır. Sadece string türünde kayıt kabul ederler.</p>
+<h3>1. LocalStorage (Kalıcı Hafıza)</h3>
+<p>Kullanıcı tarayıcıyı, sekmeyi veya bilgisayarı kapatsa dahi veriler açıkça silinmediği sürece kalıcı olarak saklanır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                localStorage.setItem('tema', 'karanlik');
+                let aktifTema = localStorage.getItem('tema');
+                console.log(aktifTema); // "karanlik"
+                // localStorage.removeItem('tema'); // Tekli silme
+                // localStorage.clear(); // Tümünü temizleme
+            </code></pre>
+<h3>2. SessionStorage (Oturum Bazlı Hafıza)</h3>
+<p>Veriler sadece ilgili tarayıcı sekmesi açık kaldığı sürece saklanır. Sekme kapatıldığında tüm hafıza otomatik silinir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                sessionStorage.setItem('oturumKodu', 'XYZ123');
+                console.log(sessionStorage.getItem('oturumKodu')); // "XYZ123"
+            </code></pre>
+</div></section><section class="section" id="s26"><div class="section-header"><h2><span>26. </span>Event Loop (Olay Döngüsü)</h2></div><div class="sub">
+
+<p>JavaScript, tek iş parçacıklı (single-threaded) ve eşzamanlı (synchronous) çalışan bir dildir. Asenkron işlemleri (Fetch, Timer, Events) bloklanmadan yürütebilmesini Event Loop mimarisine borçludur.</p>
+<h3>1. Stack, Web APIs ve Queue İlişkisi</h3>
+<p>Senkron kodlar Çağrı Yığınına (Call Stack) girip hemen yürütülür. Asenkron işler Web API alanına devredilir, süresi bitenler Görev Kuyruğuna (Task Queue) aktarılır. Stack boşaldığında Event Loop kuyruktaki işleri sırayla stack'e taşır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                console.log("Başlangıç"); // 1. Yürütülür (Senkron)
+                
+                setTimeout(() =&gt; {
+                    console.log("Zamanlayıcı tetiklendi"); // 3. Yürütülür (Macrotask)
+                }, 0);
+                
+                console.log("Bitiş"); // 2. Yürütülür (Senkron)
+            </code></pre>
+<h3>2. Microtask ve Macrotask Kuyruğu Önceliği</h3>
+<p>Promises (then, catch) ve <code>queueMicrotask</code> yapıları Microtask kuyruğuna girer ve her zaman <code>setTimeout</code> gibi Macrotask kuyruklarından önce çalıştırılır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                setTimeout(() =&gt; console.log("Timeout"), 0); // Macrotask
+                Promise.resolve().then(() =&gt; console.log("Promise")); // Microtask (Öncelikli)
+                // Çıktı Sırası: Promise -&gt; Timeout
+            </code></pre>
+</div></section><section class="section" id="s27"><div class="section-header"><h2><span>27. </span>Prototypes (Prototip Yapısı)</h2></div><div class="sub">
+
+<h3>1. Prototip Kalıtımı (Prototypal Inheritance)</h3>
+<p>JavaScript, sınıf tabanlı (Class-based) dillerden farklı olarak nesne tabanlı prototip mimarisine sahiptir. Her nesnenin, metot ve özelliklerini miras aldığı gizli bir <code>[[Prototype]]</code> bağı bulunur.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let hayvan = {
+                    yurur: true,
+                    sesCikar() { return "Ses"; }
+                };
+                let kedi = Object.create(hayvan); // kedi'nin prototipini hayvan yapar
+                console.log(kedi.yurur); // true (Miras alındı)
+            </code></pre>
+<h3>2. Prototype Chain (Prototip Zinciri)</h3>
+<p>Bir nesnenin özelliği çağrıldığında, tarayıcı önce nesnenin kendisine bakar. Bulamazsa prototipine, orada da bulamazsa prototipin prototipine (Object.prototype) kadar zinciri tarar.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function Kisi(isim) { this.isim = isim; }
+                Kisi.prototype.selamla = function() { return `Merhaba ${this.isim}`; };
+                
+                let can = new Kisi("Can");
+                console.log(can.selamla()); // "Merhaba Can" (Zincir üzerinden erişim)
+            </code></pre>
+</div></section><section class="section" id="s28"><div class="section-header"><h2><span>28. </span>Memory Management (Bellek Yönetimi)</h2></div><div class="sub">
+
+<p>JavaScript, nesneler ve değişkenler üretildiğinde otomatik olarak bellek tahsis eder (Allocation) ve kullanım dışı kaldıklarında otomatik olarak temizler (Deallocation).</p>
+<h3>1. Stack (Yığın) ve Heap (Öbek) Bellek</h3>
+<p>İlkel veriler (primitive) ve referans adresleri hızlı erişim için <strong>Stack</strong> üzerinde saklanır. Nesneler, diziler ve fonksiyonlar gibi büyük referans tipleri ise dinamik büyüklüğe sahip <strong>Heap</strong> üzerinde saklanır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let sayi = 10; // Stack üzerinde saklanır
+                let kullanici = { ad: "Efe" }; // Nesne Heap'te, adresi Stack'te saklanır
+            </code></pre>
+<h3>2. Garbage Collection (Çöp Toplayıcı) ve Referans Sayımı</h3>
+<p>JavaScript, artık ulaşılamayan (unreachable) bellek bloklarını serbest bırakmak için <em>Mark-and-Sweep (İşaretle ve Süpür)</em> algoritmasına sahip bir Garbage Collector barındırır. Hafıza sızıntılarını önlemek için kullanılmayan büyük referanslar boşa çıkarılmalıdır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let veri = { veriSeti: "Geniş Data" };
+                veri = null; // Eski nesne boşa düştü, Garbage Collector ilk döngüde belleği temizleyecek
+            </code></pre>
+</div></section><section class="section" id="s29"><div class="section-header"><h2><span>29. </span>Modern Özellikler (ES10+)</h2></div><div class="sub">
+
+<p>JavaScript (ECMAScript) standartlarına son yıllarda eklenen, kod yazma konforunu ve güvenliğini artıran modern dil yenilikleridir.</p>
+<h3>1. Nullish Coalescing (??) Operatörü</h3>
+<p>Veya <code>||</code> operatörünün aksine, sadece değerin <code>null</code> veya <code>undefined</code> olduğu durumlarda sağdaki varsayılan değeri atar. <code>0</code> veya <code>""</code> (boş metin) gibi geçerli "falsy" değerleri ezmez.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let sayfaSayisi = 0;
+                let sonucVeya = sayfaSayisi || 10; // 10 döndürür (Çünkü 0 falsy değerdir)
+                let sonucNullish = sayfaSayisi ?? 10; // 0 döndürür (Güvenli yöntem)
+            </code></pre>
+<h3>2. Object.fromEntries() ve String.prototype.replaceAll()</h3>
+<p>Dizi formatındaki anahtar-değer çiftlerini nesneye dönüştürme ve metindeki tüm hedef kelimeleri tek seferde değiştirme metotları.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let matris = [['renk', 'mavi'], ['kod', '#00f']];
+                let nesne = Object.fromEntries(matris);
+                console.log(nesne.renk); // "mavi"
+
+                let metin = "elma, armut, elma";
+                console.log(metin.replaceAll("elma", "muz")); // "muz, armut, muz"
+            </code></pre>
+</div></section><section class="section" id="s30"><div class="section-header"><h2><span>30. </span>Web Components</h2></div><div class="sub">
+
+<p>Herhangi bir framework (React, Vue, Angular vb.) bağımlılığı olmadan, tamamen tarayıcının yerel gücüyle kapsüllenmiş, yeniden kullanılabilir özel HTML etiketleri ve arayüz bileşenleri oluşturma standartları setidir.</p>
+<h3>1. Custom Elements ve Shadow DOM</h3>
+<p>Bileşenin iç yapısını, CSS stillerini ve scriptlerini ana sayfadan tamamen izole ederek (kapsülleyerek) dışarı sızmasını engelleme mekanizmasıdır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                class KapsulluButon extends HTMLElement {
+                    constructor() {
+                        super();
+                        // Shadow kökü oluşturma (izolasyon)
+                        const shadow = this.attachShadow({ mode: 'open' });
+                        shadow.innerHTML = `
+                            &lt;style&gt; button { background: purple; color: white; } &lt;/style&gt;
+                            &lt;button&gt;&lt;slot&gt;&lt;/slot&gt;&lt;/button&gt;
+                        `;
+                    }
+                }
+                customElements.define('ozel-buton', KapsulluButon);
+            </code></pre>
+<h3>2. HTML Şablonları (Template &amp; Slot)</h3>
+<p>HTML içerisinde render edilmeden bekleyen, script ile kopyalanıp dinamik kullanılan iskelet yapılardır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                &lt;!-- Kullanımı --&gt;
+                &lt;ozel-buton&gt;Gönder&lt;/ozel-buton&gt;
+            </code></pre>
+</div></section><section class="section" id="s31"><div class="section-header"><h2><span>31. </span>Proxy &amp; Reflect</h2></div><div class="sub">
+
+<p>Nesnelerin temel operasyonlarına (değer okuma, değer atama, silme vb.) araya girerek özel davranışlar enjekte etmeyi sağlayan meta-programlama araçlarıdır.</p>
+<h3>1. Proxy ile Veri Validasyonu (Get / Set Traps)</h3>
+<p>Bir nesneye değer atanırken veya okunurken araya girerek güvenlik, loglama veya doğrulama katmanı oluşturma sürecidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let hedefKullanici = { isim: "Can", yas: 20 };
+                let korumaliProxy = new Proxy(hedefKullanici, {
+                    get: (target, prop) =&gt; {
+                        return prop in target ? target[prop] : "Özellik bulunamadı";
+                    },
+                    set: (target, prop, value) =&gt; {
+                        if (prop === 'yas' &amp;&amp; typeof value !== 'number') {
+                            throw new TypeError("Yaş değeri sayı olmalıdır!");
+                        }
+                        target[prop] = value;
+                        return true;
+                    }
+                });
+                console.log(korumaliProxy.adresten); // "Özellik bulunamadı"
+                // korumaliProxy.yas = "yirmi"; // Hata fırlatır!
+            </code></pre>
+<h3>2. Reflect API Kullanımı</h3>
+<p>Proxy içindeki tuzakları (traps) yerel davranışlarına yönlendirmeyi kolaylaştıran yardımcı metotlar bütünüdür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Reflect.set(target, prop, value) kullanımı yerel atamayı güvenle yürütür.
+            </code></pre>
+</div></section><section class="section" id="s32"><div class="section-header"><h2><span>32. </span>Intl (Uluslararasılaştırma API'si)</h2></div><div class="sub">
+
+<p>Web uygulamalarının küresel standartlara uyum sağlaması için sayıları, para birimlerini, tarihleri ve zamanları kullanıcının yerel diline (Locale) göre kusursuz biçimlendiren yerleşik API'dir.</p>
+<h3>1. Para Birimi ve Sayı Biçimlendirme</h3>
+<p>Sayısal verileri ülkelerin resmi para birimi simgelerine ve binlik/ondalık ayrım kurallarına göre düzenleme.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let paraFormatla = new Intl.NumberFormat('tr-TR', {
+                    style: 'currency',
+                    currency: 'TRY'
+                });
+                console.log(paraFormatla.format(25350)); // "25.350,00 ₺"
+            </code></pre>
+<h3>2. Tarih, Zaman ve Bağıl Zaman Biçimlendirme</h3>
+<p>Tarih metinlerini veya "3 gün önce", "dün" gibi ifadeleri dile göre otomatik çeviren esnek yapılardır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let relativeFormat = new Intl.RelativeTimeFormat('tr', { numeric: 'auto' });
+                console.log(relativeFormat.format(-1, 'day')); // "dün"
+                console.log(relativeFormat.format(2, 'week')); // "2 hafta sonra"
+            </code></pre>
+</div></section><section class="section" id="s33"><div class="section-header"><h2><span>33. </span>Security (Güvenlik Önlemleri)</h2></div><div class="sub">
+
+<p>İstemci tarafında çalışan JavaScript kodlarının, kötü niyetli saldırılara (XSS, CSRF, Data Injection) karşı dayanıklı hale getirilmesi için uygulanması gereken güvenlik standartlarıdır.</p>
+<h3>1. Cross-Site Scripting (XSS) Koruması</h3>
+<p>Kullanıcıdan alınan verilerin filtrelenmeden doğrudan <code>innerHTML</code> ile ekrana basılması, saldırganın zararlı JS enjekte etmesine yol açar. Her zaman <code>textContent</code> kullanılmalıdır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                let tehlikeliGirdi = "&lt;img src=x onerror=alert('Hacked')&gt;";
+                // GÜVENSİZ: div.innerHTML = tehlikeliGirdi;
+                
+                // GÜVENLİ KULLANIM:
+                let guvenliAlan = document.createElement('div');
+                guvenliAlan.textContent = tehlikeliGirdi; // Kodu düz metne dönüştürür
+            </code></pre>
+<h3>2. Zararlı Yapılardan Kaçınma (eval)</h3>
+<p>Metin olarak gelen string verileri canlı kod gibi çalıştıran <code>eval()</code> fonksiyonu, büyük bir güvenlik açığıdır ve asla kullanılmamalıdır.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // KÖTÜ PRATİK: eval("let gizli = 5;");
+                // JSON verileri işlenirken her zaman JSON.parse() tercih edilmelidir.
+            </code></pre>
+</div></section><section class="section" id="s34"><div class="section-header"><h2><span>34. </span>Testing (Birim Testi Mantığı)</h2></div><div class="sub">
+
+<p>Yazılan kodların, fonksiyonların ve modüllerin beklenen senaryolara göre doğru ve hatasız çalışıp çalışmadığını otomatik yazılımlarla denetleme sürecidir (Jest, Mocha, Vitest mantığı).</p>
+<h3>1. Assertions (İddialar / Doğrulamalar)</h3>
+<p>Fonksiyona gönderilen parametrelerin ürettiği çıktı ile gerçekte olması gereken çıktıyı karşılaştırma işlemidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function topla(a, b) { return a + b; }
+
+                // Temel Test Fonksiyonu
+                function assertEqual(guncel, beklenen, testAdi) {
+                    if (guncel === beklenen) {
+                        console.log(`✅ [BAŞARILI] ${testAdi}`);
+                    } else {
+                        console.error(`❌ [BAŞARISIZ] ${testAdi}: Beklenen ${beklenen}, gelen ${guncel}`);
+                    }
+                }
+                assertEqual(topla(2, 3), 5, "2 artı 3 testi");
+            </code></pre>
+<h3>2. Exception Testing (Hata Testi)</h3>
+<p>Hatalı parametre gönderildiğinde fonksiyonun doğru hata tipini fırlatıp fırlatmadığını denetleme sürecidir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Fonksiyonun throw ettiği hatalar try-catch ile izole edilerek test edilir.
+            </code></pre>
+</div></section><section class="section" id="s35"><div class="section-header"><h2><span>35. </span>Build Araçları Mantığı</h2></div><div class="sub">
+
+<p>Modern projelerde yazılan çoklu modüller, gelişmiş sözdizimleri ve kaynaklar tarayıcıların doğrudan çalıştıramayacağı kadar karmaşıktır. Build (Paketleme) araçları bu süreci optimize eder.</p>
+<h3>1. Minification ve Bundling</h3>
+<p>Vite, Webpack veya Rollup gibi araçlar, yüzlerce JS dosyasını analiz ederek tek bir optimize edilmiş çıktı dosyasına (bundle) dönüştürür. Kod içerisindeki boşlukları siler ve değişken isimlerini kısaltarak boyutu küçültür (Minification).</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Geliştirme Aşaması (Okunabilir Kod):
+                const kullanıcıAdıUzantısı = "admin";
+                
+                // Build Sonrası (Optimize Üretim Kodu):
+                const a="admin";
+            </code></pre>
+<h3>2. Transpilation (Babel / SWC)</h3>
+<p>En yeni JavaScript özellikleriyle yazılmış kodların, eski tarayıcılarda da sorunsuz çalışabilmesi için ES5 sürümüne geriye dönük çevrilmesi işlemidir.</p>
+</div></section><section class="section" id="s36"><div class="section-header"><h2><span>36. </span>Node.js Çevresi</h2></div><div class="sub">
+
+<p>JavaScript'in tarayıcı sınırlarından çıkarak sunucularda, bilgisayar işletim sistemlerinde doğrudan bir arka plan (backend) dili olarak çalışmasını sağlayan V8 tabanlı çalışma ortamıdır.</p>
+<h3>1. Global Nesneler ve Tarayıcı Farkları</h3>
+<p>Node.js ortamında tarayıcıya ait olan <code>window</code>, <code>document</code>, <code>alert()</code> gibi DOM elementleri bulunmaz. Bunun yerine <code>global</code>, <code>process</code>, <code>buffer</code> yapıları mevcuttur.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                // Node.js üzerinde çalıştırılır:
+                console.log(process.version); // Node.js sürümünü döndürür
+                console.log(globalThis === global); // true
+            </code></pre>
+<h3>2. Dosya Sistemi Dosya İşlemleri (fs Module)</h3>
+<p>İşletim sistemi seviyesinde dosya oluşturma, okuma, klasör yönetimi gibi backend operasyonlarını yürütür.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                const fs = require('fs');
+                // Senkron dosya yazma örneği
+                fs.writeFileSync('log.txt', 'Sistem hatasız başlatıldı.');
+                const icerik = fs.readFileSync('log.txt', 'utf-8');
+                console.log(icerik); // "Sistem hatasız başlatıldı."
+            </code></pre>
+</div></section><section class="section" id="s37"><div class="section-header"><h2><span>37. </span>Debugging (Hata Ayıklama)</h2></div><div class="sub">
+
+<p>Çalışma zamanında meydana gelen mantık hatalarını, beklenmeyen veri çökmelerini tespit etmek için kodun akışını izleme ve değişkenlerin durumunu anlık yakalama sanatıdır.</p>
+<h3>1. debugger; İfadesi ve Kesme Noktaları (Breakpoints)</h3>
+<p>Kodun içerisine <code>debugger;</code> yazıldığında, eğer tarayıcının geliştirici konsolu (DevTools) açıksa kod o satırda donar. Geliştirici, bellek durumunu adım adım inceler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function maasHesapla(taban, carpan) {
+                    let toplam = taban * carpan;
+                    debugger; // Tarayıcı burada durur. Değişkenlerin o anki değerleri incelenir.
+                    return toplam;
+                }
+                maasHesapla(30000, 1.5);
+            </code></pre>
+<h3>2. Gelişmiş Konsol Metotları</h3>
+<p>Sadece <code>console.log</code> değil; verileri tablo yapan <code>table()</code>, sayaç tutan <code>count()</code> ve süre ölçen <code>time()</code> kullanımı.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                console.time('DonguSuresi');
+                for(let i=0; i&lt;100000; i++) {}
+                console.timeEnd('DonguSuresi'); // Geçen süreyi milisaniye olarak basar
+            </code></pre>
+</div></section><section class="section" id="s38"><div class="section-header"><h2><span>38. </span>Bonus İpuçları (Debounce &amp; Throttle)</h2></div><div class="sub">
+
+<p>Özellikle pencere boyutlandırma (resize), sayfa kaydırma (scroll) veya arama kutusuna yazı yazma gibi milisaniyede onlarca kez tetiklenen olayların (events) performans çöküşüne yol açmasını engellemek için kullanılan iki kritik optimizasyon tekniğidir.</p>
+<h3>1. Debounce Fonksiyonu</h3>
+<p>Kullanıcı ardı ardına işlem yapmayı (örneğin klavyeden yazı yazmayı) tamamen bitirene kadar fonksiyonun çalışmasını geciktirir. İşlem bittikten X milisaniye sonra fonksiyon tek bir kez tetiklenir.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function debounce(fonksiyon, gecikme) {
+                    let zamanlayici;
+                    return function(...args) {
+                        clearTimeout(zamanlayici);
+                        zamanlayici = setTimeout(() =&gt; {
+                            fonksiyon.apply(this, args);
+                        }, gecikme);
+                    };
+                }
+                // Kullanımı: Sunucuya her harfte değil, yazma bitince istek atar
+                const guvenliArama = debounce(() =&gt; console.log("API İsteği atıldı"), 500);
+            </code></pre>
+<h3>2. Throttle Fonksiyonu</h3>
+<p>Yoğun event akışlarında, fonksiyonun sürekli tetiklenmesini engelleyerek her X milisaniyede **en fazla bir kez** çalışmasına izin verir. Akışı düzenli aralıklara böler.</p>
+<pre><button class="copy-btn">Kopyala</button><code class="language-javascript">
+                function throttle(fn, limit) {
+                    let beklemede = false;
+                    return function(...args) {
+                        if (!beklemede) {
+                            fn.apply(this, args);
+                            beklemede = true;
+                            setTimeout(() =&gt; beklemede = false, limit);
+                        }
+                    };
+                }
+                // Kullanımı: Sayfa kaydırılırken her milisaniyede değil, 200ms'de bir çalışır
+                window.addEventListener('scroll', throttle(() =&gt; console.log("Kaydırılıyor"), 200));
+            </code></pre>
+</div></section></div>
+</main>
+<!-- Sections Progress Bar -->
+<div id="progressBar">
+<div class="prog-text">
+<div class="prog-info">
+<span id="prog-num">01</span>
+<span id="prog-name">Veri Tipleri</span>
+</div>
+<div id="prog-percent">%0</div>
+</div>
+<div class="prog-fill" id="prog-fill"></div>
+</div>
+<!-- Scroll Top Button -->
+<div id="scrollTop" title="Yukarı Çık">
+<svg viewbox="0 0 56 56">
+<circle class="bg" cx="28" cy="28" r="26"></circle>
+<circle class="progress" cx="28" cy="28" r="26"></circle>
+</svg>
+<span class="arrow-up">↑</span>
+</div>
+<!-- Cmd+K Search Modal -->
+<div id="search-modal">
+<div class="search-container">
+<svg viewbox="0 0 24 24">
+<path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path>
+</svg>
+<input autocomplete="off" id="search-input" placeholder="Dokümantasyonda ara (Örn: Promise)..." type="text"/>
+</div>
+</div>
+<script>
+        // --- 1. JAVASCRIPT RENK PALETİ & THEME TOGGLE ---
+        const themeBtn = document.getElementById('theme-btn');
+        themeBtn.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeBtn.innerText = isLight ? '🌙' : '☀️';
+            // Kaydetme işlemi
+            localStorage.setItem('theme', isLight ? 'light' : 'dark');
+            
+            // Prism Tema Değişimi
+            const prismTheme = document.getElementById('prism-theme');
+            if (prismTheme) {
+                prismTheme.href = isLight ? "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css" : "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css";
+            }
+        });
+        
+        // Cihaz/Kaydedilmiş tema kontrolü
+        const isInitialLight = localStorage.getItem('theme') === 'light' || (!localStorage.getItem('theme') && window.matchMedia('(prefers-color-scheme: light)').matches);
+        if (isInitialLight) {
+            document.body.classList.add('light-mode');
+            themeBtn.innerText = '🌙';
+            const prismTheme = document.getElementById('prism-theme');
+            if (prismTheme) {
+                prismTheme.href = "https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism.min.css";
+            }
+        }
+
+
+        // --- 5. GELİŞMİŞ MOTOR: SÖZLÜK & TOOLTIP SİSTEMİ ---
+        const dictionary = {
+            'DOM': 'Document Object Model - Tarayıcının HTML elemanlarını yapılandırdığı ağaç modeli',
+            'Event Loop': 'JavaScript asenkron süreçlerini yöneten döngü mekanizması',
+            'Closure': 'İç fonksiyonun dışarıdaki (parent) lexical scope\'a erişebilmesi',
+            'Prototype': 'JS nesnelerinin birbiri ardına miras (inheritance) zinciri kurduğu yapı',
+            'XSS': 'Cross-Site Scripting güvenlik açığı'
+        };
+
+        function applyTooltips() {
+            const paragraphs = document.querySelectorAll('.sub p, .info-box p');
+            paragraphs.forEach(p => {
+                let html = p.innerHTML;
+                Object.keys(dictionary).forEach(key => {
+                    // HTML etiketleri içerisine sızmamak için regex
+                    const regex = new RegExp(`\\b${key}\\b(?![^<]*>)`, 'g');
+                    html = html.replace(regex, `<span class="tooltip" data-tip="${dictionary[key]}">$&</span>`);
+                });
+                p.innerHTML = html;
+            });
+        }
+        applyTooltips();
+
+        // --- KOPYALA BUTONLARI MİMARİSİ ---
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const codeNode = btn.nextElementSibling;
+                navigator.clipboard.writeText(codeNode.innerText).then(() => {
+                    const originalText = btn.innerText;
+                    btn.innerText = 'Kopyalandı ✔';
+                    btn.style.background = 'var(--accent)';
+                    btn.style.color = 'var(--accent-text)';
+                    btn.style.borderColor = 'var(--accent)';
+                    setTimeout(() => {
+                        btn.innerText = originalText;
+                        btn.style.background = '';
+                        btn.style.color = '';
+                        btn.style.borderColor = '';
+                    }, 2000);
+                });
+            });
+        });
+
+        // --- 4. SCROLLSPY, TOC & STICKY PROGRESS BAR ---
+        const sections = document.querySelectorAll('.section');
+        const navLinks = document.querySelectorAll('.toc-item');
+        const progNum = document.getElementById('prog-num');
+        const progName = document.getElementById('prog-name');
+        const progPercent = document.getElementById('prog-percent');
+        const progFill = document.getElementById('prog-fill');
+        
+        const scrollTopBtn = document.getElementById('scrollTop');
+        const progressCircle = document.querySelector('#scrollTop circle.progress');
+        const circleCircumference = 2 * Math.PI * 26; // 163.36
+        
+        window.addEventListener('scroll', () => {
+            let current = '';
+            
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (window.scrollY >= (sectionTop - 200)) {
+                    current = section.getAttribute('id');
+                }
+            });
+
+            // Yan menüyü (TOC) aktifleştir
+            navLinks.forEach(link => {
+                link.classList.remove('active', 'toc-entering');
+                if (link.getAttribute('href') === `#${current}`) {
+                    link.classList.add('active', 'toc-entering');
+                }
+            });
+
+            // Alt Kısım Sticky Progress Bar Hesaplaması (Dinamik Bölüm İçin)
+            if (current) {
+                const activeSection = document.getElementById(current);
+                const titleText = activeSection.querySelector('h2').innerText;
+                const parts = titleText.split('. ');
+                progNum.innerText = parts[0];
+                progName.innerText = parts[1] || '';
+
+                const sTop = activeSection.offsetTop;
+                const sHeight = activeSection.offsetHeight;
+                
+                // Bölüm içerisindeki ilerlemeyi hesapla
+                const scrollInSec = window.scrollY - sTop + 200;
+                let pct = Math.floor((scrollInSec / sHeight) * 100);
+                if (pct < 0) pct = 0;
+                if (pct > 100) pct = 100;
+                
+                progPercent.innerText = `%${pct}`;
+                progFill.style.width = `${pct}%`;
+            }
+
+            // --- Scroll Top Butonu & Dairesel İlerleme (Tüm Sayfa) ---
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            const scrollRatio = window.scrollY / docHeight;
+            const offset = circleCircumference - (scrollRatio * circleCircumference);
+            progressCircle.style.strokeDashoffset = offset;
+
+            if (window.scrollY > 400) {
+                scrollTopBtn.classList.add('show');
+            } else {
+                scrollTopBtn.classList.remove('show');
+            }
+        });
+
+        scrollTopBtn.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        // --- 5. GELİŞMİŞ MOTOR: Cmd+K Arama & Dinamik Vurgulama (<mark>) ---
+        const searchModal = document.getElementById('search-modal');
+        const searchInput = document.getElementById('search-input');
+        
+        // Tüm işaretleri temizle
+        function removeHighlights() {
+            const marks = document.querySelectorAll('mark.search-highlight');
+            marks.forEach(mark => {
+                const parent = mark.parentNode;
+                if (parent) {
+                    parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                    parent.normalize();
+                }
+            });
+        }
+
+        // Metin nodları üzerinde arama yapıp işaretleme fonksiyonu
+        function highlightText(node, query) {
+            if (node.nodeType === 3) { // Text Node
+                const text = node.nodeValue;
+                const index = text.toLowerCase().indexOf(query);
+                if (index >= 0) {
+                    const mark = document.createElement('mark');
+                    mark.className = 'search-highlight';
+                    mark.textContent = text.substring(index, index + query.length);
+                    
+                    const after = document.createTextNode(text.substring(index + query.length));
+                    node.nodeValue = text.substring(0, index);
+                    
+                    node.parentNode.insertBefore(mark, node.nextSibling);
+                    node.parentNode.insertBefore(after, mark.nextSibling);
+                }
+            } else if (node.nodeType === 1 && node.nodeName !== 'SCRIPT' && node.nodeName !== 'STYLE' && node.nodeName !== 'MARK') {
+                for (let i = 0; i < node.childNodes.length; i++) {
+                    highlightText(node.childNodes[i], query);
+                }
+            }
+        }
+
+        document.addEventListener('keydown', e => {
+            // MacOS Cmd+K veya Windows Ctrl+K
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchModal.classList.add('show');
+                searchInput.focus();
+            }
+            if (e.key === 'Escape' && searchModal.classList.contains('show')) {
+                searchModal.classList.remove('show');
+                removeHighlights();
+                searchInput.value = '';
+            }
+            if (e.key === 'Enter' && searchModal.classList.contains('show')) {
+                e.preventDefault();
+                searchModal.classList.remove('show');
+                const firstMatch = document.querySelector('mark.search-highlight');
+                if (firstMatch) {
+                    firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }
+            }
+        });
+
+        searchModal.addEventListener('click', e => {
+            if (e.target === searchModal) {
+                searchModal.classList.remove('show');
+                removeHighlights();
+                searchInput.value = '';
+            }
+        });
+
+        let searchTimeout;
+        searchInput.addEventListener('input', (e) => {
+            clearTimeout(searchTimeout);
+            const query = e.target.value.toLowerCase().trim();
+            
+            removeHighlights();
+            
+            if (query.length < 2) return;
+
+            searchTimeout = setTimeout(() => {
+                try {
+                    // Hem sol menüyü hem içeriği tara
+                    highlightText(document.getElementById('sidebar'), query);
+                    highlightText(document.getElementById('main-content'), query);
+                    
+                    const firstMatch = document.querySelector('mark.search-highlight');
+                    if (firstMatch) {
+                        firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
+                } catch(err) {
+                    console.error("Arama hatası:", err);
+                }
+            }, 300);
+        });
+
+        // Başlangıç tetiklemesi (Sayfa yüklendiğinde progress bar hesaplanması için)
+        window.dispatchEvent(new Event('scroll'));
+
+    </script>
+    <!-- PrismJS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+</body>
+</html>

@@ -1,0 +1,1406 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HTML5 Kapsamlı Başvuru Rehberi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js Tema (Keskin Renkler) -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-okaidia.min.css" rel="stylesheet" />
+
+    <style>
+        /* Prism.js Arkaplan Ezme (Koyu Arkaplanı Koru) */
+        pre[class*="language-"], code[class*="language-"] {
+            background: transparent !important;
+            text-shadow: none !important;
+            margin: 0 !important;
+        }
+        /* 1. HTML5 COCA-COLA RED / ORANGE PALETİ & TIPOGRAFİ */
+        :root {
+            --bg: #0F0F0F;
+            --bg2: #141414;
+            --bg3: #1A1A1A;
+            --bg4: #1F1F1F;
+            --border: #2A2A2A;
+            --border2: #333333;
+            --accent: #E34F26;
+            --accent2: #EF652A;
+            
+            --text-main: #E0E0E0;
+            --text-muted: #999999;
+            
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-mono: 'JetBrains Mono', monospace;
+            
+            --radius-sm: 8px;
+            --radius-md: 16px;
+            --radius-lg: 24px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Light Mode Tema Değişkenleri */
+        body.light-mode {
+            --bg: #F8F9FA;
+            --bg2: #FFFFFF;
+            --bg3: #F1F3F5;
+            --bg4: #E9ECEF;
+            --border: #DEE2E6;
+            --border2: #CED4DA;
+            --text-main: #212529;
+            --text-muted: #6C757D;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-body);
+            line-height: 1.6;
+            overflow-x: hidden;
+            display: flex;
+            scroll-behavior: smooth;
+        }
+
+        /* Üst Bilgi (Search, Stats, Theme Toggle) */
+        header {
+            position: fixed;
+            top: 0;
+            left: 280px;
+            right: 0;
+            height: 70px;
+            background: rgba(15, 15, 15, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 40px;
+            z-index: 100;
+            transition: background 0.3s;
+        }
+
+        body.light-mode header {
+            background: rgba(248, 249, 250, 0.85);
+        }
+
+        .header-left .search-btn {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-family: var(--font-body);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 14px;
+            transition: var(--transition);
+        }
+        
+        .header-left .search-btn:hover {
+            border-color: var(--accent);
+            color: var(--text-main);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+
+        .theme-toggle {
+            background: none;
+            border: none;
+            color: var(--text-main);
+            font-size: 20px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .theme-toggle:hover {
+            background: var(--bg3);
+        }
+
+        /* 4. DİNAMİK YAN MENÜ (Sidebar / TOC) */
+        .sidebar {
+            width: 280px;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            background-color: var(--bg2);
+            border-right: 1px solid var(--border);
+            padding: 30px 20px;
+            overflow-y: auto;
+            z-index: 101;
+            transition: background-color 0.3s;
+        }
+
+        .sidebar-brand {
+            font-family: var(--font-heading);
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--text-main);
+            margin-bottom: 40px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .sidebar-brand span {
+            color: var(--accent);
+        }
+
+        .toc-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 16px;
+            border-radius: var(--radius-sm);
+            color: var(--text-muted);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+            font-size: 14px;
+        }
+
+        .toc-item .toc-num {
+            font-family: var(--font-mono);
+            font-size: 12px;
+            opacity: 0.6;
+            margin-right: 12px;
+        }
+        
+        .toc-item .toc-text {
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .toc-item .toc-dot {
+            width: 6px;
+            height: 6px;
+            background-color: transparent;
+            border-radius: 50%;
+            transition: var(--transition);
+        }
+
+        .toc-item:hover {
+            color: var(--text-main);
+            background: var(--bg3);
+        }
+
+        /* ScrollSpy Aktif Durumu & Efektleri */
+        .toc-item.active {
+            color: var(--accent);
+            background: rgba(227, 79, 38, 0.1);
+        }
+
+        .toc-item.active .toc-dot {
+            background-color: var(--accent);
+            animation: dotPulse 1.5s infinite;
+        }
+        
+        .toc-item.toc-entering {
+            transform: translateX(4px);
+        }
+
+        @keyframes dotPulse {
+            0% { box-shadow: 0 0 0 0 rgba(227, 79, 38, 0.4); }
+            70% { box-shadow: 0 0 0 6px rgba(227, 79, 38, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(227, 79, 38, 0); }
+        }
+
+        /* Ana İçerik Alanı */
+        .main-content {
+            margin-left: 280px;
+            padding: 120px 60px 140px 60px; /* Alttan boşluk arttırıldı, progress bar kapanmasın diye */
+            width: calc(100% - 280px);
+            max-width: 1100px;
+        }
+
+        h1, h2, h3, h4 {
+            font-family: var(--font-heading);
+            color: var(--text-main);
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            font-size: 32px;
+            margin-bottom: 24px;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 12px;
+        }
+
+        p {
+            margin-bottom: 20px;
+            color: var(--text-muted);
+        }
+
+        ul {
+            margin-bottom: 20px;
+            padding-left: 20px;
+            color: var(--text-muted);
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+
+        /* 3. SQUIRCLE GRID & CARD MİMARİSİ */
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            padding: 24px;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.05);
+        }
+
+        .card:hover {
+            border-color: var(--border2);
+            transform: translateY(-4px);
+        }
+
+        .card h3 {
+            color: var(--accent);
+            font-size: 20px;
+            margin-top: 0;
+            margin-bottom: 12px;
+        }
+
+        /* Bilgi, İpucu ve Uyarı Kutuları */
+        .info-box {
+            padding: 16px 24px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 24px;
+            display: flex;
+            align-items: flex-start;
+            gap: 16px;
+            border-left: 4px solid transparent;
+        }
+        
+        .info-box p {
+            margin-bottom: 0;
+            color: var(--text-main);
+        }
+
+        .info-box.note {
+            background: rgba(100, 149, 237, 0.1);
+            border-left-color: cornflowerblue;
+        }
+        
+        .info-box.tip {
+            background: rgba(46, 204, 113, 0.1);
+            border-left-color: #2ecc71;
+        }
+        
+        .info-box.warn {
+            background: rgba(241, 196, 15, 0.1);
+            border-left-color: #f1c40f;
+        }
+
+        /* Kod Blokları & Copy Button */
+        .code-block-wrapper {
+            position: relative;
+            margin-bottom: 24px;
+            border-radius: var(--radius-sm);
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            overflow: hidden;
+        }
+
+        pre {
+            padding: 24px;
+            overflow-x: auto;
+            margin: 0;
+            tab-size: 4;
+        }
+
+        code {
+            font-family: var(--font-mono);
+            font-size: 14px;
+            color: #d1d5db; /* Syntax highlight varsayılanı */
+            line-height: 1.5;
+        }
+        
+        body.light-mode code {
+            color: #24292e;
+        }
+
+        p code, li code {
+            background: var(--bg3);
+            padding: 2px 6px;
+            border-radius: 4px;
+            color: var(--accent2);
+            border: 1px solid var(--border);
+            font-family: var(--font-mono);
+            font-size: 13px;
+        }
+
+        .copy-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            background: var(--bg4);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: var(--font-body);
+            font-size: 12px;
+            transition: var(--transition);
+        }
+
+        .copy-btn:hover {
+            background: var(--border);
+            color: var(--text-main);
+        }
+
+        /* Sözlük Tooltip (Altı kesik çizgili) */
+        .tooltip {
+            border-bottom: 1px dashed var(--accent);
+            cursor: help;
+            position: relative;
+            color: var(--text-main);
+            transition: color 0.2s;
+        }
+        
+        .tooltip:hover {
+            color: var(--accent);
+        }
+
+        /* 2. STICKY SECTIONS PROGRESS BAR (Alt İlerleme Çubuğu) */
+        #progressBar {
+            position: fixed;
+            bottom: 0;
+            left: 280px;
+            right: 0;
+            height: 52px;
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            z-index: 100;
+        }
+        
+        .prog-info {
+            position: absolute;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            padding: 0 40px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-main);
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .prog-info span.accent {
+            color: var(--accent);
+            font-family: var(--font-mono);
+            margin-right: 8px;
+            font-size: 12px;
+        }
+
+        .prog-fill {
+            height: 100%;
+            background: rgba(227, 79, 38, 0.15);
+            width: 0%;
+            position: absolute;
+            left: 0;
+            top: 0;
+            transition: width 0.1s ease-out;
+            z-index: 1;
+            overflow: hidden;
+        }
+        
+        /* Moving Parlaması Efekti */
+        .prog-fill.moving::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            width: 100%;
+            background: linear-gradient(90deg, transparent, rgba(227, 79, 38, 0.5), transparent);
+            transform: translateX(-100%);
+            animation: moveGlow 2s infinite linear;
+        }
+        
+        @keyframes moveGlow {
+            100% { transform: translateX(100%); }
+        }
+
+        /* Yukarı Çık Butonu (SVG Progress Ring ile) */
+        #scrollTop {
+            position: fixed;
+            bottom: 80px;
+            right: 40px;
+            width: 50px;
+            height: 50px;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            z-index: 99;
+            color: var(--text-main);
+        }
+        
+        #scrollTop.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #scrollTop:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+            color: var(--accent);
+            box-shadow: 0 4px 12px rgba(227, 79, 38, 0.2);
+        }
+        
+        .progress-ring {
+            position: absolute;
+            top: -1px; left: -1px; right: -1px; bottom: -1px;
+            transform: rotate(-90deg);
+        }
+        
+        .progress-ring-circle {
+            stroke: var(--accent);
+            stroke-width: 2;
+            fill: transparent;
+            stroke-dasharray: 150;
+            stroke-dashoffset: 150;
+            transition: stroke-dashoffset 0.1s linear;
+        }
+
+        /* Arama Motoru - Cmd+K */
+        #searchModal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.3); /* Şeffaflık artırıldı */
+            z-index: 1000;
+            display: none;
+            align-items: flex-start;
+            justify-content: center;
+            padding-top: 15vh;
+        }
+        
+        #searchModal.active {
+            display: flex;
+        }
+
+        .search-box {
+            background: var(--bg2);
+            width: 100%;
+            max-width: 600px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .search-input-wrapper {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .search-input-wrapper input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-size: 18px;
+            font-family: var(--font-body);
+            outline: none;
+        }
+        
+        /* Arama Sonucu Vurgusu (Yellow Highlight) */
+        mark.search-hl {
+            background-color: rgba(241, 196, 15, 0.4);
+            color: var(--text-main);
+            padding: 2px 4px;
+            border-radius: 2px;
+            font-weight: 500;
+        }
+
+        /* Bölüm Boşlukları */
+        .section {
+            padding-top: 80px; /* Scroll için offset */
+            margin-top: -80px;
+            min-height: 40vh; /* Esneklik sağlandı */
+            margin-bottom: 80px;
+        }
+
+        /* JS ile eklenecek tooltip balonu */
+        .custom-tooltip-box {
+            position: absolute;
+            background: var(--bg4);
+            color: var(--text-main);
+            padding: 8px 12px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+            pointer-events: none;
+            opacity: 0;
+            transform: translateY(5px);
+            transition: opacity 0.2s, transform 0.2s;
+            z-index: 1000;
+            max-width: 250px;
+            white-space: normal;
+            line-height: 1.5;
+        }
+        .custom-tooltip-box.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            header, .main-content, #progressBar { left: 0; margin-left: 0; width: 100%; }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 4. DİNAMİK YAN MENÜ (Sidebar) -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <span>HTML5</span> Reference
+        </div>
+        <ul class="toc-list" id="tocList">
+            <a href="#s1" class="toc-item active" data-target="s1">
+                <span class="toc-num">01</span>
+                <span class="toc-text">Giriş & Temel Yapı</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s2" class="toc-item" data-target="s2">
+                <span class="toc-num">02</span>
+                <span class="toc-text">Semantik Etiketler</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s3" class="toc-item" data-target="s3">
+                <span class="toc-num">03</span>
+                <span class="toc-text">Metin Biçimlendirme</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s4" class="toc-item" data-target="s4">
+                <span class="toc-num">04</span>
+                <span class="toc-text">Form Elemanları</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s5" class="toc-item" data-target="s5">
+                <span class="toc-num">05</span>
+                <span class="toc-text">Multimedya Elemanları</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s6" class="toc-item" data-target="s6">
+                <span class="toc-num">06</span>
+                <span class="toc-text">Tablolar & Veri Sunumu</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s7" class="toc-item" data-target="s7">
+                <span class="toc-num">07</span>
+                <span class="toc-text">Bağlantılar & Navigasyon</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s8" class="toc-item" data-target="s8">
+                <span class="toc-num">08</span>
+                <span class="toc-text">Gömülü İçerikler & Iframe</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s9" class="toc-item" data-target="s9">
+                <span class="toc-num">09</span>
+                <span class="toc-text">Grafik & Çizim Dünyası</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s10" class="toc-item" data-target="s10">
+                <span class="toc-num">10</span>
+                <span class="toc-text">Global Nitelikler</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s11" class="toc-item" data-target="s11">
+                <span class="toc-num">11</span>
+                <span class="toc-text">Erişilebilirlik & Standartlar</span>
+                <span class="toc-dot"></span>
+            </a>
+            <a href="#s12" class="toc-item" data-target="s12">
+                <span class="toc-num">12</span>
+                <span class="toc-text">Performans & Web Storage</span>
+                <span class="toc-dot"></span>
+            </a>
+        </ul>
+    </aside>
+
+    <!-- Üst Bilgi Alanı -->
+    <header>
+        <div class="header-left">
+            <button class="search-btn" id="searchBtn">
+                <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                Arama yap... (Cmd/Ctrl + K)
+            </button>
+        </div>
+        <div class="header-right">
+
+            <button class="theme-toggle" id="themeToggle" title="Temayı Değiştir (Light/Dark)">☀️</button>
+        </div>
+    </header>
+
+    <!-- 6. HTML İÇERİK İSKELETİ -->
+    <main class="main-content" id="mainContent">
+        
+        <section class="section" id="s1" data-title="Giriş & Temel Yapı">
+            <h2>01. Giriş & Temel Yapı</h2>
+            <p>HTML5, web sayfalarının içeriğini yapılandırmak için kullanılan standart işaretleme dilidir. Önceki sürümlere kıyasla daha temiz kod yazımını teşvik eder ve gereksiz tanımlamalardan (strict DOCTYPE gibi) arındırılmıştır. Bu bölümde DOM hiyerarşisi ve temel sayfa iskeletini inceleyeceğiz.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>DOCTYPE Bildirimi</h3>
+                    <p>Tarayıcıya sayfanın HTML5 standartlarına uygun işleneceğini söyler. Eskiden karmaşık ve uzun olan bu bildirim, artık sade bir <code>&lt;!DOCTYPE html&gt;</code> kullanımına indirgenmiştir.</p>
+                </div>
+                <div class="card">
+                    <h3>Head & Meta Ayarları</h3>
+                    <p>Mobil uyumluluk için <code>viewport</code>, karakter kodlaması için <code>UTF-8</code> setinin tanımlanması şarttır. Bu etiketler kullanıcıya görünmez ama tarayıcı için elzemdir.</p>
+                </div>
+            </div>
+
+            <div class="info-box note">
+                <p>Not: HTML5, kapanmamış etiketlere (örneğin <code>&lt;img&gt;</code> veya <code>&lt;br&gt;</code>) karşı oldukça toleranslıdır. "Self-closing" zorunluluğu kaldırılmıştır.</p>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="tr"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;
+    &lt;title&gt;Premium Developer Reference&lt;/title&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;HTML5 Dünyasına Hoş Geldiniz&lt;/h1&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s2" data-title="Semantik Etiketler">
+            <h2>02. Semantik Etiketler</h2>
+            <p>Semantik yapı, yazılan HTML kodunun hem geliştiriciler hem de makineler (arama motorları botları, ekran okuyucular) tarafından anlamsal olarak kavranabilmesini sağlar. Sınırsız <code>div</code> kullanımı (div soup) yerine, içeriğe uygun etiketler tercih edilmelidir.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>&lt;header&gt; &amp; &lt;footer&gt;</h3>
+                    <p>Sadece sayfa geneli için değil, bağımsız makalelerin (article) başlık ve özet kısımlarını belirlemek için de kullanılabilir.</p>
+                </div>
+                <div class="card">
+                    <h3>&lt;article&gt; &amp; &lt;section&gt;</h3>
+                    <p><code>&lt;article&gt;</code> tek başına anlam ifade eden bağımsız içerikleri, <code>&lt;section&gt;</code> ise tematik olarak gruplanmış yapıları ifade eder.</p>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <p>İpucu: Eğer bir blok için mantıksal olarak bir başlık (h1-h6) atayamıyorsanız, muhtemelen orada <code>&lt;section&gt;</code> yerine <code>&lt;div&gt;</code> kullanmanız daha doğrudur.</p>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;header&gt;
+    &lt;nav&gt;
+        &lt;!-- Ana Navigasyon menüsü --&gt;
+    &lt;/nav&gt;
+&lt;/header&gt;
+
+&lt;main&gt;
+    &lt;section class="latest-news"&gt;
+        &lt;h2&gt;Son Haberler&lt;/h2&gt;
+        &lt;article&gt;
+            &lt;header&gt;
+                &lt;h3&gt;HTML5 Çıktı!&lt;/h3&gt;
+                &lt;time datetime="2014-10-28"&gt;28 Ekim 2014&lt;/time&gt;
+            &lt;/header&gt;
+            &lt;p&gt;W3C bugün nihai standartları yayınladı...&lt;/p&gt;
+        &lt;/article&gt;
+    &lt;/section&gt;
+&lt;/main&gt;
+
+&lt;footer&gt;
+    &lt;p&gt;&amp;copy; 2026 Developer Reference&lt;/p&gt;
+&lt;/footer&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s3" data-title="Metin Biçimlendirme">
+            <h2>03. Metin Biçimlendirme</h2>
+            <p>HTML5, metinlerin sadece görsel olarak değil anlamsal olarak da vurgulanmasını sağlayan gelişmiş tipografik etiketler sunar.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>&lt;mark&gt; (Vurgu)</h3>
+                    <p>Metin içerisinde özellikle dikkate değer, örneğin arama sonuçlarında eşleşen kelimeleri veya odaklanılması gereken referansları sarı arka planla işaretlemek için kullanılır.</p>
+                </div>
+                <div class="card">
+                    <h3>&lt;del&gt; &amp; &lt;ins&gt;</h3>
+                    <p>Silinmiş (<code>&lt;del&gt;</code>) ve yeni eklenmiş (<code>&lt;ins&gt;</code>) metinleri belirterek bir dökümandaki revizyon geçmişinin izlenmesini sağlar.</p>
+                </div>
+                <div class="card">
+                    <h3>&lt;sub&gt; &amp; &lt;sup&gt;</h3>
+                    <p>Kimyasal formüllerde alt simge (H<sub>2</sub>O) ve matematiksel ifadelerde üst simge (E=mc<sup>2</sup>) yazımları için standartlaştırılmıştır.</p>
+                </div>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;p&gt;Kullanıcı deneyimini artırmak için &lt;del&gt;HTML4&lt;/del&gt; yerine &lt;ins&gt;HTML5&lt;/ins&gt; yapısına geçiyoruz.&lt;/p&gt;
+&lt;p&gt;Lütfen form içerisindeki &lt;mark&gt;kırmızı ve yıldızlı&lt;/mark&gt; alanları eksiksiz doldurunuz.&lt;/p&gt;
+&lt;p&gt;Su molekülü &lt;b&gt;H&lt;sub&gt;2&lt;/sub&gt;O&lt;/b&gt; formülü ile gösterilirken, Pisagor teoremi &lt;b&gt;a&lt;sup&gt;2&lt;/sup&gt; + b&lt;sup&gt;2&lt;/sup&gt; = c&lt;sup&gt;2&lt;/sup&gt;&lt;/b&gt; şeklindedir.&lt;/p&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s4" data-title="Form Elemanları & Validasyon">
+            <h2>04. Form Elemanları & Validasyon</h2>
+            <p>Email, tarih (date), renk (color) ve numara (number) gibi yeni input tipleri sayesinde, harici JavaScript kütüphanelerine gerek kalmadan yerel (native) istemci tarafı validasyon işlemleri yapılabilir. Mobil cihazlarda, input tipine özel klavyeler otomatik olarak tetiklenir.</p>
+            
+            <div class="info-box warn">
+                <p>Uyarı: İstemci tarafı validasyon, kullanıcı deneyimi içindir. Kötü niyetli kullanıcılar bu kontrolleri DOM üzerinden aşabileceği için, sunucu tarafında (backend) veri doğrulaması yapmak kesinlikle zorunludur.</p>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;form action="/api/register" method="POST"&gt;
+    &lt;!-- E-Posta Kontrolü --&gt;
+    &lt;label for="email"&gt;E-Posta Adresi:&lt;/label&gt;
+    &lt;input type="email" id="email" name="email" required placeholder="ornek@domain.com"&gt;
+    
+    &lt;!-- Tarih Seçici --&gt;
+    &lt;label for="dob"&gt;Doğum Tarihi:&lt;/label&gt;
+    &lt;input type="date" id="dob" name="dob" min="1950-01-01" max="2010-12-31"&gt;
+    
+    &lt;!-- Aralık Belirleme (Pattern Regex) --&gt;
+    &lt;label for="pin"&gt;4 Haneli PIN:&lt;/label&gt;
+    &lt;input type="password" id="pin" pattern="[0-9]{4}" title="Sadece 4 haneli rakam giriniz"&gt;
+    
+    &lt;button type="submit"&gt;Kayıt Ol&lt;/button&gt;
+&lt;/form&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s5" data-title="Multimedya Elemanları">
+            <h2>05. Multimedya Elemanları</h2>
+            <p>HTML5, harici eklentilere ihtiyaç duymadan medya gösterimini doğal bir DOM bileşenine dönüştürür. Yeni nitelikler sayesinde yükleme stratejileri ve erişilebilirlik standartları da büyük oranda gelişmiştir.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>&lt;audio&gt; &amp; &lt;video&gt;</h3>
+                    <p><code>controls</code> (kullanıcı arayüzü), <code>poster</code> (yüklenmeden önce gösterilecek resim) ve erişilebilir altyazılar (subtitles, descriptions) için <code>&lt;track&gt;</code> desteği sunar.</p>
+                </div>
+                <div class="card">
+                    <h3>&lt;img&gt; Optimizasyonları</h3>
+                    <p>Modern web performansında resimler için <code>loading="lazy"</code> (tembel yükleme) ile bant genişliği tasarrufu, <code>srcset</code> ve <code>sizes</code> ile ekran çözünürlüğüne (retina) uygun adaptif resim sunumu esastır.</p>
+                </div>
+            </div>
+
+            <div class="info-box tip">
+                <p>İpucu: Videolarda tarayıcı uyumluluğu için tek format yerine <code>&lt;source&gt;</code> etiketiyle hem MP4 hem de WebM formatlarında sunmalısınız. Mobil cihazlarda otomatik oynatım (autoplay) için videonun <code>muted</code> (sessiz) olması şarttır.</p>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- Responsive ve Optimize Edilmiş Resim --&gt;
+&lt;img src="resim-kucuk.jpg" 
+     srcset="resim-kucuk.jpg 480w, resim-buyuk.jpg 1080w" 
+     sizes="(max-width: 600px) 480px, 1080px" 
+     loading="lazy" 
+     alt="Açıklayıcı alternatif metin"&gt;
+
+&lt;!-- Video ve Altyazı Entegrasyonu --&gt;
+&lt;video width="100%" controls poster="thumbnail.jpg" preload="metadata" muted&gt;
+    &lt;source src="video-hq.webm" type="video/webm"&gt;
+    &lt;source src="video-hq.mp4" type="video/mp4"&gt;
+    &lt;track src="altyazi-tr.vtt" kind="subtitles" srclang="tr" label="Türkçe" default&gt;
+&lt;/video&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s6" data-title="Tablolar & Gelişmiş Veri Sunumu">
+            <h2>06. Tablolar & Gelişmiş Veri Sunumu</h2>
+            <p>Eskiden tüm site tasarımlarının yapıldığı tablolar (table layouts), günümüzde sadece gerçek anlamda (satır ve sütunlardan oluşan) tablo verilerini göstermek için kullanılmalıdır. Semantik bir tablo, yapısının <code>&lt;thead&gt;</code>, <code>&lt;tbody&gt;</code> ve <code>&lt;tfoot&gt;</code> bölümlerine ayrılmasıyla daha düzenli ve ekran okuyucular tarafından daha anlaşılır olur.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Tablo Yapı Taşları</h3>
+                    <p>Tabloları bir satırda <code>&lt;tr&gt;</code> oluşturup, başlıklar için <code>&lt;th&gt;</code> (koyu ve ortalı varsayılan) ve normal hücre verileri için <code>&lt;td&gt;</code> etiketleri kullanarak şekillendiririz.</p>
+                </div>
+                <div class="card">
+                    <h3>Hücreleri Birleştirme</h3>
+                    <p>Satırları dikey olarak birleştirmek için <code>rowspan</code>, sütunları yatay olarak birleştirmek için <code>colspan</code> öznitelikleri (attributes) kullanılır.</p>
+                </div>
+            </div>
+            
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;table style="width:100%; border-collapse: collapse;"&gt;
+    &lt;thead&gt;
+        &lt;tr&gt;
+            &lt;th&gt;Ürün Kodu&lt;/th&gt;
+            &lt;th&gt;Ürün Adı&lt;/th&gt;
+            &lt;th&gt;Fiyat&lt;/th&gt;
+        &lt;/tr&gt;
+    &lt;/thead&gt;
+    &lt;tbody&gt;
+        &lt;tr&gt;
+            &lt;td&gt;HTML-101&lt;/td&gt;
+            &lt;td&gt;Başlangıç Rehberi&lt;/td&gt;
+            &lt;td&gt;Ücretsiz&lt;/td&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;!-- İki sütunu birleştiren hücre --&gt;
+            &lt;td colspan="2" style="text-align: right;"&gt;Toplam:&lt;/td&gt;
+            &lt;td&gt;Ücretsiz&lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/tbody&gt;
+&lt;/table&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s7" data-title="Bağlantılar & Navigasyon">
+            <h2>07. Bağlantılar (Links) & İntra-Navigasyon</h2>
+            <p>Hipermetin bağları (Hyperlinks), internetin temel yapı taşıdır. İster farklı bir domain'e ister sayfa içindeki başka bir başlığa olsun, tüm geçişler <code>&lt;a&gt;</code> etiketiyle sağlanır.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Bağlantı Türleri ve Güvenlik</h3>
+                    <p>Mutlak (Absolute) ve Göreceli (Relative) yolların kullanımı. Yeni sekmede açılan linklerde (<code>target="_blank"</code>), gidilen sitenin eski sekmeye müdahalesini engellemek için <code>rel="noopener noreferrer"</code> niteliğini eklemek kritik bir güvenlik önlemidir.</p>
+                </div>
+                <div class="card">
+                    <h3>Özel Protokoller & Çapa (Anchor)</h3>
+                    <p>Sayfa içindeki bir <code>id</code>'ye yönlendirme yapan çapa linkler. Ayrıca doğrudan e-posta istemcisini (<code>mailto:</code>) veya telefon arama uygulamasını (<code>tel:</code>) tetikleyen linkler iletişim için önemlidir.</p>
+                </div>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- Dış Bağlantı ve Güvenlik (target="_blank" uyarısı) --&gt;
+&lt;a href="https://example.com" target="_blank" rel="noopener noreferrer"&gt;Dış Siteye Git&lt;/a&gt;
+
+&lt;!-- Sayfa İçi Gezinme (Anchor Link) --&gt;
+&lt;a href="#s4"&gt;Form Elemanları Bölümüne Git&lt;/a&gt;
+
+&lt;!-- İletişim Protokolleri --&gt;
+&lt;a href="mailto:iletisim@sirket.com?subject=Destek"&gt;Bize E-Posta Gönderin&lt;/a&gt;
+&lt;a href="tel:+905551234567"&gt;Hemen Ara&lt;/a&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s8" data-title="Gömülü İçerikler & Iframe">
+            <h2>08. Gömülü İçerikler & Iframe</h2>
+            <p><code>&lt;iframe&gt;</code>, harici bir web sayfasını, videoyu (ör. YouTube) veya haritayı (ör. Google Maps) kendi sayfanızın içinde göstermenizi sağlar. Performans ve güvenlik açısından dikkatli yönetilmesi gereken bir yapıdır.</p>
+            
+            <div class="info-box warn">
+                <p>Güvenlik Uyarısı: Üçüncü taraf bir sitenin kendi sayfanız içinde serbestçe JavaScript çalıştırmasını engellemek için her zaman <code>sandbox</code> özelliğini kullanmalısınız. Aksi takdirde zararlı bir iframe, tıklamaları çalabilir (Clickjacking) veya yönlendirmeler yapabilir.</p>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- Harici Video Gömme Örneği --&gt;
+&lt;iframe width="560" height="315" 
+        src="https://www.youtube.com/embed/dQw4w9WgXcQ" 
+        title="YouTube video player" 
+        frameborder="0" 
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
+        allowfullscreen
+        loading="lazy"&gt;
+&lt;/iframe&gt;
+
+&lt;!-- Sandbox Güvenlik Modeli ile Iframe --&gt;
+&lt;iframe src="https://guvenilmez-site.com" 
+        sandbox="allow-scripts allow-same-origin"
+        loading="lazy"&gt;
+&lt;/iframe&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s9" data-title="Grafik & Çizim Dünyası">
+            <h2>09. HTML5 Grafik & Çizim Dünyası</h2>
+            <p>HTML5, iki farklı güçlü grafik teknolojisi sunar. İhtiyacınıza göre Canvas'ı (piksel tabanlı) veya SVG'yi (vektör tabanlı) kullanabilirsiniz.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Canvas (Immediate Mode)</h3>
+                    <p>JavaScript ile piksel piksel çizilir. Ağır hesaplamalar, devasa veri görselleştirme (ör. binlerce nokta içeren borsa grafikleri) ve tarayıcı tabanlı oyunlar için çok yüksek performans sağlar, ancak DOM'da tek bir etiket olarak görünür.</p>
+                </div>
+                <div class="card">
+                    <h3>SVG (Retained Mode)</h3>
+                    <p>Matematikseldir. Sonsuz kez büyütülebilir, asla bozulmaz. İkonlar, logolar ve CSS ile animasyon katılacak haritalar için mükemmeldir. İçindeki her çizgi, CSS ve JS ile ayrı ayrı kontrol edilebilen birer DOM elemanıdır.</p>
+                </div>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- İnline SVG Örneği: CSS ile renk değiştiren vektör --&gt;
+&lt;svg width="100" height="100" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;
+    &lt;circle class="svg-shape" cx="50" cy="50" r="40" fill="#E34F26" /&gt;
+    &lt;style&gt;
+        .svg-shape { transition: fill 0.3s; cursor: pointer; }
+        .svg-shape:hover { fill: #111; }
+    &lt;/style&gt;
+&lt;/svg&gt;
+
+&lt;!-- Canvas Örneği --&gt;
+&lt;canvas id="myCanvas" width="100" height="100"&gt;&lt;/canvas&gt;
+&lt;script&gt;
+    const ctx = document.getElementById('myCanvas').getContext('2d');
+    ctx.fillStyle = '#E34F26';
+    ctx.fillRect(10, 10, 80, 80);
+&lt;/script&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s10" data-title="Global Nitelikler">
+            <h2>10. Global Nitelikler (Attributes)</h2>
+            <p>HTML'de tüm etiketlere uygulanabilen evrensel (global) nitelikler vardır. Bunlar, elementin kimliğini, stilini veya nasıl davranacağını belirler.</p>
+            
+            <ul style="margin-bottom: 24px; color: var(--text-muted); line-height: 1.8;">
+                <li><code>id</code>: Sayfa içinde elementi benzersiz (unique) olarak tanımlar. JS seçimleri ve çapa linkleri için kullanılır.</li>
+                <li><code>class</code>: CSS ile şekillendirmek veya JS'de grup seçimi yapmak için elemana sınıflar atar.</li>
+                <li><code>title</code>: Fare ile üzerine gelindiğinde ufak bir açıklama metni gösterir.</li>
+                <li><code>hidden</code>: Elemanı mantıksal ve görsel olarak sayfadan gizler.</li>
+                <li><code>tabindex</code>: Klavye navigasyonunda (Tab tuşu) elementin sırasını belirler. Pozitif sayılar sırayı belirtirken, <code>-1</code> elemanın sekme tuşuyla odaklanmasını engeller.</li>
+            </ul>
+
+            <div class="info-box tip">
+                <p>İpucu: HTML5 ile gelen <code>data-*</code> nitelikleri, bir DOM elemanında özel, standart dışı bilgiler saklamanızı sağlar. Bu verilere JavaScript'te <code>dataset</code> üzerinden ulaşılır.</p>
+            </div>
+
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- Global Niteliklerin Birlikte Kullanımı --&gt;
+&lt;button id="submitBtn" 
+        class="btn-primary tooltip-trigger" 
+        title="Formu Onayla" 
+        tabindex="1" 
+        accesskey="s" 
+        data-action="save" 
+        data-user-id="98765"&gt;
+    Kaydet (Alt + S)
+&lt;/button&gt;
+
+&lt;script&gt;
+    const btn = document.getElementById('submitBtn');
+    // data-* niteliklerine erişim (data-user-id -&gt; userId)
+    console.log(btn.dataset.action); // Çıktı: "save"
+    console.log(btn.dataset.userId); // Çıktı: "98765"
+&lt;/script&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s11" data-title="Erişilebilirlik & Standartlar">
+            <h2>11. Erişilebilirlik (WAI-ARIA) & Modern Standartlar</h2>
+            <p>Erişilebilirlik, sitenizi herkesin, özellikle de ekran okuyucu veya alternatif donanımlar kullanan engelli bireylerin rahatça deneyimlemesini sağlamaktır. ARIA (Accessible Rich Internet Applications), standart HTML elemanlarının yetersiz kaldığı kompleks arayüzler için makinelere ekstra anlam katmayı sağlar.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Semantik Olmayan Elemanları Tanımlama</h3>
+                    <p>Bir <code>&lt;div&gt;</code> öğesini buton gibi çalıştırıyorsanız (ki önerilmez), mutlaka <code>role="button"</code> ve <code>tabindex="0"</code> eklemelisiniz.</p>
+                </div>
+                <div class="card">
+                    <h3>Durum Yönetimi (State)</h3>
+                    <p>Açılır kapanır menülerin durumunu (<code>aria-expanded="true/false"</code>) veya dekoratif ikonların ekran okuyucudan gizlenmesini (<code>aria-hidden="true"</code>) sağlamak elzemdir.</p>
+                </div>
+            </div>
+            
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- Görsel engelliler için içeriğin ne olduğunu bildiren etiketleme --&gt;
+&lt;button aria-label="Menüyü Kapat" aria-expanded="true"&gt;
+    &lt;!-- Sadece göze hitap eden, sesli okunması gerekmeyen ikon --&gt;
+    &lt;svg aria-hidden="true"&gt;...&lt;/svg&gt;
+&lt;/button&gt;
+
+&lt;!-- Sekmeli (Tab) Arayüzlerde ARIA kullanımı --&gt;
+&lt;div role="tablist"&gt;
+    &lt;button role="tab" aria-selected="true" aria-controls="panel1" id="tab1"&gt;Profil&lt;/button&gt;
+    &lt;button role="tab" aria-selected="false" aria-controls="panel2" id="tab2"&gt;Ayarlar&lt;/button&gt;
+&lt;/div&gt;
+
+&lt;div id="panel1" role="tabpanel" aria-labelledby="tab1"&gt;Profil içerikleri...&lt;/div&gt;
+&lt;div id="panel2" role="tabpanel" aria-labelledby="tab2" hidden&gt;Ayarlar içerikleri...&lt;/div&gt;</code></pre>
+            </div>
+        </section>
+
+        <section class="section" id="s12" data-title="Performans & Web Storage">
+            <h2>12. Web Performansı & Web Storage Entegrasyonu</h2>
+            <p>Hızlı ve duyarlı bir web deneyimi için kaynakların önceden getirilmesi ve verilerin tarayıcı tarafında saklanarak sunucu yükünün hafifletilmesi şarttır. Ayrıca Web Bileşenleri (Web Components) konsepti, tekrar kullanılabilen DOM iskeletleri sunar.</p>
+
+            <div class="grid-2">
+                <div class="card">
+                    <h3>Kaynak İpuçları (Resource Hints)</h3>
+                    <p>Tarayıcıya sonraki adımları fısıldayarak hız kazanabilirsiniz. <code>&lt;link rel="preload"&gt;</code> kritik kaynakları hemen indirir. <code>prefetch</code> ise gelecekteki sayfalarda gerekecek kaynakları arka planda getirir.</p>
+                </div>
+                <div class="card">
+                    <h3>Template ve Slot İskeletleri</h3>
+                    <p><code>&lt;template&gt;</code> etiketi, içindeki HTML kodunu sayfa yüklenirken render etmeyen, ancak JavaScript ile daha sonra çoğaltılıp (klonlanıp)DOM'a enjekte edilmesini sağlayan gizli bir iskelettir.</p>
+                </div>
+            </div>
+            
+            <div class="code-block-wrapper">
+                <button class="copy-btn">Kopyala</button>
+                <pre><code class="language-html">&lt;!-- Head kısmında Performans İpuçları --&gt;
+&lt;!-- Kritik font dosyasını sayfa ayrıştırılmadan (parse) getir --&gt;
+&lt;link rel="preload" href="ana-font.woff2" as="font" type="font/woff2" crossorigin&gt;
+&lt;!-- Kullanıcının muhtemelen tıklayacağı sonraki sayfa varlığını önbelleğe al --&gt;
+&lt;link rel="prefetch" href="/sonraki-sayfa.html"&gt;
+
+&lt;!-- Web Components İçin Template Yapısı --&gt;
+&lt;template id="cardTemplate"&gt;
+    &lt;div class="card"&gt;
+        &lt;h3&gt;&lt;slot name="title"&gt;Varsayılan Başlık&lt;/slot&gt;&lt;/h3&gt;
+        &lt;p&gt;&lt;slot name="content"&gt;İçerik yükleniyor...&lt;/slot&gt;&lt;/p&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+
+&lt;script&gt;
+    // Template'i klonlayıp sayfaya basma örneği
+    const tmpl = document.getElementById('cardTemplate');
+    const clone = tmpl.content.cloneNode(true);
+    // clone içindeki slot'ları veya elemanları manipüle edebilir ve DOM'a ekleyebilirsiniz.
+    document.body.appendChild(clone);
+&lt;/script&gt;</code></pre>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 2. STICKY SECTIONS PROGRESS BAR -->
+    <div id="progressBar">
+        <div class="prog-fill"></div>
+        <div class="prog-info">
+            <div id="progText"><span class="accent">01</span> Giriş & Temel Yapı</div>
+            <div id="progPercent">%0</div>
+        </div>
+    </div>
+
+    <!-- Scroll to Top Butonu -->
+    <button id="scrollTop" title="Yukarı Çık">
+        <svg class="progress-ring" width="50" height="50">
+            <circle class="progress-ring-circle" cx="25" cy="25" r="23"></circle>
+        </svg>
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M5 15l7-7 7 7"></path></svg>
+    </button>
+
+    <!-- Arama Modal -->
+    <div id="searchModal">
+        <div class="search-box">
+            <div class="search-input-wrapper">
+                <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                <input type="text" id="searchInput" placeholder="Rehberde ara...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Sözlük Tooltip Kutusu -->
+    <div id="customTooltip" class="custom-tooltip-box"></div>
+
+    <script>
+        /* 1. Theme Toggle (Light / Dark Mode) */
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            document.body.classList.toggle('light-mode');
+            const isLight = document.body.classList.contains('light-mode');
+            themeToggle.textContent = isLight ? '🌙' : '☀️';
+        });
+
+
+
+        /* 5. Sözlük & Tooltip Sistemi */
+        const glossary = {
+            'DOM': 'Document Object Model: HTML dökümanının programlanabilir ağaç yapısı.',
+            'Semantik': 'Anlamsal web yapı taşı. Kodun işlevini adından belli etmesi.',
+            'SEO': 'Search Engine Optimization: Arama Motoru Optimizasyonu.',
+            'WebAudio': 'Web Audio API: Tarayıcıda ses sentezi, işleme ve miksaj yeteneği.',
+            'Canvas': 'Piksel tabanlı anında çizim API\'si (2D/3D).',
+            'WebGL': 'Web Graphics Library: Tarayıcıda donanım hızlandırmalı grafikler için.',
+            'API': 'Application Programming Interface: İki uygulamanın konuşmasını sağlayan köprü.'
+        };
+
+        const applyTooltips = () => {
+            const paragraphs = document.querySelectorAll('.section p');
+            paragraphs.forEach(p => {
+                let html = p.innerHTML;
+                Object.keys(glossary).forEach(term => {
+                    const regex = new RegExp(`\\b(${term})\\b`, 'g');
+                    html = html.replace(regex, `<span class="tooltip" data-tip="${glossary[term]}">$1</span>`);
+                });
+                p.innerHTML = html;
+            });
+        };
+        applyTooltips();
+
+        const tooltipBox = document.getElementById('customTooltip');
+        document.body.addEventListener('mouseover', e => {
+            if (e.target.classList.contains('tooltip')) {
+                tooltipBox.textContent = e.target.getAttribute('data-tip');
+                tooltipBox.classList.add('show');
+                const rect = e.target.getBoundingClientRect();
+                tooltipBox.style.left = rect.left + window.scrollX + (rect.width/2) - (tooltipBox.offsetWidth/2) + 'px';
+                tooltipBox.style.top = rect.top + window.scrollY - tooltipBox.offsetHeight - 8 + 'px';
+            }
+        });
+        document.body.addEventListener('mouseout', e => {
+            if (e.target.classList.contains('tooltip')) {
+                tooltipBox.classList.remove('show');
+            }
+        });
+
+        /* 2 & 4. ScrollSpy, Progress Bar & Sidebar Entegrasyonu */
+        const sections = document.querySelectorAll('.section');
+        const tocItems = document.querySelectorAll('.toc-item');
+        const progFill = document.querySelector('.prog-fill');
+        const progText = document.getElementById('progText');
+        const progPercent = document.getElementById('progPercent');
+        const circle = document.querySelector('.progress-ring-circle');
+        const circumference = circle.r.baseVal.value * 2 * Math.PI;
+
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+
+        const updateScroll = () => {
+            const scrollTop = window.scrollY;
+            const docHeight = document.body.scrollHeight - window.innerHeight;
+            
+            // Sayfa Geneli İlerleme (Yukarı Çık SVG Halka Barı)
+            const scrollPercent = docHeight > 0 ? Math.min((scrollTop / docHeight), 1) : 0;
+            circle.style.strokeDashoffset = circumference - scrollPercent * circumference;
+
+            // Yukarı Çık Butonunun Görünürlüğü
+            const scrollTopBtn = document.getElementById('scrollTop');
+            if (scrollTop > 300) scrollTopBtn.classList.add('visible');
+            else scrollTopBtn.classList.remove('visible');
+
+            // ScrollSpy: Hangi bölüm aktif tespit ediliyor
+            let currentSection = sections[0];
+            let currentSecIdx = 0;
+            const offset = 150; // Başlık okunmaya başlandığında geçişi tetikle
+            
+            sections.forEach((sec, idx) => {
+                if (scrollTop >= sec.offsetTop - offset) {
+                    currentSection = sec;
+                    currentSecIdx = idx;
+                }
+            });
+
+            // Geliştirme: Sayfanın en sonuna scroll edildiyse, otomatik en son bölümü seç
+            const isAtBottom = Math.ceil(scrollTop + window.innerHeight) >= document.body.scrollHeight - 20;
+            if (isAtBottom) {
+                currentSecIdx = sections.length - 1;
+                currentSection = sections[currentSecIdx];
+            }
+
+            // Sol Yan Menü (Sidebar) .active Sınıfı Eklemesi
+            tocItems.forEach(item => {
+                item.classList.remove('active', 'toc-entering');
+                if (item.getAttribute('data-target') === currentSection.id) {
+                    item.classList.add('active', 'toc-entering');
+                }
+            });
+
+            // Alt Bar İlerlemesi (Bölüm içi yüzde)
+            const secTop = currentSection.offsetTop - offset;
+            const secHeight = currentSection.offsetHeight;
+            let secProgress = ((scrollTop - secTop) / secHeight) * 100;
+            
+            if (secProgress < 0) secProgress = 0;
+            if (secProgress > 100) secProgress = 100;
+            
+            // Eğer sayfanın en altına indiysek o bölümün progressini %100 olarak kilitle
+            if (isAtBottom) {
+                secProgress = 100;
+            }
+
+            const secNum = String(currentSecIdx + 1).padStart(2, '0');
+            const secTitle = currentSection.getAttribute('data-title');
+
+            progFill.style.width = `${secProgress}%`;
+            progText.innerHTML = `<span class="accent">${secNum}</span> ${secTitle}`;
+            progPercent.textContent = `%${Math.round(secProgress)}`;
+            
+            // %0 ve %100 değilse hareketli parlama animasyonu at
+            if (secProgress > 0 && secProgress < 100) {
+                progFill.classList.add('moving');
+            } else {
+                progFill.classList.remove('moving');
+            }
+        };
+
+        window.addEventListener('scroll', updateScroll, { passive: true });
+        window.addEventListener('resize', updateScroll);
+        setTimeout(updateScroll, 100);
+
+        // Sidebar link tıklandığında kaydırma
+        tocItems.forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = item.getAttribute('data-target');
+                const targetEl = document.getElementById(targetId);
+                window.scrollTo({
+                    top: targetEl.offsetTop - 80,
+                    behavior: 'smooth'
+                });
+            });
+        });
+
+        document.getElementById('scrollTop').addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+
+        /* 6. Kod Kopyalama Sistemi */
+        document.querySelectorAll('.copy-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.nextElementSibling.innerText;
+                navigator.clipboard.writeText(code).then(() => {
+                    const originalText = btn.textContent;
+                    btn.textContent = 'Kopyalandı!';
+                    btn.style.color = 'var(--accent)';
+                    setTimeout(() => {
+                        btn.textContent = originalText;
+                        btn.style.color = '';
+                    }, 2000);
+                });
+            });
+        });
+
+        /* 5. Arama Motoru (Cmd+K / Ctrl+K) */
+        const searchModal = document.getElementById('searchModal');
+        const searchInput = document.getElementById('searchInput');
+
+        const openSearch = () => {
+            searchModal.classList.add('active');
+            searchInput.focus();
+        };
+
+        const closeSearch = () => {
+            searchModal.classList.remove('active');
+            // searchInput.value ve highlights temizlenmiyor, böylece kullanıcı modal kapanınca kelimeyi görebilir.
+        };
+
+        document.getElementById('searchBtn').addEventListener('click', openSearch);
+        
+        searchModal.addEventListener('click', (e) => {
+            if (e.target === searchModal) closeSearch();
+        });
+
+        window.addEventListener('keydown', (e) => {
+            if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                e.preventDefault();
+                searchModal.classList.contains('active') ? closeSearch() : openSearch();
+            }
+            if (e.key === 'Escape') {
+                closeSearch();
+            }
+        });
+
+        const clearHighlights = () => {
+            const marks = document.querySelectorAll('mark.search-hl');
+            marks.forEach(mark => {
+                const parent = mark.parentNode;
+                parent.replaceChild(document.createTextNode(mark.textContent), mark);
+                parent.normalize();
+            });
+        };
+
+        const highlightText = (text) => {
+            clearHighlights();
+            if (!text.trim()) return;
+            const regex = new RegExp(`(${text})`, 'gi');
+            
+            const walker = document.createTreeWalker(document.getElementById('mainContent'), NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const nodesToReplace = [];
+            
+            while(node = walker.nextNode()) {
+                if (['SCRIPT', 'STYLE', 'CODE', 'PRE'].includes(node.parentNode.nodeName)) continue;
+                // Fix regex stateful bug by not using global test()
+                if (node.nodeValue.toLowerCase().includes(text.toLowerCase())) {
+                    nodesToReplace.push(node);
+                }
+            }
+            
+            nodesToReplace.forEach(n => {
+                const span = document.createElement('span');
+                span.innerHTML = n.nodeValue.replace(regex, '<mark class="search-hl">$1</mark>');
+                n.parentNode.replaceChild(span, n);
+            });
+        };
+
+        searchInput.addEventListener('input', (e) => {
+            highlightText(e.target.value);
+            const firstMatch = document.querySelector('mark.search-hl');
+            if (firstMatch) {
+                firstMatch.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+        });
+
+        // Enter'a basınca aramayı onayla ve pencereyi kapat
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                closeSearch();
+            }
+        });
+    </script>
+
+    <!-- Prism.js Kütüphanesi -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-markup.min.js"></script>
+</body>
+</html>

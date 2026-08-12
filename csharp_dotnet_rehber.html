@@ -1,0 +1,943 @@
+<!DOCTYPE html>
+<html lang="tr" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>C# & .NET İleri Seviye Programlama Başvuru Rehberi</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            /* Dark Theme (Blue-Slate Premium) */
+            --bg: #0B0F19;
+            --bg2: #111625;
+            --bg3: #181E33;
+            --border: #2B3554;
+            --accent: #512BD4;
+            --cyan: #00E5FF;
+            --text-main: #F8FAFC;
+            --text-muted: #94A3B8;
+            --scroll-track: #0B0F19;
+            --scroll-thumb: #2B3554;
+            --glass-bg: rgba(17, 22, 37, 0.7);
+            --code-bg: #0d111c;
+        }
+
+        [data-theme="light"] {
+            --bg: #F8FAFC;
+            --bg2: #FFFFFF;
+            --bg3: #F1F5F9;
+            --border: #E2E8F0;
+            --accent: #512BD4;
+            --cyan: #00B4D8;
+            --text-main: #0F172A;
+            --text-muted: #475569;
+            --scroll-track: #F8FAFC;
+            --scroll-thumb: #CBD5E1;
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --code-bg: #F1F5F9;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            overflow-x: hidden;
+            transition: background-color 0.3s ease, color 0.3s ease;
+        }
+
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--scroll-track); }
+        ::-webkit-scrollbar-thumb { background: var(--scroll-thumb); border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+
+        /* Typography */
+        h1, h2, h3, h4 { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; color: var(--text-main); margin-bottom: 1rem; }
+        h1 { font-size: 2.5rem; letter-spacing: -0.02em; }
+        h2 { font-size: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 0.5rem; margin-top: 2rem; margin-bottom: 1.5rem; }
+        h3 { font-size: 1.3rem; color: var(--cyan); margin-top: 1.5rem; }
+        p { margin-bottom: 1.25rem; color: var(--text-muted); font-size: 1.05rem; }
+        code { font-family: 'JetBrains Mono', monospace; font-size: 0.9em; }
+        ul, ol { margin-bottom: 1.25rem; margin-left: 1.5rem; color: var(--text-muted); font-size: 1.05rem; }
+        li { margin-bottom: 0.5rem; }
+
+        /* Layout */
+        .app-container { display: flex; min-height: 100vh; }
+
+        /* Sidebar */
+        .sidebar {
+            width: 320px;
+            background-color: var(--bg2);
+            border-right: 1px solid var(--border);
+            padding: 2rem;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+            z-index: 100;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+
+        .brand {
+            display: flex; align-items: center; gap: 12px;
+            font-family: 'Plus Jakarta Sans', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--text-main);
+        }
+
+        .brand-icon {
+            width: 36px; height: 36px;
+            background: linear-gradient(135deg, var(--accent), var(--cyan));
+            border-radius: 10px; display: flex; align-items: center; justify-content: center;
+            color: white; font-size: 1.2rem;
+        }
+
+        /* Search */
+        .search-container { position: relative; }
+        .search-input {
+            width: 100%; padding: 12px 16px 12px 40px; border-radius: 8px;
+            border: 1px solid var(--border); background-color: var(--bg3); color: var(--text-main);
+            font-family: 'Inter', sans-serif; font-size: 0.95rem; outline: none; transition: all 0.2s ease;
+        }
+        .search-input:focus { border-color: var(--cyan); box-shadow: 0 0 0 3px rgba(0, 229, 255, 0.1); }
+        .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none; }
+
+        /* TOC */
+        .toc { display: flex; flex-direction: column; gap: 0.5rem; }
+        .toc-item {
+            display: flex; align-items: center; gap: 12px; padding: 10px 14px;
+            border-radius: 8px; color: var(--text-muted); text-decoration: none; font-weight: 500;
+            transition: all 0.2s ease; cursor: pointer;
+        }
+        .toc-item:hover { background-color: var(--bg3); color: var(--text-main); }
+        .toc-item.active { background-color: rgba(81, 43, 212, 0.1); color: var(--cyan); font-weight: 600; }
+        .pulse-dot { width: 8px; height: 8px; border-radius: 50%; background-color: var(--border); transition: all 0.3s ease; }
+        .toc-item.active .pulse-dot { background-color: var(--cyan); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); animation: pulse 2s infinite; }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 6px rgba(0, 229, 255, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(0, 229, 255, 0); }
+        }
+
+        /* Controls */
+        .controls { margin-top: auto; display: flex; align-items: center; gap: 1rem; }
+        .theme-toggle {
+            background: var(--bg3); border: 1px solid var(--border); color: var(--text-main);
+            padding: 10px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+            transition: all 0.2s ease; flex: 1;
+        }
+        .theme-toggle:hover { border-color: var(--cyan); }
+
+        /* Main Content */
+        .main-content {
+            margin-left: 320px; padding: 4rem 6rem 8rem 6rem;
+            width: calc(100% - 320px); max-width: 1200px;
+        }
+
+        /* Content Boxes */
+        .content-box {
+            background-color: var(--bg2); border: 1px solid var(--border); border-radius: 16px;
+            padding: 2.5rem; margin-bottom: 3rem; position: relative; overflow: hidden;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            --mouse-x: -1000px; --mouse-y: -1000px;
+        }
+        .content-box::before {
+            content: ''; position: absolute; top: var(--mouse-y); left: var(--mouse-x);
+            width: 400px; height: 400px; background: radial-gradient(circle, rgba(0, 229, 255, 0.08) 0%, transparent 60%);
+            transform: translate(-50%, -50%); pointer-events: none; opacity: 0; transition: opacity 0.3s; z-index: 0;
+        }
+        .content-box:hover::before { opacity: 1; }
+        .content-box > * { position: relative; z-index: 1; }
+
+        .topic-block { margin-top: 2rem; padding-top: 1rem; border-top: 1px dashed var(--border); }
+        .topic-block:first-of-type { border-top: none; }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg) !important; border: 1px solid var(--border); border-radius: 12px;
+            padding: 1.5rem !important; position: relative; margin: 1.5rem 0 !important; overflow-x: auto;
+        }
+        .copy-btn {
+            position: absolute; top: 12px; right: 12px; background: var(--bg3); border: 1px solid var(--border);
+            color: var(--text-main); padding: 6px 12px; border-radius: 6px; font-size: 0.8rem; cursor: pointer;
+            transition: all 0.2s ease; opacity: 0;
+        }
+        pre:hover .copy-btn { opacity: 1; }
+        .copy-btn:hover { background: var(--accent); border-color: var(--accent); color: white; }
+
+        /* Sticky Footer */
+        .sticky-footer {
+            position: fixed; bottom: 0; left: 320px; right: 0; height: 60px;
+            background: var(--glass-bg); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
+            border-top: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between;
+            padding: 0 2rem; z-index: 90; transition: left 0.3s ease;
+        }
+        .progress-container { display: flex; align-items: center; gap: 1rem; flex: 1; }
+        .progress-bar-bg { height: 6px; background: var(--bg3); border-radius: 3px; flex: 1; max-width: 300px; overflow: hidden; }
+        .progress-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--cyan)); width: 0%; border-radius: 3px; transition: width 0.1s ease; }
+        .progress-text { font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; color: var(--cyan); font-weight: 600; width: 45px; }
+        .current-module { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; color: var(--text-main); font-size: 0.95rem; }
+
+        /* Responsive */
+        @media (max-width: 1024px) {
+            .sidebar { width: 280px; }
+            .main-content { margin-left: 280px; width: calc(100% - 280px); padding: 3rem 2rem 6rem 2rem; }
+            .sticky-footer { left: 280px; }
+        }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .main-content { margin-left: 0; width: 100%; padding: 2rem 1rem 6rem 1rem; }
+            .sticky-footer { left: 0; }
+        }
+
+        /* Badges */
+        .badge {
+            display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700;
+            text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem;
+        }
+        .badge-purple { background: rgba(81, 43, 212, 0.15); color: #B794F4; border: 1px solid rgba(81, 43, 212, 0.3); }
+        .badge-cyan { background: rgba(0, 229, 255, 0.15); color: var(--cyan); border: 1px solid rgba(0, 229, 255, 0.3); }
+        [data-theme="light"] .badge-purple { color: var(--accent); }
+        [data-theme="light"] .badge-cyan { color: #008B99; }
+        
+        .alert { padding: 1rem; border-radius: 8px; margin-bottom: 1rem; border-left: 4px solid; }
+        .alert-warning { background: rgba(234, 179, 8, 0.1); border-color: #EAB308; color: #FEF08A; }
+        .alert-info { background: rgba(56, 189, 248, 0.1); border-color: #38BDF8; color: #BAE6FD; }
+        [data-theme="light"] .alert-warning { color: #854D0E; }
+        [data-theme="light"] .alert-info { color: #0369A1; }
+    </style>
+</head>
+<body>
+
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="brand" data-tilt data-tilt-max="10" data-tilt-speed="400" data-tilt-glare="true" data-tilt-max-glare="0.2">
+            <div class="brand-icon">C#</div>
+            <span>DevRef</span>
+        </div>
+
+        <div class="search-container">
+            <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" class="search-input" id="searchInput" placeholder="Rehberde ara (örn. Span)...">
+        </div>
+
+        <nav class="toc" id="toc">
+            <a href="#sec-basics" class="toc-item">
+                <div class="pulse-dot"></div>
+                C# Temelleri & OOP
+            </a>
+            <a href="#sec-async" class="toc-item active">
+                <div class="pulse-dot"></div>
+                Asenkron Programlama
+            </a>
+            <a href="#sec-memory" class="toc-item">
+                <div class="pulse-dot"></div>
+                Bellek Yönetimi
+            </a>
+            <a href="#sec-linq" class="toc-item">
+                <div class="pulse-dot"></div>
+                LINQ Derinlemesine
+            </a>
+            <a href="#sec-modern" class="toc-item">
+                <div class="pulse-dot"></div>
+                Modern C# Özellikleri
+            </a>
+        </nav>
+
+        <div class="controls">
+            <button class="theme-toggle" id="themeToggle" aria-label="Temayı Değiştir" data-tippy-content="Aydınlık/Karanlık Tema">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            </button>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        
+        <!-- Section 0 -->
+        <section id="sec-basics" class="content-section">
+            <div class="content-box">
+                <span class="badge badge-purple">Bölüm 01</span>
+                <h2>C# Temelleri ve OOP Kavramları</h2>
+                <p>İleri seviye konulara geçmeden önce, C# ve .NET mimarisinin üzerine inşa edildiği temel yapı taşlarını, bellek yönetiminin temellerini ve Nesne Yönelimli Programlama (OOP) prensiplerini eksiksiz anlamak kritik önem taşır.</p>
+                
+                <div class="topic-block">
+                    <h3>1. Stack vs Heap ve Tip Mimarisi</h3>
+                    <p>C#'ta bellek yönetimi ve değişkenlerin saklanma biçimi (Memory Allocation) iki ana bölgeye ayrılır: Stack ve Heap.</p>
+                    <ul>
+                        <li><strong>Value Types (Değer Tipleri):</strong> <code>struct</code>, <code>enum</code>, <code>int</code>, <code>double</code>, <code>bool</code> gibi tiplerdir. Doğrudan veriyi içerirler ve kural olarak <strong>Stack</strong>'te tahsis edilirler. İşlem bittiğinde anında bellekten silinirler (Garbage Collector beklemez).</li>
+                        <li><strong>Reference Types (Referans Tipleri):</strong> <code>class</code>, <code>string</code>, <code>interface</code>, <code>delegate</code>, <code>array</code> gibi tiplerdir. Verinin kendisi <strong>Heap</strong>'te tutulur, Stack'te ise sadece bu veriyi gösteren bellek adresi (Pointer/Referans) yer alır. Heap'teki verinin temizlenmesi Garbage Collector'ın (GC) sorumluluğundadır.</li>
+                    </ul>
+                    <pre><code class="language-csharp">// 1. Değer Tipi Kopyalama (Tamamen bağımsız iki değişken oluşur)
+int a = 10;
+int b = a; 
+b = 20; // 'a' bu değişiklikten etkilenmez, hala 10'dur.
+
+// 2. Referans Tipi Kopyalama (Sadece bellek adresi kopyalanır)
+List&lt;int&gt; list1 = new List&lt;int&gt; { 1, 2 };
+List&lt;int&gt; list2 = list1; 
+list2.Add(3); // list1 ve list2 aynı bellek adresini (Heap objesini) gösterdiği için list1 de değişir!</code></pre>
+                    <div class="alert alert-warning">
+                        <strong>Kritik Uyarı (Boxing/Unboxing):</strong> Bir değer tipini (örn. int) referans tipine (örn. object) atamak "Boxing" işlemidir. Bu, değişkeni alıp Heap'te yeni bir kutuya koyar. Sürekli boxing/unboxing yapmak performansı ciddi şekilde düşürür (GC'yi yorar).
+                    </div>
+                </div>
+
+                <div class="topic-block">
+                    <h3>2. Parametre Aktarım Yöntemleri (ref, out, in)</h3>
+                    <p>Varsayılan olarak değer tipleri metoda "kopyalanarak" (by value), referans tiplerinin de "referansının kopyası" aktarılarak yollanır. Bu davranışı değiştirmek mümkündür:</p>
+                    <ul>
+                        <li><code>ref</code>: Değişkenin orijinal bellek adresini metoda yollar. Metot içindeki değişiklik orijinal değişkeni etkiler. Değişkenin metoda verilmeden önce başlatılmış (initialize) olması zorunludur.</li>
+                        <li><code>out</code>: <code>ref</code> ile aynıdır, ancak değişkene metoda girmeden değer atanmak zorunda değildir. Metodun, değişkeni mutlaka dolduracağı garanti edilir (Örn: int.TryParse).</li>
+                        <li><code>in</code>: <code>ref</code> gibi bellek adresini yollar ancak salt okunurdur (readonly). Sadece büyük struct'ları kopyalama maliyetinden kurtarmak için performans amaçlı kullanılır.</li>
+                    </ul>
+                </div>
+
+                <div class="topic-block">
+                    <h3>3. OOP: Encapsulation (Kapsülleme) ve Erişim Belirleyiciler</h3>
+                    <p>Bir sınıfın verilerini (fields) dışarıdan gelebilecek kontrolsüz müdahalelere kapatma işlemidir.</p>
+                    <ul>
+                        <li><code>public</code>: Her yerden erişilebilir.</li>
+                        <li><code>private</code>: Yalnızca tanımlandığı sınıf (class) içinden erişilebilir.</li>
+                        <li><code>protected</code>: Kendi sınıfı ve miras alan (inherit eden) alt sınıflardan erişilebilir.</li>
+                        <li><code>internal</code>: Sadece aynı DLL/Proje (Assembly) içinden erişilebilir.</li>
+                    </ul>
+                    <pre><code class="language-csharp">public class User
+{
+    // Field (Özel alan)
+    private int _age; 
+
+    // Property (Özellik) - Getter ve Setter ile mantık yürütme
+    public int Age 
+    {
+        get { return _age; }
+        set 
+        { 
+            if (value &lt; 0) throw new ArgumentException("Yaş negatif olamaz.");
+            _age = value; 
+        }
+    }
+
+    // Auto-property (Derleyici arka planda private field oluşturur)
+    public string Name { get; set; }
+    
+    // Init-only Property (C# 9) - Nesne sadece new ile yaratılırken atanabilir, sonra değiştirilemez!
+    public DateTime CreatedAt { get; init; } = DateTime.UtcNow;
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>4. OOP: Kalıtım (Inheritance) ve Çok Biçimlilik (Polymorphism)</h3>
+                    <p><strong>Kalıtım</strong>, bir sınıfın (Base) özelliklerini başka bir sınıfa (Derived) aktarmasıdır. C#'ta bir sınıf sadece <strong>TEK BİR</strong> sınıftan miras alabilir.<br>
+                    <strong>Çok Biçimlilik</strong> (Polymorphism), alt sınıfların üst sınıfın metotlarını ezerek (override) kendilerine özgü davranış sergileyebilmesidir.</p>
+                    <pre><code class="language-csharp">public class Animal
+{
+    // virtual: Alt sınıflar dilerse bu metodu değiştirebilir
+    public virtual void MakeSound() => Console.WriteLine("Sessizlik...");
+}
+
+public class Dog : Animal
+{
+    // override: Üst sınıftaki 'virtual' metodu eziyoruz
+    public override void MakeSound() => Console.WriteLine("Hav hav!");
+}
+
+// Polimorfizm kullanımı:
+Animal myPet = new Dog();
+myPet.MakeSound(); // Çıktı: "Hav hav!" (Animal tipinde tutulsa da Dog'un metodu çalışır)</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>5. Soyutlama (Abstraction): Interface vs Abstract Class</h3>
+                    <p>Soyutlama, karmaşıklığı gizleyip sadece gerekli arayüzü sunma işlemidir.</p>
+                    <ul>
+                        <li><strong>Interface (Arayüz):</strong> Gövdesiz metot tanımlarıdır ("Sözleşme"). Bir sınıf <strong>birden fazla</strong> interface uygulayabilir (Çoklu Kalıtım). Dependency Injection'ın bel kemiğidir. C# 8.0 ile Default Interface Methods (Gövde barındıran metotlar) desteklenmeye başlamıştır.</li>
+                        <li><strong>Abstract Class (Soyut Sınıf):</strong> Yarı şablon, yarı gerçek sınıftır. Hem ortak kod yazabilirsiniz hem de alt sınıfların doldurmasını zorunlu tutacağınız <code>abstract</code> metotlar tanımlayabilirsiniz. <code>new</code> ile doğrudan yaratılamazlar.</li>
+                    </ul>
+                    <pre><code class="language-csharp">public interface ILogger 
+{ 
+    void LogInfo(string msg);
+    // C# 8 Default Interface Method:
+    void LogError(string msg) => Console.WriteLine("ERROR: " + msg); 
+}
+
+public abstract class BaseRepository
+{
+    protected string ConnectionString { get; set; }
+    
+    // Ortak dolu metot
+    public void OpenConnection() { /* ... */ }
+    
+    // Alt sınıfların mecburen yazacağı soyut metot
+    public abstract void Save(); 
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>6. Hata Yönetimi (Exceptions)</h3>
+                    <p>Uygulama çalışırken oluşan istisnai durumları yakalamak için <code>try-catch-finally</code> kullanılır.</p>
+                    <pre><code class="language-csharp">try 
+{
+    int result = 10 / int.Parse("0");
+}
+catch (DivideByZeroException ex) 
+{
+    Console.WriteLine("Sıfıra bölme hatası: " + ex.Message);
+    throw; // Hatayı yutmadan üst katmana (çağrıldığı yere) fırlatır (Call stack korunur)
+}
+catch (Exception ex)
+{
+    // Diğer tüm hatalar
+}
+finally 
+{
+    // Hata olsun veya olmasın her zaman çalışır (Örn: Veritabanı bağlantısı kapatmak için)
+    Console.WriteLine("İşlem bitti.");
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>7. Generics (Jenerikler)</h3>
+                    <p>Aynı mantığı farklı tipler için (tip güvenli şekilde) tekrar tekrar yazmanızı önler. Boxing/Unboxing sorununu kökten çözer.</p>
+                    <pre><code class="language-csharp">// 'T' burada jenerik tiptir. Kullanılırken belirlenir.
+public class Repository&lt;T&gt; where T : class, new() // Kısıtlamalar (Constraints)
+{
+    public T CreateNewInstance()
+    {
+        // T'nin class (referans tip) ve parametresiz constructor'a sahip olduğu garanti edilmiştir
+        return new T(); 
+    }
+}
+
+var userRepo = new Repository&lt;User&gt;(); // T yerine 'User' geçer.</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>8. Delegates ve Fonksiyonel C# (Action, Func)</h3>
+                    <p>C#'ta metotları bir değişkene atamak veya başka metotlara parametre olarak yollamak için <strong>Delegate</strong> (Temsilci) kullanılır. Modern C#'ta özel delegate tanımlamak yerine yerleşik (built-in) yapılar kullanılır:</p>
+                    <ul>
+                        <li><code>Action&lt;T&gt;</code>: Parametre alır, ancak <strong>geriye değer dönmez</strong> (void).</li>
+                        <li><code>Func&lt;T, TResult&gt;</code>: Parametre alır ve <strong>geriye bir değer döner</strong>. Son parametre dönüş tipidir.</li>
+                        <li><code>Predicate&lt;T&gt;</code>: Bir tip alır ve her zaman <strong>bool (true/false) döner</strong> (Genelde filtreleme için).</li>
+                    </ul>
+                    <pre><code class="language-csharp">// Func örneği: (int x, int y) alır, 'string' döner
+Func&lt;int, int, string&gt; calculateAndFormat = (x, y) => $"Sonuç: {x + y}";
+Console.WriteLine(calculateAndFormat(5, 10)); // Çıktı: "Sonuç: 15"
+
+// Action örneği (Dönüş tipi void)
+Action&lt;string&gt; print = msg => Console.WriteLine(msg);
+print("Merhaba Fonksiyonel C#!");</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 1 -->
+        <section id="sec-async" class="content-section">
+            <div class="content-box">
+                <span class="badge badge-cyan">Bölüm 02</span>
+                <h2>Asenkron Programlama Derinlemesine</h2>
+                <p>C#'ın <code>async/await</code> modeli aslında derleyici seviyesinde devasa bir state machine (durum makinesi) oluşturur (<code>IAsyncStateMachine</code>). Arka planda thread bloklanmaz; bunun yerine görev tamamlandığında ThreadPool'dan uygun bir thread devam işlemlerini (continuation) yürütür.</p>
+                
+                <div class="topic-block">
+                    <h3>1. Task vs ValueTask ve Senkron Tamamlanma</h3>
+                    <p><code>Task</code> bir referans tipidir (class). Her metot çağrısında heap'te tahsis (allocation) edilir. Ancak, metodunuz sıklıkla senkron tamamlanıyorsa (örneğin veriyi cache'ten okuyorsa), gereksiz heap alokasyonlarından kaçınmak için değer tipi (struct) olan <code>ValueTask</code> kullanılmalıdır.</p>
+                    <pre><code class="language-csharp">public async ValueTask&lt;int&gt; GetDataAsync(string key)
+{
+    // Veri cache'te varsa (Senkron tamamlanma - Sıfır Heap Allocation)
+    if (_cache.TryGetValue(key, out int value))
+        return value;
+
+    // Aksi halde asenkron operasyon çalışır (Task'e düşer)
+    return await FetchFromDatabaseAsync(key);
+}</code></pre>
+                    <div class="alert alert-warning">
+                        <strong>Kritik Uyarı:</strong> <code>ValueTask</code>'i asla birden fazla kez <code>await</code> etmeyin ve aynı anda birden fazla thread'den beklemeyin (<code>Task.WhenAll</code> içine doğrudan vermeyin, <code>.AsTask()</code> ile çevirin). Arkasındaki nesne havuza geri dönmüş ve başka bir işlem için kullanılıyor olabilir.
+                    </div>
+                </div>
+
+                <div class="topic-block">
+                    <h3>2. Task.WhenAll ve Hata Yönetimi (Exception Aggregation)</h3>
+                    <p>Bağımsız işlemleri paralel yürüterek I/O bekleme süresini minimize edin. <code>Task.WhenAll</code> tüm task'lerin bitmesini bekler. Hata oluştuğunda sadece ilk hatayı fırlatır, tüm hataları görmek için <code>Task.Exception.InnerExceptions</code> kontrol edilmelidir.</p>
+                    <pre><code class="language-csharp">var userTask = GetUserAsync(id);
+var ordersTask = GetOrdersAsync(id);
+var pointsTask = GetLoyaltyPointsAsync(id);
+
+try {
+    // 3 asenkron ağ çağrısı aynı anda başlar ve paralelde beklenir
+    await Task.WhenAll(userTask, ordersTask, pointsTask);
+    
+    // İşlem bittiğinde Result'lara güvenle senkron erişilir
+    var response = new UserDashboard(userTask.Result, ordersTask.Result, pointsTask.Result);
+} catch (Exception ex) {
+    // Yalnızca İLK fırlatılan exception buraya düşer.
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>3. Task.WhenAny ile Zaman Aşımı (Timeout) İmplementasyonu</h3>
+                    <p>Bir işlemin belli bir sürede tamamlanmasını zorlamak için <code>Task.Delay</code> ile birlikte <code>Task.WhenAny</code> harika bir çözümdür.</p>
+                    <pre><code class="language-csharp">var fetchTask = FetchHugeDataAsync();
+var timeoutTask = Task.Delay(TimeSpan.FromSeconds(5));
+
+var completedTask = await Task.WhenAny(fetchTask, timeoutTask);
+
+if (completedTask == timeoutTask) {
+    throw new TimeoutException("Veri çekme işlemi 5 saniyeyi aştı!");
+}
+var data = await fetchTask; // Güvenle sonucu al</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>4. ConfigureAwait(false) ve Deadlock'lardan Kaçınma</h3>
+                    <p>UI frameworklerinde (WPF, WinForms) veya eski ASP.NET projelerinde <code>SynchronizationContext</code> mevcuttur. Bir kütüphane geliştiriyorsanız, UI thread'ini kitlememek ve performansı artırmak için daima <code>ConfigureAwait(false)</code> kullanın.</p>
+                    <pre><code class="language-csharp">public async Task&lt;string&gt; DownloadContentAsync(string url)
+{
+    using var client = new HttpClient();
+    // İşlem bittiğinde orjinal thread'e dönmeye zorlamaz (Threadpool threadinden devam eder)
+    var response = await client.GetAsync(url).ConfigureAwait(false);
+    return await response.Content.ReadAsStringAsync().ConfigureAwait(false);
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>5. IAsyncEnumerable Akışları</h3>
+                    <p>Devasa bir dosyayı okurken listeyi tamamen belleğe (List&lt;T&gt;) doldurmak yerine parça parça işlemek asenkron akışlarla mümkündür. <code>Yield return</code> ile asenkron iteratör yazılır.</p>
+                    <pre><code class="language-csharp">public async IAsyncEnumerable&lt;LogEntry&gt; StreamLogsAsync([EnumeratorCancellation] CancellationToken ct = default)
+{
+    using var reader = File.OpenText("server.log");
+    string line;
+    while ((line = await reader.ReadLineAsync().WaitAsync(ct)) != null)
+    {
+        yield return ParseLog(line); // Her bir satır okundukça yield edilir
+    }
+}
+
+// Tüketim noktası:
+await foreach (var log in StreamLogsAsync(cancellationToken)) {
+    Console.WriteLine(log.Message); // Memory şişmez!
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 2 -->
+        <section id="sec-memory" class="content-section">
+            <div class="content-box">
+                <span class="badge badge-purple">Bölüm 03</span>
+                <h2>Bellek Yönetimi & Performans İpuçları</h2>
+                <p>C# bir Garbage Collector (GC) dilidir. Yüksek performanslı uygulamaların en büyük düşmanı sık GC tetiklenmesidir. "Zero-allocation" (sıfır bellek ayırma) mimarisi modern C# ile çok kolaylaşmıştır.</p>
+                
+                <div class="topic-block">
+                    <h3>1. Span&lt;T&gt; ve ReadOnlySpan&lt;T&gt;</h3>
+                    <p>Metin (string) veya Array (dizi) operasyonlarında <code>Substring</code> kullanmak yeni bir metin objesi oluşturur. <code>Span&lt;T&gt;</code>, hafızadaki mevcut bloğa (heap, stack veya unmanaged bellek) pencere (view) açarak sıfır alokasyon sağlar.</p>
+                    <pre><code class="language-csharp">string record = "KUTAY;1995;ACTIVE";
+
+// KÖTÜ: Substring() yüzünden heap'te 2 yeni string nesnesi oluşturulur.
+string yearStr = record.Substring(6, 4); 
+int year = int.Parse(yearStr);
+
+// İYİ: Mevcut string'in belleğine salt okunur bir pencere açılır (Allocation yok!)
+ReadOnlySpan&lt;char&gt; recordSpan = record.AsSpan();
+ReadOnlySpan&lt;char&gt; yearSpan = recordSpan.Slice(6, 4);
+int year2 = int.Parse(yearSpan);</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>2. 'ref struct' Limitleri ve Memory&lt;T&gt;</h3>
+                    <p><code>Span&lt;T&gt;</code> bir <code>ref struct</code>'tır. Yani sadece <strong>Stack</strong>'te yaşayabilir (Heap'e çıkamaz). Bu yüzden <code>async/await</code> metotları içerisinde (state machine heap'e taşındığı için) Span KULLANILAMAZ. Çözüm <code>Memory&lt;T&gt;</code>'dir.</p>
+                    <pre><code class="language-csharp">public async Task ProcessDataAsync(Memory&lt;byte&gt; buffer)
+{
+    // Memory&lt;T&gt; heap'te yaşayabildiği için await noktasından geçebilir
+    await _networkStream.ReadAsync(buffer);
+    
+    // Senkron (ve hızlı) veri işleme safhasında Span'a dönüştürülür:
+    ProcessInternal(buffer.Span); 
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>3. Stackalloc ile Stack Bellek Kullanımı</h3>
+                    <p>Küçük byte veya char dizilerine ihtiyacınız varsa array (<code>new int[100]</code>) oluşturup heap'i kirletmek yerine, metot sonlandığında anında temizlenen stack'i kullanın.</p>
+                    <pre><code class="language-csharp">public void GenerateShortHash()
+{
+    // Heap yerine o anki metodun stack framinden 64 byte alır
+    Span&lt;byte&gt; hashBuffer = stackalloc byte[64];
+    
+    // Buffer doldurulur ve işlenir. GC'ye iş düşmez!
+    RandomNumberGenerator.Fill(hashBuffer);
+    Compute(hashBuffer);
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>4. LOH (Large Object Heap) ve ArrayPool</h3>
+                    <p>85.000 byte'tan (yaklaşık 85KB) büyük nesneler doğrudan LOH'a gider. LOH, klasik GC mantığında olduğu gibi defragmantasyon (sıkıştırma) yapmaz ve performans sorunları yaratır. Büyük diziler için daima ArrayPool kullanın.</p>
+                    <pre><code class="language-csharp">public void ProcessImage(int size)
+{
+    // KÖTÜ: 100KB'lık byte array = LOH alokasyonu
+    // byte[] buffer = new byte[100000];
+
+    // İYİ: Havuzdan ödünç al (Allocation yok, GC baskısı sıfır)
+    byte[] buffer = ArrayPool&lt;byte&gt;.Shared.Rent(100000);
+    try
+    {
+        // Havuz boyutu istediğinizden büyük olabilir, Span ile sınırlandırın
+        Span&lt;byte&gt; exactSpan = buffer.AsSpan(0, 100000);
+        FillImagePixels(exactSpan);
+    }
+    finally
+    {
+        // Mutlaka havuza iade edin!
+        ArrayPool&lt;byte&gt;.Shared.Return(buffer);
+    }
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 3 -->
+        <section id="sec-linq" class="content-section">
+            <div class="content-box">
+                <span class="badge badge-cyan">Bölüm 04</span>
+                <h2>LINQ Derinlemesine</h2>
+                
+                <div class="topic-block">
+                    <h3>1. Deferred Execution (Ertelenmiş Çalışma)</h3>
+                    <p>LINQ'nun filtre metotları (<code>Where</code>, <code>Select</code>, <code>OrderBy</code> vb.) doğrudan çalışmaz, sadece bir <strong>sorgu planı</strong> (Expression/Iterator) döndürürler. Ancak değerleri dışarı çıkaran (<code>ToList()</code>, <code>First()</code>, <code>Count()</code> veya <code>foreach</code>) metotlar tetiklendiğinde query çalışır.</p>
+                    <pre><code class="language-csharp">var numbers = new List&lt;int&gt; { 1, 2, 3 };
+
+// Sorgu planı hazırlandı, DÖNGÜ ÇALIŞMADI!
+var query = numbers.Where(n => n > 1); 
+
+numbers.Add(4); // Ana listeye ekleme yaptık
+
+// ŞİMDİ query çalışıyor. Sonuç: 2, 3, 4
+// Eğer 'query' listeye çevrilseydi (ToList), 4'ü görmeyecektik.
+foreach(var item in query) {
+    Console.WriteLine(item);
+}</code></pre>
+                    <div class="alert alert-info">
+                        <strong>Çoklu Çalışma Tuzağı:</strong> Bir LINQ sorgusu üzerinde <code>.Count()</code> ve ardından <code>.ToList()</code> çağırırsanız veritabanına VEYA bellek içi koleksiyona o sorguyu <strong>2 kere</strong> çalıştırmış olursunuz.
+                    </div>
+                </div>
+
+                <div class="topic-block">
+                    <h3>2. IEnumerable vs IQueryable</h3>
+                    <p>En büyük mimari hatalardan biri ORM'ler (Entity Framework vb.) ile çalışırken yanlış filtreleme zinciri kurmaktır.</p>
+                    <ul>
+                        <li><strong>IQueryable:</strong> Arka planda yazdığınız C# kodunu SQL, MongoDB veya REST sorgularına <strong>çeviren</strong> bir Expression Tree oluşturur.</li>
+                        <li><strong>IEnumerable:</strong> Yalnızca elinizdeki hazır liste/hafıza üzerinde gezinmek içindir, veriyi çektikten SONRA bellekte C# ile filtreler.</li>
+                    </ul>
+                    <pre><code class="language-csharp">// KÖTÜ ÖRNEK: Tablodaki 1 milyon kaydı RAM'e çeker (.AsEnumerable() veya .ToList() ile)
+// ve C# RAM'inde filtrelemeye çalışır.
+var activeUsers = dbContext.Users.AsEnumerable().Where(u => u.IsActive).ToList();
+
+// İYİ ÖRNEK: Expression tree kullanarak şu SQL'i üretir: "SELECT * FROM Users WHERE IsActive = 1"
+// Yalnızca dönen aktif kullanıcılar RAM'e yerleşir.
+var activeUsers = dbContext.Users.Where(u => u.IsActive).ToList();</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>3. Any() vs Count() > 0</h3>
+                    <p>Bir koleksiyonda eleman olup olmadığını kontrol etmek için <code>Count()</code> kullanmak felakettir (Özellikle IQueryable ve SQL ile). <code>Any()</code> ilk kaydı bulduğunda döngüyü keser.</p>
+                    <pre><code class="language-csharp">// KÖTÜ: "SELECT COUNT(*) FROM Users" sorgusu atar, tüm tabloyu tarar
+if (dbContext.Users.Count() > 0) { ... }
+
+// İYİ: "SELECT TOP 1 1 FROM Users" (veya "EXISTS") atar, performansı inanılmaz artırır
+if (dbContext.Users.Any()) { ... }</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>4. PLINQ (AsParallel)</h3>
+                    <p>CPU bound (matematiksel vb.) büyük işlemlerde CPU'nun çoklu çekirdeklerini kullanmak için LINQ'yu paralel hale getirebilirsiniz.</p>
+                    <pre><code class="language-csharp">// Tüm çekirdekleri kullanarak listeyi aynı anda işler
+var heavyResults = largeDataList
+    .AsParallel()
+    .WithDegreeOfParallelism(Environment.ProcessorCount)
+    .Where(x => IsPrimeNumber(x))
+    .ToList();</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4 -->
+        <section id="sec-modern" class="content-section">
+            <div class="content-box">
+                <span class="badge badge-purple">Bölüm 05</span>
+                <h2>Modern C# Özellikleri ve Refactoring</h2>
+                
+                <div class="topic-block">
+                    <h3>1. Records (C# 9)</h3>
+                    <p><code>class</code> yapısı reference-based (referans) eşitliği sağlar, yani içerikleri aynı olsa da RAM'deki adresleri farklıysa nesneler eşit değildir. <code>record</code> ise otomatik olarak value-based (değer) eşitlik sağlar (ve Deconstruct destekler).</p>
+                    <pre><code class="language-csharp">public record CustomerDto(int Id, string Name);
+
+var c1 = new CustomerDto(1, "Ahmet");
+var c2 = new CustomerDto(1, "Ahmet");
+
+Console.WriteLine(c1 == c2); // Sınıf(class) olsaydı FALSE, Record olduğu için TRUE!
+
+// 'with' keyword'ü ile immutable nesne kopyalama
+var c3 = c1 with { Name = "Mehmet" }; // Id=1, Name=Mehmet
+</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>2. Primary Constructors (C# 12)</h3>
+                    <p>Artık her servisin veya sınıfın tepesinde constructor yazmak zorunda değilsiniz, sınıf imzasına parametreler verebilirsiniz. Dependency Injection kodlarını inanılmaz kısaltır.</p>
+                    <pre><code class="language-csharp">// ESKİ YÖNTEM:
+public class UserService 
+{
+    private readonly IUserRepository _repo;
+    public UserService(IUserRepository repo) { _repo = repo; }
+}
+
+// YENİ YÖNTEM (C# 12):
+public class UserService(IUserRepository repo, ILogger&lt;UserService&gt; logger)
+{
+    public void DeleteUser(int id)
+    {
+        // Doğrudan 'repo' ve 'logger' değişkenlerini kullanabilirsiniz.
+        logger.LogWarning("{Id} siliniyor...", id);
+        repo.Delete(id);
+    }
+}</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>3. İleri Düzey Pattern Matching (Switch Expressions)</h3>
+                    <p>İç içe geçmiş <code>if-else</code> veya uzun <code>switch-case</code> bloklarını mükemmel, okunabilir ve kısa fonksiyonel ifadelere çevirir.</p>
+                    <pre><code class="language-csharp">public string EvaluateOrder(Order order) => order switch
+{
+    // Property Pattern & Logical Pattern
+    { Status: "Pending", Amount: > 1000 } => "Büyük Bekleyen Sipariş",
+    
+    // Type Pattern (Miras alınan veya interfaceden gelen tipleri kontrol etme)
+    DigitalOrder digi when digi.SizeMb > 100 => "Büyük Dosya İndirmesi",
+    PhysicalOrder { WeightGrams: < 500 } => "Küçük Kargo",
+    
+    // List Pattern (Özellikle Parser yazarken dizilerin içini analiz eder)
+    { Items: ["Laptop", "Mouse", ..] } => "Bilgisayar Paketi Kampanyası",
+    
+    // null kontrolü
+    null => throw new ArgumentNullException(nameof(order)),
+    
+    // Fallback (default)
+    _ => "Standart Sipariş"
+};</code></pre>
+                </div>
+
+                <div class="topic-block">
+                    <h3>4. Collection Expressions (C# 12)</h3>
+                    <p>Dizileri veya Listeleri ilklendirmek çok daha temiz hale geldi (Spread operatörü <code>..</code> dahil edildi).</p>
+                    <pre><code class="language-csharp">int[] arr1 = [1, 2, 3];
+int[] arr2 = [4, 5, 6];
+
+// İki diziyi birleştirme (JS spread operatörüne benzer)
+int[] combined = [..arr1, 99, ..arr2]; // [1, 2, 3, 99, 4, 5, 6]
+
+// Liste veya Span dönerken
+List&lt;string&gt; names = ["Alice", "Bob"];
+Span&lt;int&gt; values = [10, 20, 30]; // Derleyici stackalloc'a optimize edebilir!</code></pre>
+                </div>
+            </div>
+        </section>
+        
+    </main>
+
+    <!-- Sticky Footer -->
+    <div class="sticky-footer">
+        <div class="progress-container" data-tippy-content="Okuma İlerlemesi">
+            <span class="progress-text" id="progressText">0%</span>
+            <div class="progress-bar-bg">
+                <div class="progress-bar-fill" id="progressBar"></div>
+            </div>
+        </div>
+        <div class="current-module" id="currentModuleTitle">
+            Asenkron Programlama
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-csharp.min.js"></script>
+    
+    <!-- Tooltips (Tippy) -->
+    <script src="https://unpkg.com/@popperjs/core@2"></script>
+    <script src="https://unpkg.com/tippy.js@6"></script>
+    
+    <!-- 3D Tilt Effect -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/vanilla-tilt/1.8.0/vanilla-tilt.min.js"></script>
+    
+    <!-- Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <script>
+        // Initialize Tooltips
+        tippy('[data-tippy-content]', {
+            theme: 'translucent',
+            animation: 'scale'
+        });
+
+        // Theme Toggle
+        const themeToggle = document.getElementById('themeToggle');
+        themeToggle.addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            
+            themeToggle.innerHTML = newTheme === 'dark' 
+                ? '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>'
+                : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>';
+        });
+
+        // Mouse-tracking coordinate glow on .content-box
+        document.querySelectorAll('.content-box').forEach(box => {
+            box.addEventListener('mousemove', e => {
+                const rect = box.getBoundingClientRect();
+                const x = e.clientX - rect.left;
+                const y = e.clientY - rect.top;
+                box.style.setProperty('--mouse-x', `${x}px`);
+                box.style.setProperty('--mouse-y', `${y}px`);
+            });
+        });
+
+        // Code block copy & confetti
+        document.querySelectorAll('pre').forEach(pre => {
+            const btn = document.createElement('button');
+            btn.className = 'copy-btn';
+            btn.textContent = 'Kopyala';
+            
+            btn.addEventListener('click', async (e) => {
+                const code = pre.querySelector('code').innerText;
+                await navigator.clipboard.writeText(code);
+                
+                btn.textContent = 'Kopyalandı!';
+                btn.style.background = 'var(--cyan)';
+                btn.style.color = '#000';
+                
+                const rect = btn.getBoundingClientRect();
+                const x = (rect.left + rect.width / 2) / window.innerWidth;
+                const y = (rect.top + rect.height / 2) / window.innerHeight;
+                
+                confetti({
+                    particleCount: 50,
+                    spread: 60,
+                    origin: { x, y },
+                    colors: ['#512BD4', '#00E5FF', '#ffffff']
+                });
+
+                setTimeout(() => {
+                    btn.textContent = 'Kopyala';
+                    btn.style.background = '';
+                    btn.style.color = '';
+                }, 2000);
+            });
+            
+            pre.appendChild(btn);
+        });
+
+        // Improved Real-time Search
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', (e) => {
+            const query = e.target.value.toLowerCase().trim();
+            
+            if (!query) {
+                document.querySelectorAll('.content-section').forEach(sec => sec.style.display = '');
+                document.querySelectorAll('.topic-block').forEach(block => block.style.display = '');
+                return;
+            }
+
+            document.querySelectorAll('.content-section').forEach(sec => {
+                let secHasVisibleBlocks = false;
+                const secHeader = sec.querySelector('h2').innerText.toLowerCase();
+                const matchesHeader = secHeader.includes(query);
+
+                sec.querySelectorAll('.topic-block').forEach(block => {
+                    const blockText = block.innerText.toLowerCase();
+                    if (blockText.includes(query) || matchesHeader) {
+                        block.style.display = '';
+                        secHasVisibleBlocks = true;
+                    } else {
+                        block.style.display = 'none';
+                    }
+                });
+
+                if (secHasVisibleBlocks || matchesHeader) {
+                    sec.style.display = '';
+                } else {
+                    sec.style.display = 'none';
+                }
+            });
+        });
+
+        // Intersection Observer for TOC and Sticky Footer
+        const sections = document.querySelectorAll('.content-section');
+        const tocItems = document.querySelectorAll('.toc-item');
+        const currentModuleTitle = document.getElementById('currentModuleTitle');
+
+        const observerOptions = {
+            root: null,
+            rootMargin: '-20% 0px -60% 0px',
+            threshold: 0
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    const id = entry.target.id;
+                    tocItems.forEach(item => {
+                        item.classList.remove('active');
+                        if (item.getAttribute('href') === `#${id}`) {
+                            item.classList.add('active');
+                            currentModuleTitle.textContent = item.textContent.trim();
+                        }
+                    });
+                }
+            });
+        }, observerOptions);
+
+        sections.forEach(sec => observer.observe(sec));
+
+        // Reading Progress
+        const progressBar = document.getElementById('progressBar');
+        const progressText = document.getElementById('progressText');
+
+        window.addEventListener('scroll', () => {
+            const winScroll = document.body.scrollTop || document.documentElement.scrollTop;
+            const height = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+            let scrolled = 0;
+            if (height > 0) {
+                scrolled = (winScroll / height) * 100;
+            }
+            if (scrolled > 100) scrolled = 100;
+            if (scrolled < 0) scrolled = 0;
+            
+            progressBar.style.width = scrolled + "%";
+            progressText.textContent = Math.round(scrolled) + "%";
+        });
+
+        // TOC Smooth scroll
+        tocItems.forEach(item => {
+            item.addEventListener('click', e => {
+                e.preventDefault();
+                const targetId = item.getAttribute('href');
+                const targetSec = document.querySelector(targetId);
+                window.scrollTo({
+                    top: targetSec.offsetTop - 40,
+                    behavior: 'smooth'
+                });
+            });
+        });
+    </script>
+</body>
+</html>

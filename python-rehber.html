@@ -1,0 +1,4236 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Python Developer Reference</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+    <style>
+       /* 1. CSS MİMARİSİ & RENK PALETİ */
+       :root {
+           --bg: #0F0F0F;
+           --bg2: #141414;
+           --bg3: #1A1A1A;
+           --bg4: #1F1F1F;
+           --text: #E0E0E0;
+           --text-muted: #9E9E9E;
+           --accent: #4B8BBE; /* Python Blue */
+           --accent2: #FFD43B; /* Python Yellow */
+           --font-heading: 'Plus Jakarta Sans', sans-serif;
+           --font-body: 'Inter', sans-serif;
+           --font-code: 'JetBrains Mono', monospace;
+           --toc-width: 280px;
+           --header-height: 60px;
+           --progress-height: 60px;
+       }
+       
+       body.light-mode {
+           --bg: #F8F9FA;
+           --bg2: #FFFFFF;
+           --bg3: #E9ECEF;
+           --bg4: #DEE2E6;
+           --text: #212529;
+           --text-muted: #6C757D;
+       }
+       
+       * { box-sizing: border-box; }
+       
+       body {
+           margin: 0;
+           font-family: var(--font-body);
+           background-color: var(--bg);
+           color: var(--text);
+           display: flex;
+           line-height: 1.6;
+           padding-bottom: var(--progress-height);
+           transition: background-color 0.3s, color 0.3s;
+       }
+
+       /* Top Bar */
+       
+       .top-bar {
+           position: fixed;
+           top: 0;
+           left: var(--toc-width);
+           right: 0;
+           height: var(--header-height);
+           background: rgba(20, 20, 20, 0.75);
+           backdrop-filter: blur(16px);
+           -webkit-backdrop-filter: blur(16px);
+           border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 0 24px;
+           z-index: 100;
+           transition: background-color 0.3s, border-color 0.3s;
+       }
+.search-box {
+           display: flex;
+           align-items: center;
+           background: var(--bg3);
+           padding: 8px 16px;
+           border-radius: 20px;
+           border: 1px solid var(--bg4);
+           color: var(--text-muted);
+           width: 320px;
+           transition: all 0.3s;
+       }
+       .search-box:focus-within {
+           border-color: var(--accent);
+           box-shadow: 0 0 0 2px rgba(240, 165, 0, 0.2);
+       }
+       .search-box kbd {
+           background: var(--bg);
+           padding: 2px 6px;
+           border-radius: 4px;
+           font-size: 11px;
+           margin-left: auto;
+           font-family: var(--font-code);
+       }
+       .search-input {
+           background: transparent;
+           border: none;
+           color: var(--text);
+           outline: none;
+           font-family: var(--font-body);
+           margin-left: 10px;
+           width: 100%;
+       }
+       
+       .theme-toggle {
+           background: var(--bg3);
+           border: 1px solid var(--bg4);
+           color: var(--text);
+           padding: 8px 12px;
+           border-radius: 8px;
+           cursor: pointer;
+           font-size: 1.1rem;
+           transition: 0.3s;
+       }
+       .theme-toggle:hover {
+           border-color: var(--accent);
+       }
+
+       /* 4. DİNAMİK YAN MENÜ (Sidebar / TOC) */
+       .sidebar {
+           width: var(--toc-width);
+           position: fixed;
+           top: 0;
+           left: 0;
+           bottom: 0;
+           background-color: var(--bg2);
+           border-right: 1px solid var(--bg3);
+           overflow-y: auto;
+           padding: 24px 0;
+           z-index: 110;
+           transition: background-color 0.3s, border-color 0.3s;
+       }
+       
+       .toc-header {
+           padding: 0 24px 20px;
+           font-family: var(--font-heading);
+           font-size: 1.25rem;
+           color: var(--accent);
+           font-weight: 700;
+           border-bottom: 1px solid var(--bg3);
+           margin-bottom: 15px;
+           letter-spacing: -0.5px;
+       }
+       
+       .toc-item {
+           display: flex;
+           align-items: center;
+           padding: 10px 24px;
+           color: var(--text-muted);
+           text-decoration: none;
+           font-size: 0.95rem;
+           transition: all 0.3s ease;
+       }
+       .toc-item:hover {
+           background: var(--bg3);
+           color: var(--text);
+       }
+       .toc-item .num {
+           font-family: var(--font-code);
+           margin-right: 12px;
+           font-size: 0.85rem;
+           opacity: 0.6;
+       }
+       .toc-dot {
+           width: 6px;
+           height: 6px;
+           background-color: var(--bg4);
+           border-radius: 50%;
+           margin-left: auto;
+           transition: all 0.3s;
+       }
+       .toc-item.active {
+           color: var(--accent);
+           background: var(--bg3);
+       }
+       .toc-item.active .num {
+           color: var(--accent);
+           opacity: 1;
+       }
+       .toc-item.active .toc-dot {
+           background-color: var(--accent2);
+           animation: dotPulse 1.5s infinite;
+       }
+       .toc-entering {
+           transform: translateX(-8px);
+       }
+
+       @keyframes dotPulse { 0% { box-shadow: 0 0 0 0 rgba(255, 212, 59, 0.6); } 70% { box-shadow: 0 0 0 6px rgba(255, 212, 59, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 212, 59, 0); } }
+
+       /* Main Content */
+       .main-content {
+           margin-left: var(--toc-width);
+           padding: calc(var(--header-height) + 50px) 50px 100px;
+           width: 100%;
+           max-width: 960px;
+       }
+       
+       .hero {
+           margin-bottom: 60px;
+       }
+       
+       .hero h1 {
+           font-family: var(--font-heading);
+           font-size: 3.5rem;
+           margin: 0 0 20px;
+           background: linear-gradient(135deg, #4B8BBE, #FFD43B, #F43F5E, #4B8BBE);
+           background-size: 300% auto;
+           -webkit-background-clip: text;
+           -webkit-text-fill-color: transparent;
+           letter-spacing: -1px;
+           text-shadow: 0 10px 30px rgba(75, 139, 190, 0.2);
+           animation: textShine 4s linear infinite;
+       }
+       @keyframes textShine {
+           0% { background-position: 0% center; }
+           100% { background-position: 300% center; }
+       }
+       .hero-stats {
+           display: inline-flex;
+           gap: 20px;
+           color: var(--text-muted);
+           font-size: 0.95rem;
+           background: var(--bg2);
+           padding: 10px 24px;
+           border-radius: 30px;
+           border: 1px solid var(--bg3);
+           transition: transform 0.3s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.3s, border-color 0.3s;
+       }
+       .hero-stats:hover {
+           transform: translateY(-5px) scale(1.05);
+           box-shadow: 0 10px 20px rgba(75, 139, 190, 0.2);
+           border-color: var(--accent);
+       }
+       
+       .section {
+           margin-bottom: 70px;
+           scroll-margin-top: calc(var(--header-height) + 40px);
+       }
+       .section h2 {
+           font-family: var(--font-heading);
+           color: var(--text);
+           font-size: 2rem;
+           border-bottom: 1px solid var(--bg3);
+           padding-bottom: 12px;
+           margin-bottom: 24px;
+           letter-spacing: -0.5px;
+       }
+       
+       /* Code blocks */
+       .code-wrapper {
+           position: relative;
+           background: var(--bg2);
+           border: 1px solid var(--bg3);
+           border-radius: 12px;
+           margin: 24px 0;
+           overflow: hidden;
+       }
+       .copy-btn {
+           position: absolute;
+           top: 12px;
+           right: 12px;
+           background: var(--bg4);
+           color: var(--text-muted);
+           border: none;
+           padding: 6px 12px;
+           border-radius: 6px;
+           cursor: pointer;
+           font-size: 12px;
+           font-family: var(--font-body);
+           transition: 0.2s;
+           z-index: 10;
+       }
+       .copy-btn:hover { background: var(--accent); color: #000; }
+       
+
+       pre {
+           margin: 0;
+           padding: 24px;
+           overflow-x: auto;
+       }
+       code {
+           font-family: var(--font-code);
+           font-size: 0.8rem;
+           color: #E0E0E0; 
+       }
+       body.light-mode code {
+           color: #24292e;
+       }
+        /* Token Colors for Prism.js Highlighter */
+       code[class*="language-"], pre[class*="language-"] {
+           text-shadow: none;
+           direction: ltr;
+           text-align: left;
+           white-space: pre;
+           word-spacing: normal;
+           word-break: normal;
+           line-height: 1.6;
+           tab-size: 4;
+           hyphens: none;
+       }
+       .token.comment, .token.prolog, .token.doctype, .token.cdata { color: #8B949E; font-style: italic; }
+       .token.punctuation { color: #8B949E; }
+       .token.namespace { opacity: .7; }
+       .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #34D399; font-weight: 500; }
+       .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: var(--accent2); }
+       .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: #C9D1D9; }
+       .token.atrule, .token.attr-value, .token.keyword { color: #FF7B72; font-weight: 600; }
+       .token.function { color: var(--accent); font-weight: 600; }
+       .token.class-name { color: #79C0FF; font-weight: 600; }
+       .token.regex, .token.important, .token.variable { color: #D2A8FF; }
+       .token.decorator { color: #D2A8FF; font-weight: 500; }
+       
+       /* Light Mode overrides */
+       body.light-mode .token.comment { color: #6E7781; }
+       body.light-mode .token.punctuation { color: #57606A; }
+       body.light-mode .token.property, body.light-mode .token.tag, body.light-mode .token.boolean, body.light-mode .token.number, body.light-mode .token.constant, body.light-mode .token.symbol, body.light-mode .token.deleted { color: #0550AE; }
+       body.light-mode .token.selector, body.light-mode .token.attr-name, body.light-mode .token.string, body.light-mode .token.char, body.light-mode .token.builtin, body.light-mode .token.inserted { color: #D3500B; }
+       body.light-mode .token.operator, body.light-mode .token.entity, body.light-mode .token.url, body.light-mode .language-css .token.string, body.light-mode .style .token.string { color: #24292F; }
+       body.light-mode .token.atrule, body.light-mode .token.attr-value, body.light-mode .token.keyword { color: #CF222E; }
+       body.light-mode .token.function { color: #0969DA; }
+       body.light-mode .token.class-name { color: #8250DF; }
+       body.light-mode .token.regex, body.light-mode .token.important, body.light-mode .token.variable { color: #A52A2A; }
+       body.light-mode .token.decorator { color: #8250DF; }
+
+       /* 3. SQUIRCLE GRID & CARD MİMARİSİ */
+       .grid-2 {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+           gap: 24px;
+           margin: 24px 0;
+       }
+       
+       .card {
+           background: linear-gradient(145deg, var(--bg2), var(--bg3));
+           border: 1px solid rgba(255, 255, 255, 0.04);
+           padding: 24px;
+           border-radius: 16px;
+           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s, border-color 0.3s;
+           position: relative;
+           overflow: hidden;
+       }
+       .card::before {
+           content: '';
+           position: absolute;
+           top: 0; left: 0; right: 0;
+           height: 3px;
+           background: linear-gradient(90deg, #4B8BBE, #FFD43B);
+           opacity: 0;
+           transition: opacity 0.3s;
+       }
+       .card:hover {
+           transform: translateY(-8px) scale(1.02);
+           box-shadow: 0 15px 35px rgba(0,0,0,0.3), 0 0 25px rgba(255, 212, 59, 0.2), 0 0 30px rgba(75, 139, 190, 0.3);
+           border-color: rgba(255, 212, 59, 0.5);
+       }
+       .card:hover::before {
+           opacity: 1;
+       }
+.card h4 {
+           margin-top: 0;
+           color: var(--accent);
+           font-family: var(--font-heading);
+           font-size: 1.1rem;
+           margin-bottom: 12px;
+       }
+
+       /* Info Boxes */
+       .info-box {
+           padding: 16px 20px;
+           border-radius: 12px;
+           margin: 24px 0;
+           border-left: 4px solid;
+           font-size: 0.95rem;
+       }
+       .info-box.note { background: rgba(59, 130, 246, 0.1); border-color: #3b82f6; }
+       .info-box.tip  { background: rgba(16, 185, 129, 0.1); border-color: #10b981; }
+       .info-box.warn { background: rgba(239, 68, 68, 0.1); border-color: #ef4444; }
+
+       /* Tooltip */
+       .tooltip {
+           position: relative;
+           display: inline-block;
+           border-bottom: 1px dashed var(--accent);
+           cursor: help;
+           color: var(--accent);
+           font-weight: 500;
+       }
+       .tooltip::after {
+           content: attr(data-tip);
+           visibility: hidden;
+           width: max-content;
+           max-width: 280px;
+           background-color: var(--bg4);
+           color: var(--text);
+           text-align: center;
+           border-radius: 8px;
+           padding: 10px 14px;
+           position: absolute;
+           z-index: 10;
+           bottom: 130%;
+           left: 50%;
+           transform: translateX(-50%) translateY(10px);
+           opacity: 0;
+           transition: opacity 0.3s, transform 0.3s;
+           font-size: 0.85rem;
+           border: 1px solid var(--bg3);
+           box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+           font-family: var(--font-body);
+           font-weight: 400;
+           line-height: 1.4;
+       }
+       .tooltip:hover::after {
+           visibility: visible;
+           opacity: 1;
+           transform: translateX(-50%) translateY(0);
+       }
+
+       /* Search Highlight */
+       mark.search-hl {
+           background-color: rgba(240, 165, 0, 0.4);
+           color: inherit;
+           border-radius: 3px;
+           padding: 0 2px;
+       }
+
+       /* 2. STICKY HEADER & SECTIONS PROGRESS BAR */
+       
+       #progressBar {
+           position: fixed;
+           bottom: 0;
+           left: var(--toc-width);
+           right: 0;
+           height: var(--progress-height);
+           background: rgba(20, 20, 20, 0.75);
+           backdrop-filter: blur(16px);
+           -webkit-backdrop-filter: blur(16px);
+           border-top: 1px solid rgba(255, 255, 255, 0.05);
+           display: flex;
+           flex-direction: column;
+           z-index: 100;
+           transition: background-color 0.3s, border-color 0.3s;
+       }
+       .prog-bar-inner {
+           height: 4px;
+           background: rgba(255, 255, 255, 0.1);
+           width: 100%;
+       }
+       .prog-fill {
+           height: 100%;
+           background: linear-gradient(90deg, #306998, #4B8BBE, #FFD43B, #FFE873, #4B8BBE);
+           background-size: 300% 100%;
+           width: 0%;
+           transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+           animation: gradientMove 3s ease infinite;
+           box-shadow: 0 0 12px rgba(255, 212, 59, 0.5);
+       }
+       @keyframes gradientMove {
+           0% { background-position: 0% 50%; }
+           50% { background-position: 100% 50%; }
+           100% { background-position: 0% 50%; }
+       }
+.prog-text {
+           display: flex;
+           justify-content: space-between;
+           align-items: center;
+           padding: 0 24px;
+           height: 100%;
+           font-size: 0.95rem;
+           color: var(--text-muted);
+       }
+       .prog-text span strong {
+           color: var(--text);
+           margin-left: 5px;
+       }
+       .prog-text .prog-val {
+           font-family: var(--font-code);
+           color: var(--accent);
+           font-weight: 600;
+       }
+
+       /* Scroll to Top */
+       .scroll-top {
+           position: fixed;
+           bottom: calc(var(--progress-height) + 24px);
+           right: 24px;
+           width: 48px;
+           height: 48px;
+           background: var(--bg2);
+           border-radius: 50%;
+           border: 1px solid var(--bg3);
+           display: flex;
+           justify-content: center;
+           align-items: center;
+           cursor: pointer;
+           opacity: 0;
+           visibility: hidden;
+           transition: all 0.3s;
+           z-index: 99;
+           box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+       }
+       .scroll-top:hover {
+           background: var(--bg3);
+           transform: translateY(-3px);
+       }
+       .scroll-top.visible {
+           opacity: 1;
+           visibility: visible;
+       }
+       .scroll-top svg {
+           width: 100%;
+           height: 100%;
+           position: absolute;
+           top: 0; left: 0;
+           transform: rotate(-90deg);
+       }
+       .scroll-top circle.progress-ring {
+           fill: transparent;
+           stroke: var(--accent);
+           stroke-width: 2.5;
+           stroke-dasharray: 138.23;
+           stroke-dashoffset: 138.23;
+           transition: stroke-dashoffset 0.1s linear;
+       }
+       .scroll-top span {
+           color: var(--text);
+           font-size: 1.2rem;
+           z-index: 1;
+           font-weight: bold;
+       }
+    
+       /* 7. LIST TO GRID TRANSFORM */
+       .sub ul, .sub ol {
+           display: grid;
+           grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+           gap: 16px;
+           margin: 24px 0;
+           padding: 0;
+           list-style: none;
+       }
+       
+       .sub li {
+           background: linear-gradient(145deg, var(--bg2), var(--bg3));
+           border: 1px solid rgba(255, 255, 255, 0.03);
+           padding: 16px 20px;
+           border-radius: 12px;
+           font-size: 0.85rem;
+           line-height: 1.6;
+           color: var(--text-muted);
+           transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s, box-shadow 0.3s;
+       }
+       .sub li:hover {
+           transform: translateY(-3px);
+           border-color: rgba(75, 139, 190, 0.4);
+           box-shadow: 0 8px 20px rgba(0,0,0,0.15), inset 0 0 0 1px rgba(75, 139, 190, 0.2);
+       }
+.sub li strong {
+           color: var(--accent);
+       }
+
+
+       .sub p {
+           font-size: 0.9rem;
+           color: var(--text);
+       }
+
+
+       /* CODE FONT SIZE OVERRIDE */
+       pre code {
+           font-size: 0.8rem !important;
+       }
+
+
+       /* 8. INFO BOX SVG FIX */
+       .info-box svg {
+           width: 22px;
+           height: 22px;
+           vertical-align: middle;
+           margin-right: 10px;
+           display: inline-block;
+           flex-shrink: 0;
+       }
+       .info-box {
+           display: flex;
+           align-items: flex-start;
+       }
+       .info-box strong {
+           display: inline-flex;
+           align-items: center;
+       }
+
+</style>
+</head>
+<body>
+<!-- 4. Dinamik Yan Menü (TOC) -->
+<div class="sidebar" id="sidebar">
+    <div class="toc-header">Developer Reference</div>
+    
+        <a href="#variables" class="toc-item" data-id="variables">
+            <span class="num">01</span> 
+            <span class="toc-text">Temel Veri Tipleri & Değişken Kapsamları</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#structures" class="toc-item" data-id="structures">
+            <span class="num">02</span> 
+            <span class="toc-text">Dahili Veri Yapıları & Collections Modülü</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#control" class="toc-item" data-id="control">
+            <span class="num">03</span> 
+            <span class="toc-text">Operatörler & Kontrol Yapıları</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#functions" class="toc-item" data-id="functions">
+            <span class="num">04</span> 
+            <span class="toc-text">Fonksiyonlar & Fonksiyonel Programlama</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#oop" class="toc-item" data-id="oop">
+            <span class="num">05</span> 
+            <span class="toc-text">Nesne Yönelimli Programlama (OOP)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#patterns" class="toc-item" data-id="patterns">
+            <span class="num">06</span> 
+            <span class="toc-text">Sınıf Bağlantıları & Tasarım Desenleri</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#exceptions" class="toc-item" data-id="exceptions">
+            <span class="num">07</span> 
+            <span class="toc-text">Hata Yönetimi (Exception Handling)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#gc" class="toc-item" data-id="gc">
+            <span class="num">08</span> 
+            <span class="toc-text">Bellek Yönetimi & Garbage Collector</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#api" class="toc-item" data-id="api">
+            <span class="num">09</span> 
+            <span class="toc-text">API Çağrıları (HTTP HTTP Client)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#database" class="toc-item" data-id="database">
+            <span class="num">10</span> 
+            <span class="toc-text">Veritabanı Programlama (SQL & SQLite)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#generators" class="toc-item" data-id="generators">
+            <span class="num">11</span> 
+            <span class="toc-text">Generators & Iterators (Yineleyiciler)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#decorators" class="toc-item" data-id="decorators">
+            <span class="num">12</span> 
+            <span class="toc-text">Gelişmiş Dekoratörler (Deep Decorators)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#context" class="toc-item" data-id="context">
+            <span class="num">13</span> 
+            <span class="toc-text">Bağlam Yöneticileri (Context Managers)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#concurrency" class="toc-item" data-id="concurrency">
+            <span class="num">14</span> 
+            <span class="toc-text">Multithreading, Multiprocessing & Asyncio</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#io" class="toc-item" data-id="io">
+            <span class="num">15</span> 
+            <span class="toc-text">Dosya Yönetimi & Veri Serileştirme</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#modules" class="toc-item" data-id="modules">
+            <span class="num">16</span> 
+            <span class="toc-text">Modüller, Paketler & Dağıtım</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#regex" class="toc-item" data-id="regex">
+            <span class="num">17</span> 
+            <span class="toc-text">Düzenli İfadeler (Regular Expressions - re)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#testing" class="toc-item" data-id="testing">
+            <span class="num">18</span> 
+            <span class="toc-text">Test Etme (Testing & Mocking)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#logging" class="toc-item" data-id="logging">
+            <span class="num">19</span> 
+            <span class="toc-text">Loglama Mekanizması (Logging)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#typing" class="toc-item" data-id="typing">
+            <span class="num">20</span> 
+            <span class="toc-text">Tip İpuçları & Statik Analiz (Typing)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#datetime" class="toc-item" data-id="datetime">
+            <span class="num">21</span> 
+            <span class="toc-text">Tarih, Zaman & Performans Sayaçları</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#math" class="toc-item" data-id="math">
+            <span class="num">22</span> 
+            <span class="toc-text">Matematik, İstatistik & Hassas Sayılar</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#fstrings" class="toc-item" data-id="fstrings">
+            <span class="num">23</span> 
+            <span class="toc-text">F-Strings & Gelişmiş Metin Biçimlendirme</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#comprehensions" class="toc-item" data-id="comprehensions">
+            <span class="num">24</span> 
+            <span class="toc-text">Comprehensions (Tek Satırda Koleksiyonlar)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#builtins" class="toc-item" data-id="builtins">
+            <span class="num">25</span> 
+            <span class="toc-text">Yerleşik Fonksiyonlar (Built-in Functions)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#venv" class="toc-item" data-id="venv">
+            <span class="num">26</span> 
+            <span class="toc-text">Sanal Ortamlar & Bağımlılık Yönetimi</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#libraries" class="toc-item" data-id="libraries">
+            <span class="num">27</span> 
+            <span class="toc-text">Yaygın Python Kütüphaneleri</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#gui" class="toc-item" data-id="gui">
+            <span class="num">28</span> 
+            <span class="toc-text">Masaüstü (GUI) Uygulama Geliştirme</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#wasm" class="toc-item" data-id="wasm">
+            <span class="num">29</span> 
+            <span class="toc-text">Tarayıcıda Python (WebAssembly / PyScript)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#security" class="toc-item" data-id="security">
+            <span class="num">30</span> 
+            <span class="toc-text">Python'da Güvenlik (Security Best Practices)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#adv-typing" class="toc-item" data-id="adv-typing">
+            <span class="num">31</span> 
+            <span class="toc-text">Gelişmiş Tip İpuçları (Advanced Typing)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#pypi-publish" class="toc-item" data-id="pypi-publish">
+            <span class="num">32</span> 
+            <span class="toc-text">PyPI'da Kendi Paketimizi Yayınlama</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#c-extensions" class="toc-item" data-id="c-extensions">
+            <span class="num">33</span> 
+            <span class="toc-text">C Uzantıları ve Cython (Performans)</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#socket-prog" class="toc-item" data-id="socket-prog">
+            <span class="num">34</span> 
+            <span class="toc-text">Ağ (Socket) Programlama</span> 
+            <div class="toc-dot"></div>
+        </a>
+        <a href="#cicd-actions" class="toc-item" data-id="cicd-actions">
+            <span class="num">35</span> 
+            <span class="toc-text">Sürekli Entegrasyon (CI/CD - GitHub Actions)</span> 
+            <div class="toc-dot"></div>
+        </a>
+</div>
+
+<!-- Top Bar -->
+<div class="top-bar">
+    <div class="search-box">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search Python Guide...">
+        <kbd>Cmd+K</kbd>
+    </div>
+    <button class="theme-toggle" id="themeToggle" title="Toggle Theme">☀️</button>
+</div>
+
+<!-- Main Content -->
+<div class="main-content" id="mainContent">
+    <div class="hero">
+        <h1>Python Developer Reference</h1>
+        <div class="hero-stats">
+            <span id="totalSectionsCount">35 Bölüm</span>
+        </div>
+    </div>
+    
+    <div id="contentSections">
+        <section class="section" id="variables">
+            <h2>01. Temel Veri Tipleri & Değişken Kapsamları</h2>
+            <div class="sub">
+                <p>
+                    Python dinamik tipli (dynamically typed) ve güçlü tipli (strongly typed) bir dildir. Çalışma zamanında değişkenlerin tipi otomatik belirlenir ancak örtülü tip dönüşümlerine izin verilmez.
+                </p>
+                <ul>
+                    <li><strong>int:</strong> Sınırsız duyarlıklı tamsayılar. Bellek miktarı elverdiği sürece taşma (overflow) yaşanmaz.</li>
+                    <li><strong>float:</strong> IEEE 754 standardına uygun çift duyarlıklı (double precision) ondalıklı sayılar.</li>
+                    <li><strong>complex:</strong> Gerçel ve sanal kısımdan oluşan karmaşık sayılar. `a + bj` formatında tanımlanır.</li>
+                    <li><strong>str:</strong> Değiştirilemez (immutable) karakter dizileri. Dilimleme (slicing), f-string ve yerleşik metotlar içerir.</li>
+                    <li><strong>bool:</strong> `True` ve `False` mantıksal değerleri. Matematiksel işlemlerde `1` ve `0` gibi davranırlar.</li>
+                    <li><strong>NoneType:</strong> Bir değerin veya referansın yokluğunu belirten `None` sabit tipi.</li>
+                    <li><strong>type() & isinstance():</strong> `type()` nesnenin tam sınıfını dönerken, `isinstance()` kalıtım hiyerarşisini de hesaba katar. Sınıf kontrolünde `isinstance()` tercih edilmelidir.</li>
+                    <li><strong>Değişken Kapsamları (Scopes):</strong> Local (yerel), Nonlocal (iç içe fonksiyonlar) ve Global (modül seviyesi). `global` ve `nonlocal` anahtar kelimeleriyle üst kapsamlardaki değerler değiştirilebilir.</li>
+                </ul>
+                <div class="info-box note">
+                    <strong>Tip İpuçları (Type Hints): </strong>
+                    Python 3.5+'ten itibaren statik analiz araçları için tip belirtimleri desteklenir. Değişken ve argümanlara `x: int = 5` biçiminde tip ipucu verilebilir.
+                </div>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>python_basics.py</span></div>
+                    <pre><code class="language-python"># 1. İlkel Veri Tipleri
+tam_sayi = 42                       # int
+ondalikli = 3.14159                  # float
+karmasik = 2 + 3j                    # complex
+dogru_mu = True                      # bool
+degersiz = None                      # NoneType
+
+# 2. String Slicing, f-string ve Metotlar
+metin = "Python Programlama Dili"
+# Slicing syntax: [start:stop:step]
+dilim = metin[0:6]                   # 'Python'
+ters_metin = metin[::-1]             # 'ilid amalmargorP nohtyP'
+birlestirme = f"Seçilen: {dilim} | Sayı: {ondalikli:.2f}" # f-string formatlama
+
+# Önemli str metotları
+arindirilmis = "  bosluklar  ".strip() # 'bosluklar'
+parcalanmis = metin.split(" ")       # ['Python', 'Programlama', 'Dili']
+degismis = metin.replace("Dili", "Kılavuzu")
+
+# 3. Tip Kontrolleri
+is_float = type(ondalikli) is float  # True
+is_num = isinstance(ondalikli, (int, float)) # True (kalıtım destekler)
+
+# 4. Kapsamlar: Local, Nonlocal, Global
+global_degisken = "Global Değer"
+
+def dis_fonksiyon():
+    nonlocal_degisken = "Dış Değer"
+    
+    def ic_fonksiyon():
+        nonlocal nonlocal_degisken
+        global global_degisken
+        
+        nonlocal_degisken = "İçeride Değiştirildi"
+        global_degisken = "Global Değiştirildi"
+        
+    ic_fonksiyon()
+    print("Nonlocal:", nonlocal_degisken)
+
+dis_fonksiyon()
+print("Global:", global_degisken)
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="structures">
+            <h2>02. Dahili Veri Yapıları & Collections Modülü</h2>
+            <div class="sub">
+                <p>
+                    Python verileri gruplamak için son derece esnek, optimize edilmiş dahili veri yapılarına sahiptir.
+                </p>
+                <ul>
+                    <li><strong>List (Liste):</strong> Dinamik boyutlu, sıralı ve değiştirilebilir (mutable) veri yapıları. List comprehension ile tek satırda oluşturulabilirler. `copy` ve `deepcopy` ile kopyalama yapılır.</li>
+                    <li><strong>Tuple (Demet):</strong> Değiştirilemez (immutable), sıralı yapılar. Hızlı veri paketleme ve unpack işlemlerinde kullanılır. `namedtuple` ile indis yerine isimle erişilebilen yapılar tanımlanır.</li>
+                    <li><strong>Dict (Sözlük):</strong> Anahtar-Değer (Key-Value) çiftlerinden oluşan, hash-tabanlı hızlı yapılar. Python 3.9+ ile iki sözlüğü birleştirmek için `|` ve `|=` operatörleri kullanılabilir.</li>
+                    <li><strong>Set & Frozenset:</strong> Eşsiz (unique) elemanlardan oluşan kümeler. Sırasızdırlar. `frozenset` değiştirilemeyen (immutable) kümedir. Küme işlemleri (kesişim, birleşim vb.) matematiksel operatörlerle hızlıca yapılır.</li>
+                    <li><strong>Collections Modülü:</strong> `deque` (O(1) ekleme/silme özellikli çift yönlü kuyruk), `Counter` (elemanların frekansını sayan yapı), `defaultdict` (olmayan anahtar sorgulandığında varsayılan değer dönen sözlük), `OrderedDict` (ekleme sırasını koruyan sözlük).</li>
+                    <li><strong>Heapq:</strong> Öncelikli kuyruk (priority queue) algoritmalarını implement eden min-heap yapısı.</li>
+                    <li><strong>Array Modülü:</strong> Sadece aynı türden C tipi temel verileri saklayabilen homojen, bellek dostu diziler.</li>
+                </ul>
+                <div class="info-box tip">
+                    <strong>Shallow Copy vs Deep Copy Tuzağı: </strong>
+                    `list.copy()` veya dilimleme `[:]` sadece birinci seviyedeki referansları kopyalar (shallow). İç içe listeler veya nesneler kopyalanırken alt elemanların referansı aynı kalır. Bunu engellemek için `copy.deepcopy()` kullanılmalıdır.
+                </div>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>data_structures.py</span></div>
+                    <pre><code class="language-python">import copy
+from collections import namedtuple, deque, Counter, defaultdict
+import heapq
+import array
+
+# 1. List, CRUD ve Slicing
+liste = [1, 2, 3]
+liste.append(4)               # Create
+print(liste[1])               # Read -> 2
+liste[1] = 99                 # Update
+liste.pop()                   # Delete
+
+# Shallow ve Deep Copy farkı
+orijinal = [[1, 2], [3, 4]]
+shallow = orijinal.copy()
+deep = copy.deepcopy(orijinal)
+orijinal[0][0] = 999
+# shallow[0][0] artık 999'dur, deep[0][0] hala 1'dir.
+
+# 2. Tuple, Namedtuple ve Unpacking
+demet = (10, 20, 30)
+a, b, c = demet               # Unpacking
+
+Nokta = namedtuple("Nokta", ["x", "y"])
+p = Nokta(x=5, y=10)
+print(f"Nokta koordinatları: {p.x}, {p.y}")
+
+# 3. Dict ve Python 3.9+ Merge Operatörü
+sozluk1 = {"a": 1, "b": 2}
+sozluk2 = {"b": 99, "c": 3}
+birlesik = sozluk1 | sozluk2   # {'a': 1, 'b': 99, 'c': 3}
+
+# 4. Set ve Frozenset
+kume_a = {1, 2, 3, 4}
+kume_b = {3, 4, 5, 6}
+kesisim = kume_a & kume_b     # {3, 4}
+birlesim = kume_a | kume_b    # {1, 2, 3, 4, 5, 6}
+f_kume = frozenset([1, 2, 3]) # Değiştirilemez küme
+
+# 5. Collections (Deque, Counter, DefaultDict)
+d = deque([1, 2, 3])
+d.appendleft(0)               # Sol taraftan O(1) ekleme
+d.popleft()                   # Sol taraftan O(1) silme
+
+frekanslar = Counter("abracadabra") # Counter({'a': 5, 'b': 2, 'r': 2, 'c': 1, 'd': 1})
+
+sozluk_varsayilan = defaultdict(list)
+sozluk_varsayilan["meyveler"].append("elma") # Key yoksa otomatik liste oluşturur
+
+# 6. Heapq (Min-Heap)
+sayilar = [10, 2, 5, 1, 9]
+heapq.heapify(sayilar)        # Sayıları yerinde heap yapısına dönüştürür
+heapq.heappush(sayilar, 3)    # Yeni eleman ekler
+en_kucuk = heapq.heappop(sayilar) # En küçük elemanı (1) çeker ve çıkarır
+
+# 7. Array Modülü (Homojen Diziler)
+# 'i' tamsayılar için tip kodudur (C int karşılığı)
+tamsayi_dizisi = array.array('i', [1, 2, 3, 4])
+
+# 8. Stack ve Queue Uygulamaları
+# Stack (LIFO)
+stack = []
+stack.append("A")
+stack.append("B")
+stack.pop() # 'B'
+
+# Queue (FIFO)
+queue = deque()
+queue.append("Müşteri 1")
+queue.append("Müşteri 2")
+queue.popleft() # 'Müşteri 1'
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="control">
+            <h2>03. Operatörler & Kontrol Yapıları</h2>
+            <div class="sub">
+                <p>
+                    Python'da ifadelerin yönetilmesi için zengin operatör kümesi ve modern kontrol mekanizmaları bulunur.
+                </p>
+                <ul>
+                    <li><strong>Temel Operatörler:</strong> Aritmetik, karşılaştırma ve mantıksal (`and`, `or`, `not`) operatörler.</li>
+                    <li><strong>Identity & Membership:</strong> `is` bellek adresinin eşitliğini (referans bazlı), `==` ise değerin eşitliğini kontrol eder. `in` operatörü elemanın bir koleksiyon içinde olup olmadığını sınar.</li>
+                    <li><strong>Walrus Operator (:=):</strong> Değişken atamasını bir ifade (expression) içinde doğrudan yapmaya imkan tanır.</li>
+                    <li><strong>Pattern Matching (match-case):</strong> Python 3.10 ile gelen, C'deki switch-case yapısından çok daha yetenekli yapısal desen eşleme (structural pattern matching) aracıdır. Nesnelerin tiplerini ve içeriklerini doğrudan filtreleyebilir.</li>
+                    <li><strong>Döngüler & Else Blokları:</strong> `for` ve `while` döngülerinin sonuna `else` bloğu eklenebilir. Eğer döngü `break` ifadesi ile sonlanmadan doğal yollarla biterse, `else` bloğu tetiklenir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>operators_and_flow.py</span></div>
+                    <pre><code class="language-python"># 1. Identity (is) ve Equality (==) farkı
+liste_a = [1, 2, 3]
+liste_b = [1, 2, 3]
+print(liste_a == liste_b)  # True (Değerler eşit)
+print(liste_a is liste_b)  # False (Farklı bellek adresleri)
+
+# 2. Walrus Operator (:=) kullanımı
+# Koşul içinde hem atama hem kontrol yapıyoruz
+if (uzunluk := len(liste_a)) > 2:
+    print(f"Liste uzunluğu {uzunluk} iken ikiden büyüktür.")
+
+# 3. Match-Case (Python 3.10+) Yapısal Desen Eşleme
+def komut_calistir(komut):
+    match komut.split():
+        case ["git", "yön", yon]:
+            print(f"Karakter {yon} yönüne gidiyor.")
+        case ["sil", dosya]:
+            print(f"{dosya} siliniyor.")
+        case ["ara", *kelimeler]:
+            print(f"Aranan terimler: {', '.join(kelimeler)}")
+        case _:
+            print("Geçersiz komut girdisi.")
+
+komut_calistir("git yön kuzey")
+komut_calistir("ara python oop decorators")
+
+# 4. Döngüler ve Else Bloğu
+for sayi in range(1, 5):
+    if sayi == 10:
+        break
+else:
+    # break çalışmadığı için bu blok tetiklenecektir
+    print("Döngü break ile kesilmeden başarıyla tamamlandı.")
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="functions">
+            <h2>04. Fonksiyonlar & Fonksiyonel Programlama</h2>
+            <div class="sub">
+                <p>
+                    Python fonksiyonları birinci sınıf vatandaştır (first-class citizens); yani değişkenlere atanabilir, başka fonksiyonlara parametre olarak geçilebilir veya geri döndürülebilirler.
+                </p>
+                <ul>
+                    <li><strong>Esnek Argümanlar:</strong> `*args` konumsal parametreleri bir `tuple` olarak, `**kwargs` ise isimlendirilmiş parametreleri bir `dict` olarak toplar.</li>
+                    <li><strong>Function Annotations:</strong> Fonksiyon parametreleri ve dönüş tipleri için ek açıklamalar sağlar.</li>
+                    <li><strong>Closure:</strong> İç içe fonksiyonlarda (nested functions), içteki fonksiyonun dıştaki fonksiyonun değişken kapsamını (kendi çalışması bitse bile) bellekte saklaması durumudur.</li>
+                    <li><strong>Decorators:</strong> Bir fonksiyonun davranışını, onun kodunu değiştirmeden sarmallayıp genişleten fonksiyonlardır.</li>
+                    <li><strong>Generators:</strong> `yield` kullanarak veriyi tek seferde üretip hafızaya almak yerine, her çağrıldığında üreten ve durumu (state) koruyan yapılardır.</li>
+                    <li><strong>functools.partial:</strong> Bir fonksiyonun belirli parametrelerini önceden bağlayarak daha az parametreli yeni bir fonksiyon üretir.</li>
+                </ul>
+                <div class="info-box warn">
+                    <strong>Mutable Default Argument Hatası: </strong>
+                    Varsayılan parametre olarak mutable (değiştirilebilir) nesneler (örneğin liste `[]` veya sözlük `{}`) verilmemelidir. Varsayılan argümanlar fonksiyon tanımlandığı anda bir kez oluşturulur ve sonraki çağrılarda paylaşılır. Çözüm olarak `None` kullanılmalıdır.
+                </div>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>functions_depth.py</span></div>
+                    <pre><code class="language-python">from functools import partial, reduce
+
+# 1. Hatalı ve Doğru Mutable Default Argument
+# YANLIŞ:
+def hatali_ekle(eleman, liste=[]):
+    liste.append(eleman)
+    return liste
+
+# DOĞRU:
+def dogru_ekle(eleman, liste=None):
+    if liste is None:
+        liste = []
+    liste.append(eleman)
+    return liste
+
+# 2. *args ve **kwargs
+def argumanlari_yazdir(*args, **kwargs):
+    print("Positional (args):", args)
+    print("Keyword (kwargs):", kwargs)
+
+# 3. Closure (Kapsama) Örneği
+def us_alici(us):
+    def hesapla(taban):
+        return taban ** us
+    return hesapla
+
+kare_al = us_alici(2)
+print("Kare al:", kare_al(5))  # 25
+
+# 4. Basit Bir Fonksiyonel Dekoratör (Decorator)
+def log_decorator(fonk):
+    def sarmalayici(*args, **kwargs):
+        print(f"Çalıştırılan fonksiyon: {fonk.__name__}")
+        sonuc = fonk(*args, **kwargs)
+        print("Çalışma bitti.")
+        return sonuc
+    return sarmalayici
+
+@log_decorator
+def topla(x, y):
+    return x + y
+
+# 5. Generator (yield) Örneği
+def fibonacci(limit):
+    a, b = 0, 1
+    for _ in range(limit):
+        yield a
+        a, b = b, a + b
+
+# 6. partial ve map/filter/reduce
+def carpim(x, y):
+    return x * y
+
+iki_ile_carp = partial(carpim, 2)
+print("Partial:", iki_ile_carp(10)) # 20
+
+sayilar = [1, 2, 3, 4, 5]
+kareler = list(map(lambda x: x**2, sayilar))
+tekler = list(filter(lambda x: x % 2 != 0, sayilar))
+toplam = reduce(lambda x, y: x + y, sayilar)
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="oop">
+            <h2>05. Nesne Yönelimli Programlama (OOP)</h2>
+            <div class="sub">
+                <p>
+                    Python tamamen nesneye yönelik bir dildir. Tüm yapılar, fonksiyonlar ve temel tipler dahil birer nesnedir.
+                </p>
+                <ul>
+                    <li><strong>Kapsülleme (Encapsulation):</strong> `_deger` protected özelliğidir (yazılımcı anlaşmasıyla dışarıdan dokunulmamalıdır). `__deger` ise private özelliğidir; Python arkada Name Mangling uygulayarak bu niteliği `_SinifAdi__deger` şekline dönüştürür ve doğrudan erişimi zorlaştırır.</li>
+                    <li><strong>Çoklu Kalıtım (Multiple Inheritance) & MRO:</strong> Python birden fazla sınıftan türemeyi destekler. Metotların aranma sırası C3 Lineerleştirme algoritmasıyla belirlenen **MRO (Method Resolution Order)** sırasına göredir. `super()` bu sırayı takip eder.</li>
+                    <li><strong>Özellik Yöneticileri:</strong> `@property` (getter), `@özellik.setter` (setter) ve `@classmethod` (sınıf seviyesinde işlem), `@staticmethod` (sınıftan bağımsız yardımcı fonksiyon).</li>
+                    <li><strong>Magic (Dunder) Metotlar:</strong> Çift alt tire (`__`) ile çevrili metotlar. Nesnelere aritmetik işlemler (`__add__`), uzunluk sorguları (`__len__`), indeks erişimleri (`__getitem__`), nesnenin fonksiyon gibi çağrılması (`__call__`) gibi yetenekler kazandırır.</li>
+                    <li><strong>__slots__:</strong> Sınıfta dinamik olarak nitelik (attribute) atanmasını devre dışı bırakarak nesnelerin yalnızca belirtilen nitelikleri saklamasını sağlar. Bu da bellek kullanımını ciddi oranda düşürür.</li>
+                    <li><strong>Dataclasses (Python 3.7+):</strong> `@dataclass` dekoratörü otomatik olarak `__init__`, `__repr__`, `__eq__` gibi standart dunder metotlarını üreterek boilerplate kodları engeller.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>oop_concepts.py</span></div>
+                    <pre><code class="language-python">from abc import ABC, abstractmethod
+from dataclasses import dataclass
+
+# 1. Abstraction (Soyutlama)
+class Arac(ABC):
+    @abstractmethod
+    def calis(self):
+        pass
+
+# 2. Kalıtım ve Encapsulation
+class Otomobil(Arac):
+    def __init__(self, marka, hiz):
+        self.marka = marka          # Public
+        self._hiz = hiz             # Protected
+        self.__motor = "V8"         # Private (Name Mangling uygulanır)
+
+    def calis(self):
+        return f"{self.marka} motoru çalıştı."
+
+    # @property ve Setter kullanımı
+    @property
+    def hiz(self):
+        return self._hiz
+
+    @hiz.setter
+    def hiz(self, yeni_hiz):
+        if yeni_hiz >= 0:
+            self._hiz = yeni_hiz
+
+# 3. Magic Metotlar ve __slots__ Optimizasyonu
+class Nokta:
+    # Sadece x ve y hafızada yer tutar, __dict__ oluşturulmaz
+    __slots__ = ["x", "y"]
+    
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+
+    def __repr__(self):
+        return f"Nokta({self.x}, {self.y})"
+
+    def __add__(self, diger):
+        return Nokta(self.x + diger.x, self.y + diger.y)
+
+    def __eq__(self, diger):
+        return self.x == diger.x and self.y == diger.y
+
+# 4. Dataclasses
+@dataclass
+class Urun:
+    id: int
+    isim: str
+    fiyat: float
+
+# Kullanım Örnekleri
+oto = Otomobil("Tesla", 120)
+print(oto.calis())
+oto.hiz = 150 # property setter kullanımı
+
+# Dunder test
+n1 = Nokta(1, 2)
+n2 = Nokta(3, 4)
+print(n1 + n2) # Nokta(4, 6)
+
+urun = Urun(1, "Notebook", 15000.0)
+print(urun) # Otomatik oluşturulan şık repr çıktısı
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="patterns">
+            <h2>06. Sınıf Bağlantıları & Tasarım Desenleri</h2>
+            <div class="sub">
+                <p>
+                    Sınıflar arasındaki ilişkilerin doğru modellenmesi, kodun esnekliği, sürdürülebilirliği ve test edilebilirliği açısından kritiktir.
+                </p>
+                <ul>
+                    <li><strong>Composition (Kompozisyon):</strong> "Has-a" (sahip olma) ilişkisidir. Parça nesnelerin ömrü bütünleşik nesnenin ömrüne bağlıdır. (örn: Bilgisayar kapandığında işlemcinin de nesne ömrü biter).</li>
+                    <li><strong>Aggregation (Kümeleme):</strong> Daha zayıf bir ilişkidir. Nesnelerin yaşam süreleri bağımsızdır. (örn: Kütüphane nesnesi silinse bile kitap nesneleri var olmaya devam eder).</li>
+                    <li><strong>Dependency Injection (Bağımlılık Enjeksiyonu):</strong> Bir sınıfın bağımlı olduğu diğer nesneleri kendi içinde oluşturması yerine, bu bağımlılıkların dışarıdan verilmesidir.</li>
+                    <li><strong>Singleton Desen:</strong> Bir sınıftan çalışma süresi boyunca yalnızca tek bir örnek (instance) üretilmesini güvenceye alır. Metaclass'lar ile temiz bir şekilde uygulanabilir.</li>
+                    <li><strong>Factory Desen:</strong> Nesne oluşturma mantığını istemciden gizleyerek, tek bir arayüz üzerinden dinamik nesne üretimi yapılmasını sağlar.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>design_patterns.py</span></div>
+                    <pre><code class="language-python"># 1. Composition vs Aggregation
+class Motor:
+    def __init__(self, guc):
+        self.guc = guc
+
+class Araba: # Composition: Motor'u kendi içinde üretir.
+    def __init__(self, marka, guc):
+        self.marka = marka
+        self.motor = Motor(guc) 
+
+class Ogretmen:
+    def __init__(self, isim):
+        self.isim = isim
+
+class Okul: # Aggregation: Ogretmen dışarıdan verilir, okul yok olsa da öğretmen kalır.
+    def __init__(self, isim, ogretmenler=None):
+        self.isim = isim
+        self.ogretmenler = ogretmenler or []
+
+# 2. Dependency Injection
+class VeritabaniServisi:
+    def veri_cek(self):
+        return "Ham Veri"
+
+class Raporlayici:
+    def __init__(self, db_servis: VeritabaniServisi): # Servis dışarıdan enjekte edilir
+        self.db = db_servis
+        
+    def rapor_hazirla(self):
+        veri = self.db.veri_cek()
+        return f"Rapor: {veri}"
+
+# 3. Singleton (Metaclass yöntemiyle)
+class SingletonMeta(type):
+    _instances = {}
+    def __call__(cls, *args, **kwargs):
+        if cls not in cls._instances:
+            cls._instances[cls] = super().__call__(*args, **kwargs)
+        return cls._instances[cls]
+
+class SistemAyarlari(metaclass=SingletonMeta):
+    def __init__(self):
+        self.veritabani_yolu = "/var/db/app.sqlite"
+
+# 4. Factory Deseni
+class PDFRapor:
+    def olustur(self): return "PDF Rapor Dosyası"
+
+class ExcelRapor:
+    def olustur(self): return "Excel Tablo Dosyası"
+
+class RaporFabrikasi:
+    @staticmethod
+    def rapor_olustur(tip):
+        harita = {"pdf": PDFRapor, "excel": ExcelRapor}
+        sınıf = harita.get(tip.lower())
+        if sınıf:
+            return sınıf()
+        raise ValueError(f"Bilinmeyen rapor tipi: {tip}")
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="exceptions">
+            <h2>07. Hata Yönetimi (Exception Handling)</h2>
+            <div class="sub">
+                <p>
+                    Python'da hatalar birer nesnedir ve tüm istisnalar `BaseException` hiyerarşisinden türetilmiştir. Programın kontrolünü kaybetmeden hataları yönetmek için `try-except-else-finally` blokları kullanılır.
+                </p>
+                <ul>
+                    <li><strong>Blokların Görevleri:</strong> `try` riskli kodları, `except` yakalanacak hataları belirtir. `else` hata oluşmazsa çalışır, `finally` ise hata oluşsa da oluşmasa da (kaynak kapatma vb. işlemler için) mutlaka çalışır.</li>
+                    <li><strong>Hata Zincirleme (raise ... from):</strong> Bir hatayı yakalayıp başka bir hata fırlatırken orijinal hatanın izini (traceback) kaybetmemek için kullanılır.</li>
+                    <li><strong>LBYL vs EAFP:</strong>
+                        <ul>
+                            <li><strong>LBYL (Look Before You Leap):</strong> Eylemden önce her şeyi kontrol etme tarzı (örn: `if os.path.exists(f):`).</li>
+                            <li><strong>EAFP (Easier to Ask Forgiveness than Permission):</strong> Python topluluğunda önerilen tarz; önce işlemi yapmaya çalış, hata alırsan yakala (örn: `try/except`). Daha hızlı ve okunabilirdir.</li>
+                        </ul>
+                    </li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>exceptions_handling.py</span></div>
+                    <pre><code class="language-python">import traceback
+import warnings
+
+# 1. Custom Exception (Özel İstisna) Tanımı
+class SistemHatasi(Exception):
+    """Sistem genelinde kritik hatalar için kullanılır."""
+    def __init__(self, mesaj, hata_kodu):
+        super().__init__(mesaj)
+        self.hata_kodu = hata_kodu
+
+# 2. Hata Yakalama, Else, Finally ve Hata Zincirleme
+def veri_isle(dosya_yolu):
+    try:
+        # Hata ihtimali olan kısım
+        with open(dosya_yolu, "r") as f:
+            veri = f.read()
+    except FileNotFoundError as e:
+        # Hata zincirlenerek yeni hata fırlatılıyor (orijinal hata izi korunur)
+        raise SistemHatasi("İşlem dosyası bulunamadı!", hata_kodu=500) from e
+    else:
+        # Hata yoksa çalışacak kodlar
+        print("Dosya başarıyla okundu.")
+        return veri
+    finally:
+        # Her koşulda mutlaka çalışacak kısım
+        print("Dosya okuma operasyonu tamamlandı.")
+
+# 3. EAFP felsefesi örneği (Pythonik tarz)
+sozluk = {"yas": 25}
+try:
+    yas = sozluk["yas"]
+except KeyError:
+    yas = 0
+
+# 4. Warnings kullanımı
+def eski_fonksiyon():
+    warnings.warn("Bu fonksiyon ileride kaldırılacaktır.", DeprecationWarning)
+
+try:
+    veri_isle("olmayan_dosya.txt")
+except SistemHatasi as ex:
+    print(f"Hata Kodu: {ex.hata_kodu} | Mesaj: {ex}")
+    # traceback detaylarını yazdırma
+    # traceback.print_exc()
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="gc">
+            <h2>08. Bellek Yönetimi & Garbage Collector</h2>
+            <div class="sub">
+                <p>
+                    Python otomatik bellek yönetimi (automatic memory management) yapar. Ana mekanizması **Referans Sayımı (Reference Counting)** sistemidir. Her nesnenin kaç farklı değişken tarafından işaret edildiği sayılır. Sayı `0` olduğunda nesne bellekten derhal silinir.
+                </p>
+                <ul>
+                    <li><strong>Dairesel Referans (Circular Reference):</strong> A nesnesi B'yi, B de A'yı referans gösteriyorsa referans sayıları asla `0` olmaz. Bu sızıntıyı çözmek için **Garbage Collector (gc modülü)** arka planda çalışıp dairesel referansları tespit eder ve bellekten temizler.</li>
+                    <li><strong>Weakref (Zayıf Referanslar):</strong> Referans sayacını artırmadan bir nesneye ulaşmayı sağlar. Cache mekanizmalarında veya dairesel referansların oluşmasını engellemek amacıyla kullanılır.</li>
+                    <li><strong>tracemalloc:</strong> Bellekte en çok yer kaplayan satırları tespit etmemizi sağlayan yerleşik modüldür.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>memory_gc.py</span></div>
+                    <pre><code class="language-python">import sys
+import gc
+import weakref
+import tracemalloc
+
+# 1. Referans Sayımı İzleme
+a = [1, 2, 3]
+# sys.getrefcount kendi parametresini de saydığı için gerçek referans sayısından 1 fazla döner
+print("Referans sayısı:", sys.getrefcount(a) - 1) # Normal şartlarda 1'dir.
+
+b = a
+print("Referans sayısı (b eklendi):", sys.getrefcount(a) - 1) # 2'dir.
+
+# 2. Dairesel Referans ve Manuel GC Tetikleme
+class Dugum:
+    def __init__(self, isim):
+        self.isim = isim
+        self.baglanti = None
+    def __del__(self):
+        # Yıkıcı metot: Nesne yok edilirken tetiklenir
+        pass
+
+d1 = Dugum("A")
+d2 = Dugum("B")
+d1.baglanti = d2
+d2.baglanti = d1  # Dairesel referans oluştu
+
+d1 = None
+d2 = None # Değişkenleri silmemize rağmen bellekten atılmadılar!
+
+# Manuel olarak garbage collector çağırıyoruz
+gc.collect() # GC bu dairesel döngüyü çözer ve nesneleri siler.
+
+# 3. Weakref (Zayıf Referans) Kullanımı
+class BuyukVeri:
+    def __init__(self):
+        self.liste = list(range(1000000))
+
+veri = BuyukVeri()
+zayif_veri = weakref.ref(veri)
+
+print("Veri duruyor mu?:", zayif_veri() is not None) # True
+veri = None
+print("Veri silindikten sonra:", zayif_veri() is None) # True (Referans artırılmadığı için hemen silindi)
+
+# 4. tracemalloc ile bellek kullanımı izleme
+tracemalloc.start()
+bellek_oncesi = tracemalloc.take_snapshot()
+
+# Örnek bellek harcayan kod
+bellek_yiyici = [x for x in range(50000)]
+
+bellek_sonrasi = tracemalloc.take_snapshot()
+istatistikler = bellek_sonrasi.compare_to(bellek_oncesi, 'lineno')
+print("En çok bellek harcayan 3 satır:")
+for stat in istatistikler[:3]:
+    print(stat)
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="api">
+            <h2>09. API Çağrıları (HTTP HTTP Client)</h2>
+            <div class="sub">
+                <p>
+                    Python dış dünyayla iletişim kurmak için gelişmiş kütüphaneler sunar. HTTP istekleri için sektör standardı `requests` kütüphanesidir. Standart kütüphanedeki `urllib` ise üçüncü parti bağımlılık istenmeyen durumlarda tercih edilir.
+                </p>
+                <ul>
+                    <li><strong>requests.Session:</strong> Çerezleri, bağlantı havuzunu (connection pooling) ve HTTP ayarlarını koruyarak ardışık isteklerin çok daha hızlı yapılmasını sağlar.</li>
+                    <li><strong>Timeout:</strong> İsteklerin sunucu yanıt vermediğinde asılı kalmaması için her API çağrısına timeout (saniye cinsinden) eklenmesi zorunludur.</li>
+                    <li><strong>aiohttp:</strong> Yüksek trafikli işlerde veya I/O-bound asenkron operasyonlarda paralel istek yapmak için kullanılan asenkron bir HTTP kütüphanesidir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>api_calls.py</span></div>
+                    <pre><code class="language-python">import requests
+import urllib.request
+import json
+import asyncio
+
+# 1. requests ile GET / POST İşlemleri ve Hata Yönetimi
+def api_request_example():
+    url = "https://jsonplaceholder.typicode.com/posts"
+    payload = {"title": "Python Rehberi", "body": "İçerik", "userId": 1}
+    headers = {"Content-Type": "application/json; charset=UTF-8"}
+    
+    try:
+        # Timeout tanımlamak kilitlenmeleri önlemek için elzemdir
+        response = requests.post(url, json=payload, headers=headers, timeout=5)
+        # HTTP hata kodlarında (4xx, 5xx) exception fırlatmasını sağlar
+        response.raise_for_status() 
+    except requests.exceptions.HTTPError as errh:
+        print("HTTP Hatası:", errh)
+    except requests.exceptions.ConnectionError as errc:
+        print("Bağlantı Hatası:", errc)
+    except requests.exceptions.Timeout as errt:
+        print("Timeout Hatası:", errt)
+    else:
+        veri = response.json() # JSON formatına çevirme
+        print("Dönen Veri ID:", veri.get("id"))
+
+# 2. Session (Bağlantı Havuzlama ve Cookie Koruma) Kullanımı
+def session_example():
+    with requests.Session() as session:
+        session.headers.update({"Authorization": "Bearer TOKEN_STRING"})
+        # Aynı session üzerinden atılan istekler TCP bağlantısını yeniden kullanır (keep-alive)
+        res1 = session.get("https://jsonplaceholder.typicode.com/todos/1")
+        res2 = session.get("https://jsonplaceholder.typicode.com/todos/2")
+        print("Session Sonuç 1:", res1.status_code)
+
+# 3. Dahili urllib Kütüphanesi ile GET İsteği
+def urllib_example():
+    req = urllib.request.Request("https://jsonplaceholder.typicode.com/todos/1")
+    with urllib.request.urlopen(req) as response:
+        html = response.read().decode('utf-8')
+        veri = json.loads(html)
+        print("urllib Sonuç:", veri.get("title"))
+
+# 4. Asenkron HTTP İstek Yapısı (aiohttp Konsepti)
+# Bu kod aiohttp kütüphanesinin çalışma mantığını gösteren yalancı koddur.
+"""
+async def fetch(session, url):
+    async with session.get(url) as response:
+        return await response.json()
+
+async def async_main():
+    import aiohttp
+    async with aiohttp.ClientSession() as session:
+        sonuc = await fetch(session, 'https://jsonplaceholder.typicode.com/todos/1')
+        print(sonuc)
+"""
+api_request_example()
+session_example()
+urllib_example()
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="database">
+            <h2>10. Veritabanı Programlama (SQL & SQLite)</h2>
+            <div class="sub">
+                <p>
+                    Python standart olarak `sqlite3` motoru ile birlikte gelir. PostgreSQL (`psycopg2`) ve MySQL (`mysql-connector-python`) gibi ilişkisel veritabanı sürücüleri de sqlite3 modülü ile oldukça benzer bir API yapısı (PEP 249 - Python Database API Specification v2.0) kullanır.
+                </p>
+                <ul>
+                    <li><strong>SQL Injection:</strong> Kullanıcıdan gelen değişkenleri SQL string'inin içine doğrudan yazmak (string formatlama ile) büyük güvenlik açığı oluşturur. Değerler sorguya her zaman parametre olarak geçilmelidir.</li>
+                    <li><strong>Row Factory:</strong> SQLite sorgularında satırları varsayılan `tuple` yerine isimle erişilebilen sözlük benzeri (`sqlite3.Row`) nesneler olarak dönmeye yarar.</li>
+                    <li><strong>Context Manager:</strong> Connection nesnesi context manager olarak kullanıldığında hata durumunda otomatik `rollback()`, başarı durumunda otomatik `commit()` yapar. Ancak cursor'ların kapatılmasını sağlamaz, bu yüzden cursor için ayrı bir context manager kullanılmalıdır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>database_sqlite.py</span></div>
+                    <pre><code class="language-python">import sqlite3
+
+# 1. In-Memory (Bellekte Çalışan) SQLite Veritabanı Bağlantısı
+# Context manager hata durumunda otomatik rollback, başarıda commit yapar.
+with sqlite3.connect(":memory:") as baglanti:
+    
+    # Satırlara sütun isimleriyle erişebilmek için Row Factory ataması
+    baglanti.row_factory = sqlite3.Row
+    
+    # Sorguları çalıştırmak için cursor oluşturuyoruz
+    cursor = baglanti.cursor()
+    
+    # Tablo Oluşturma
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS kullanicilar (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            isim TEXT NOT NULL,
+            eposta TEXT UNIQUE
+        )
+    """)
+    
+    # 2. Parametreli Veri Ekleme (SQL Injection Korumalı)
+    yeni_kullanici = ("Ahmet Yılmaz", "ahmet@mail.com")
+    cursor.execute("INSERT INTO kullanicilar (isim, eposta) VALUES (?, ?)", yeni_kullanici)
+    
+    # Toplu veri ekleme (executemany)
+    kullanicilar_liste = [
+        ("Can Demir", "can@mail.com"),
+        ("Elif Kaya", "elif@mail.com")
+    ]
+    cursor.executemany("INSERT INTO kullanicilar (isim, eposta) VALUES (?, ?)", kullanicilar_liste)
+    
+    # 3. Veri Çekme (Fetch İşlemleri)
+    cursor.execute("SELECT * FROM kullanicilar")
+    
+    # Row Factory aktif olduğu için verilere key ile ulaşabiliriz
+    tum_kullanicilar = cursor.fetchall()
+    for kullanici in tum_kullanicilar:
+        print(f"ID: {kullanici['id']} | İsim: {kullanici['isim']} | E-posta: {kullanici['eposta']}")
+        
+    # Tek veri çekme
+    cursor.execute("SELECT isim FROM kullanicilar WHERE id = ?", (1,))
+    tek_kullanici = cursor.fetchone()
+    if tek_kullanici:
+        print("Birinci Kullanıcı:", tek_kullanici["isim"])
+
+# Bağlantı context manager'dan çıktığı anda veritabanı kapatılır.
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="generators">
+            <h2>11. Generators & Iterators (Yineleyiciler)</h2>
+            <div class="sub">
+                <p>
+                    Python'da nesnelerin `for` döngüsünde kullanılabilmesini sağlayan sisteme **Iterator Protocol (Yineleyici Protokolü)** denir.
+                </p>
+                <ul>
+                    <li><strong>Iterator:</strong> Bir nesnenin iterable olması için `__iter__` metoduna sahip olması ve bu metodun `__next__` metodunu uygulayan bir nesne dönmesi gerekir. Veri bittiğinde `StopIteration` hatası fırlatılır.</li>
+                    <li><strong>Generator:</strong> Iterator oluşturmanın kolay yoludur. `yield` anahtar kelimesiyle veriyi parça parça dışarıya iletir, her çağrıldığında kaldığı yeri ve değişken durumlarını hafızada tutarak devam eder.</li>
+                    <li><strong>itertools:</strong> Sonsuz döngüler, permütasyonlar, kombinasyonlar ve gruplama gibi gelişmiş yineleme işlemleri için optimize edilmiş C tabanlı bir standart kütüphanedir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>iterators_generators.py</span></div>
+                    <pre><code class="language-python">import itertools
+
+# 1. Özel Iterator Sınıfı Yazımı
+class AdimSayaci:
+    def __init__(self, baslangic, bitis):
+        self.mevcut = baslangic
+        self.bitis = bitis
+
+    def __iter__(self):
+        return self
+
+    def __next__(self):
+        if self.mevcut >= self.bitis:
+            raise StopIteration # Döngüyü sonlandırma sinyali
+        veri = self.mevcut
+        self.mevcut += 1
+        return veri
+
+sayac = AdimSayaci(1, 4)
+for adim in sayac:
+    print("Sayaç Adımı:", adim)
+
+# 2. Generator Fonksiyonu ve yield from kullanımı
+def alt_generator():
+    yield "A"
+    yield "B"
+
+def ana_generator():
+    # Başka bir generator'ın çıktılarını doğrudan aktarmak için yield from kullanılır
+    yield from alt_generator()
+    yield "C"
+
+for harf in ana_generator():
+    print("Generator:", harf)
+
+# 3. Itertools Önemli Fonksiyonları
+# chain: Çoklu iterable yapıları uç uca ekler
+liste1 = [1, 2]
+liste2 = [3, 4]
+birlestirilmis = list(itertools.chain(liste1, liste2)) # [1, 2, 3, 4]
+
+# combinations ve permutations
+kombinasyonlar = list(itertools.combinations([1, 2, 3], 2)) # [(1,2), (1,3), (2,3)]
+permutasyonlar = list(itertools.permutations([1, 2, 3], 2))
+
+# groupby: Sıralı veriyi gruplar
+veriler = [("Meyve", "Elma"), ("Meyve", "Armut"), ("Sebze", "Biber")]
+for grup_adi, grup_verileri in itertools.groupby(veriler, lambda x: x[0]):
+    print(grup_adi, "->", [item[1] for item in grup_verileri])
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="decorators">
+            <h2>12. Gelişmiş Dekoratörler (Deep Decorators)</h2>
+            <div class="sub">
+                <p>
+                    Dekoratörler kod tekrarını önleyen, ortak kesen ilgi alanlarını (cross-cutting concerns: loglama, yetki kontrolü, cache) temizce yöneten yapılardır.
+                </p>
+                <ul>
+                    <li><strong>functools.wraps:</strong> Dekore edilen fonksiyonun ismini (`__name__`), docstring'ini (`__doc__`) ve imzasını korumak için dekoratör fonksiyonunun içine mutlaka eklenmelidir. Aksi takdirde dekoratör sonrası fonksiyon bilgileri kaybolur.</li>
+                    <li><strong>Parametreli Dekoratör:</strong> Dekoratörün kendisine parametre geçmek için iç içe 3 seviye fonksiyon tanımı yapılması gerekir. En dış seviye argümanları alır, orta seviye dekore edilecek fonksiyonu alır, en iç seviye ise asıl çalışacak koddur.</li>
+                    <li><strong>Class Decorator:</strong> Bir fonksiyon yerine bir sınıfı sarmallayan ya da bir sınıfı dekoratör gibi davranmaya zorlayan yapılardır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>advanced_decorators.py</span></div>
+                    <pre><code class="language-python">from functools import wraps, lru_cache
+
+# 1. Parametreli Dekoratör Yazımı ve functools.wraps
+def tekrarla(adet=2):
+    def decorator(func):
+        @wraps(func) # Orijinal fonksiyonun metadata bilgilerini korur
+        def wrapper(*args, **kwargs):
+            sonuc = None
+            for _ in range(adet):
+                sonuc = func(*args, **kwargs)
+            return sonuc
+        return wrapper
+    return decorator
+
+@tekrarla(adet=3)
+def selamla(isim):
+    """Kullanıcıyı selamlayan fonksiyon."""
+    print(f"Merhaba {isim}")
+
+selamla("Kutay")
+print("Fonksiyon İsmi:", selamla.__name__) # wraps sayesinde 'selamla' basar (wrapper değil)
+
+# 2. Sınıf Dekoratörü (Class Decorator)
+# Sınıf nesnelerini izlemek veya değiştirmek için kullanılır
+def eklenti_ekle(cls):
+    cls.eklenti_aktif = True
+    return cls
+
+@eklenti_ekle
+class WebSunucu:
+    pass
+
+ws = WebSunucu()
+print("Eklenti Aktif mi?:", ws.eklenti_aktif) # True
+
+# 3. lru_cache (Memoization / Önbellekleme)
+# Pahalı hesaplamaların sonuçlarını önbelleğe alarak performansı katlar
+@lru_cache(maxsize=128)
+def fibonacci_hesapla(n):
+    if n < 2:
+        return n
+    return fibonacci_hesapla(n-1) + fibonacci_hesapla(n-2)
+
+print("Fibonacci(35):", fibonacci_hesapla(35)) # Önbellek sayesinde anında çalışır
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="context">
+            <h2>13. Bağlam Yöneticileri (Context Managers)</h2>
+            <div class="sub">
+                <p>
+                    `with` anahtar kelimesiyle kullanılan bağlam yöneticileri, açılan kaynakların (dosya, network, veritabanı kilitleri) hata alınsa dahi güvenli bir şekilde kapatılmasını veya temizlenmesini garanti eder.
+                </p>
+                <ul>
+                    <li><strong>Protokol Metotları:</strong> Nesne `with` bloğuna girdiğinde `__enter__` çalışır. Bloktan çıkıldığında `__exit__` tetiklenir.</li>
+                    <li><strong>Hata Yönetimi:</strong> `__exit__(self, exc_type, exc_val, exc_tb)` metodu parametrelerinde oluşan hatayı alır. Eğer bu metot `True` döndürürse oluşan hata yutulur ve program durmadan devam eder. `False` veya hiçbir şey dönmezse hata normal şekilde yukarı fırlatılır.</li>
+                    <li><strong>contextlib Modülü:</strong> `@contextmanager` dekoratörü yardımıyla, sınıf yazmaya gerek kalmadan bir generator fonksiyonu (`yield` kullanarak) üzerinden kolayca context manager tanımlanabilir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>context_managers.py</span></div>
+                    <pre><code class="language-python">from contextlib import contextmanager, suppress
+
+# 1. __enter__ ve __exit__ ile Özel Context Manager Sınıfı
+class DosyaKilitleyici:
+    def __init__(self, dosya_adi):
+        self.dosya_adi = dosya_adi
+
+    def __enter__(self):
+        print(f"{self.dosya_adi} kilitlendi ve erişime açıldı.")
+        return self # with ifadesindeki 'as' atamasına gidecek nesne
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        print(f"{self.dosya_adi} kilidi açıldı ve kapatıldı.")
+        if exc_type is not None:
+            print(f"Hata yakalandı: {exc_val}")
+            # True dönersek hatayı yutmuş oluruz, program akışı bozulmaz.
+            return True 
+
+with DosyaKilitleyici("data.json") as kilit:
+    print("İşlemler yapılıyor...")
+    # Hata oluşturuyoruz
+    sonuc = 1 / 0
+
+# 2. @contextmanager ile Kolay Bağlam Yönetimi
+@contextmanager
+def db_baglantisi(db_name):
+    print(f"Veritabanı bağlantısı açıldı: {db_name}")
+    try:
+        # yield'a kadar olan kısım __enter__ gibidir
+        yield "DB_BAGLANTI_NESNESI"
+    finally:
+        # yield'dan sonraki kısım __exit__ gibidir
+        print("Veritabanı bağlantısı kapatıldı.")
+
+with db_baglantisi("app_db") as db:
+    print("Veri yazılıyor...")
+
+# 3. contextlib.suppress ile Belirli Hataları Sessizce Geçme
+# try-except bloğu açmadan belirtilen hatayı yutar
+with suppress(FileNotFoundError):
+    # Bu dosya yoksa normalde çöker, suppress ile sessizce yutulur
+    with open("olmayan_dosya.txt", "r") as f:
+        pass
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="concurrency">
+            <h2>14. Multithreading, Multiprocessing & Asyncio</h2>
+            <div class="sub">
+                <p>
+                    Python'da eşzamanlılık (concurrency) ve paralellik (parallelism) üç farklı yaklaşımla ele alınır.
+                </p>
+                <ul>
+                    <li><strong>GIL (Global Interpreter Lock):</strong> CPython yorumlayıcısının, thread emniyeti (thread safety) sağlamak amacıyla aynı anda yalnızca tek bir yerel thread'in Python bytecode çalıştırmasına izin veren mekanizmasıdır. Bu yüzden **Multithreading** CPU-bound (yoğun işlemci gücü gerektiren) işlemlerde paralellik sağlamaz, sadece I/O-bound (dosya okuma, ağ isteği bekleme) işlerinde etkilidir.</li>
+                    <li><strong>Multiprocessing:</strong> GIL engelini aşmak için ayrı işletim sistemi süreçleri (processes) oluşturur. Her sürecin kendi bellek alanı ve yorumlayıcısı vardır. CPU-bound işler için idealdir ancak süreçler arası veri transferi (IPC) maliyetlidir.</li>
+                    <li><strong>Asyncio:</strong> Tek bir thread ve süreç üzerinde, asenkron G/Ç (I/O) işlemlerinin **Event Loop (Olay Döngüsü)** yardımıyla işbirliği içinde (cooperative multitasking) yürütülmesini sağlar. CPU kilitlenmesi yaşatmayan binlerce eşzamanlı ağ bağlantısı için mükemmeldir.</li>
+                </ul>
+                <div class="info-box tip">
+                    <strong>Race Condition ve Eşzamanlılık Çakışmaları: </strong>
+                    Ortak bellek alanına sahip Threading işlemlerinde, birden fazla thread aynı anda bir değişkeni güncellemeye çalışırsa veri kaybı (race condition) yaşanır. Bunu önlemek için `threading.Lock()` nesneleri kullanılmalıdır.
+                </div>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>concurrency_demo.py</span></div>
+                    <pre><code class="language-python">import threading
+import multiprocessing
+from concurrent.futures import ThreadPoolExecutor, ProcessPoolExecutor
+import asyncio
+import time
+import queue
+
+# 1. Threading ve Lock (Race Condition Engelleme)
+paylasilan_sayac = 0
+sayac_kilidi = threading.Lock()
+
+def sayaci_artir():
+    global paylasilan_sayac
+    for _ in range(100000):
+        # Kilit sayesinde aynı anda sadece tek bir thread artırma yapar
+        with sayac_kilidi:
+            paylasilan_sayac += 1
+
+t1 = threading.Thread(target=sayaci_artir)
+t2 = threading.Thread(target=sayaci_artir)
+t1.start(); t2.start()
+t1.join(); t2.join()
+print("Kilitli Sayaç Sonucu:", paylasilan_sayac)
+
+# 2. Multiprocessing Pool (CPU-bound paralel işlem)
+def kare_hesapla(n):
+    return n * n
+
+def multiprocess_run():
+    # Süreç havuzu açıp sayıların karesini çekirdeklere dağıtarak hesaplar
+    with multiprocessing.Pool(processes=multiprocessing.cpu_count()) as pool:
+        sonuclar = pool.map(kare_hesapla, [1, 2, 3, 4, 5])
+        print("Multiprocess Sonuçlar:", sonuclar)
+
+# 3. ThreadPoolExecutor Kullanımı
+with ThreadPoolExecutor(max_workers=3) as executor:
+    isler = executor.map(kare_hesapla, [10, 20, 30])
+    print("ThreadPool Sonuçlar:", list(isler))
+
+# 4. Asyncio (async/await tabanlı asenkron yapı)
+async def asenkron_is(isim, sure):
+    print(f"Görev {isim} başladı.")
+    # time.sleep tüm thread'i bloke eder, asyncio.sleep ise sadece bu görevi bekletir
+    await asyncio.sleep(sure) 
+    print(f"Görev {isim} tamamlandı.")
+    return f"{isim} Sonucu"
+
+async def async_main():
+    # Görevleri eşzamanlı olarak event loop üzerinde çalıştırır
+    g1 = asenkron_is("A", 1)
+    g2 = asenkron_is("B", 2)
+    sonuclar = await asyncio.gather(g1, g2)
+    print("Asyncio gather sonuçları:", sonuclar)
+
+# Asyncio çalıştırma tetikleyicisi
+asyncio.run(async_main())
+
+# 5. Thread-safe Queue (Üretici-Tüketici Modeli)
+is_kuyrugu = queue.Queue()
+def uretici():
+    for i in range(5):
+        is_kuyrugu.put(f"İş-{i}")
+        time.sleep(0.1)
+
+def tuketici():
+    while True:
+        try:
+            gorev = is_kuyrugu.get(timeout=0.5)
+            print("İşlendi:", gorev)
+            is_kuyrugu.task_done()
+        except queue.Empty:
+            break
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="io">
+            <h2>15. Dosya Yönetimi & Veri Serileştirme</h2>
+            <div class="sub">
+                <p>
+                    Dosya okuma, yazma ve sistem yolları yönetimi modern Python projelerinde sıkça gerçekleştirilen G/Ç (I/O) işlemlerindendir.
+                </p>
+                <ul>
+                    <li><strong>open() Modları:</strong> `r` okuma, `w` sıfırdan yazma, `a` sonuna ekleme, `x` dosya varsa hata fırlatan güvenli yazma, `b` binary (resim, pdf vb.), `t` text (varsayılan) ve `+` okuma/yazma modudur.</li>
+                    <li><strong>pathlib.Path:</strong> Eski `os.path` modülünün yerine gelen, dosya yollarını birer nesne olarak ele alan, işletim sisteminden bağımsız nesne tabanlı kütüphanedir.</li>
+                    <li><strong>shutil & glob:</strong> Klasörleri sıkıştırma/kopyalama (`shutil`) ve desen eşleştirerek dosya arama (`glob`) işlemlerinde kullanılır.</li>
+                </ul>
+                <div class="info-box tip">
+                    <strong>Pickle Güvenlik Uyarısı: </strong>
+                    `pickle` kütüphanesi Python nesnelerini doğrudan binary serileştirir. Güvenilmeyen veya dışarıdan gelen bir pickle dosyası yüklenirse, dosya açıldığı anda zararlı Python kodlarını çalıştırabilir. Güvenli veri transferi için her zaman JSON tercih edilmelidir.
+                </div>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>file_io.py</span></div>
+                    <pre><code class="language-python">from pathlib import Path
+import shutil
+import tempfile
+import pickle
+import json
+import csv
+import glob
+
+# 1. Dosya Okuma, Yazma, Seek ve Tell
+with open("test.txt", "w+", encoding="utf-8") as f:
+    f.write("Python Programlama Dili Rehberi")
+    
+    # İmleci başa sarıyoruz
+    f.seek(0)
+    print("Mevcut İmleç Konumu:", f.tell()) # 0
+    print("Okunan İçerik:", f.read())
+
+# 2. Pathlib (Modern Dosya Yolu Yönetimi)
+dosya_yolu = Path("test_dizin") / "alt_dizin" / "dosya.json"
+# Ebeveyn dizinleri yoksa otomatik oluşturur
+dosya_yolu.parent.mkdir(parents=True, exist_ok=True) 
+
+# 3. JSON ve CSV Serileştirme
+veri = {"kullanici": "kutay", "aktif": True}
+with open(dosya_yolu, "w") as f:
+    json.dump(veri, f, indent=4)
+
+# CSV Yazma
+with open("ogrenciler.csv", "w", newline="", encoding="utf-8") as f:
+    yazici = csv.writer(f)
+    yazici.writerow(["Ad", "Soyad", "Not"])
+    yazici.writerow(["Ahmet", "Kaya", 85])
+
+# 4. Pickle Serileştirme (Güvenlik Uyarılı)
+nesne = {"data": [1, 2, 3]}
+binary_veri = pickle.dumps(nesne)
+geriye_donen = pickle.loads(binary_veri)
+
+# 5. Glob ile Wildcard Dosya Arama
+# Mevcut klasördeki tüm .py dosyalarını bulur
+py_dosyalari = glob.glob("*.py")
+
+# Temizlik
+if Path("test.txt").exists():
+    Path("test.txt").unlink()
+shutil.rmtree("test_dizin", ignore_errors=True)
+if Path("ogrenciler.csv").exists():
+    Path("ogrenciler.csv").unlink()
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="modules">
+            <h2>16. Modüller, Paketler & Dağıtım</h2>
+            <div class="sub">
+                <p>
+                    Python projeleri büyüdükçe modül (tek bir `.py` dosyası) ve paket (içinde `__init__.py` barındıran alt klasörler) yapılarına bölünür.
+                </p>
+                <ul>
+                    <li><strong>__name__ == "__main__":</strong> Bir Python dosyasının doğrudan mı çalıştırıldığını, yoksa başka bir dosya tarafından mı import edildiğini anlamayı sağlar. Doğrudan çalıştırıldığında bu kontrol bloğu aktif olur.</li>
+                    <li><strong>__init__.py:</strong> Bir dizinin Python paketi olarak tanınmasını sağlar. Paket içindeki modüllerin dışarıya nasıl açılacağını (API yüzeyini) belirlemek için `__all__` listesi burada tanımlanır.</li>
+                    <li><strong>sys.path:</strong> Python'ın modülleri aramak için sırayla taradığı yolları içeren listedir. Gerekirse çalışma zamanında manipüle edilebilir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>modules_packages.py</span></div>
+                    <pre><code class="language-python">import sys
+
+# 1. sys.path Kontrolü ve Manipülasyonu
+# Python'ın import arama yolları
+for yol in sys.path[:3]:
+    print("Arama Yolu:", yol)
+
+# İhtiyaç halinde çalışma zamanında arama dizini eklenebilir
+sys.path.append("/custom/library/path")
+
+# 2. Paket Dışa Aktarım Kontrolü (__all__ listesi mantığı)
+# my_package/__init__.py içeriği konsept olarak şöyledir:
+# __all__ = ["dosya_oku", "dosya_yaz"]
+# Bu tanımlama ile "from my_package import *" yapıldığında 
+# sadece listedeki fonksiyonlar içeri alınır.
+
+# 3. Main Kontrolü
+if __name__ == "__main__":
+    # Bu blok sadece dosya python aracılığıyla doğrudan çalıştırıldığında çalışır.
+    # Başka bir modülden import edildiğinde çalışmaz.
+    print("Dosya doğrudan çalıştırıldı.")
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="regex">
+            <h2>17. Düzenli İfadeler (Regular Expressions - re)</h2>
+            <div class="sub">
+                <p>
+                    Python yerleşik `re` modülü üzerinden karmaşık metin arama, doğrulama, yakalama ve değiştirme işlemlerini gerçekleştirmek için düzenli ifadeleri destekler.
+                </p>
+                <ul>
+                    <li><strong>Arama Metotları:</strong> `search()` metinde ilk eşleşeni bulur, `match()` metnin sadece en başını kontrol eder, `findall()` tüm eşleşmeleri liste olarak döner, `finditer()` ise eşleşen nesneleri iterator olarak döner.</li>
+                    <li><strong>Gruplar:</strong> Parantezler `()` yakalama grubu oluşturur. `(?:)` ise yakalamayan gruptur (gruplama yapar ancak veriyi saklamaz). `(?P&lt;isim&gt;)` ile gruplara isim verilebilir.</li>
+                    <li><strong>Karakter Sınıfları & Nicelikleyiciler:</strong> `\d` rakamlar, `\w` harfler ve sayılar, `\s` boşluklar. `*` sıfır veya fazla, `+` bir veya fazla, `?` opsiyonel tekrar.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>regex_expressions.py</span></div>
+                    <pre><code class="language-python">import re
+
+# 1. E-posta Yakalama ve re.compile (Performanslı Regex)
+# r"" (raw string) kullanımı kaçış karakterlerinin (\) bozulmasını önler
+eposta_deseni = re.compile(r"([a-zA-Z0-9._%+-]+)@([a-zA-Z0-9.-]+)\.([a-zA-Z]{2,})")
+
+metin = "İletişim için kutay@mail.com veya destek@sirket.org adreslerini kullanın."
+
+# findall eşleşen grupları tuple listesi olarak döner
+eslesmeler = eposta_deseni.findall(metin)
+print("E-posta listesi:", eslesmeler)
+
+# 2. İsimlendirilmiş Gruplar (Named Groups)
+tarih_deseni = re.compile(r"(?P&lt;yil&gt;\d{4})-(?P&lt;ay&gt;\d{2})-(?P&lt;gun&gt;\d{2})")
+tarih_metni = "Bugünün tarihi: 2026-06-12"
+
+eslesme = tarih_deseni.search(tarih_metni)
+if eslesme:
+    # Grupları isimleriyle sözlük olarak alabiliriz
+    tarih_sozlugu = eslesme.groupdict()
+    print("Yıl:", tarih_sozlugu["yil"]) # 2026
+    print("Gün:", eslesme.group("gun")) # 12
+
+# 3. re.finditer ve Flags (re.IGNORECASE vb.)
+# re.DOTALL: Nokta (.) karakterinin yeni satırı da içermesini sağlar
+buyuk_kucuk_desen = re.compile(r"python", re.IGNORECASE)
+for match in buyuk_kucuk_desen.finditer("Python ve python kodlama"):
+    print(f"Eşleşme bulundu. Konum: {match.start()}-{match.end()}")
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="testing">
+            <h2>18. Test Etme (Testing & Mocking)</h2>
+            <div class="sub">
+                <p>
+                    Kodun doğru çalıştığından emin olmak ve geriye dönük uyumluluk hatalarını önlemek için test süreçleri hayati öneme sahiptir.
+                </p>
+                <ul>
+                    <li><strong>unittest:</strong> Standart kütüphanedeki test çerçevesidir. `TestCase` sınıfı miras alınarak test senaryoları yazılır.</li>
+                    <li><strong>doctest:</strong> Fonksiyonların docstring açıklamaları içine yazılan interaktif Python kod örneklerini test aracı olarak çalıştırır.</li>
+                    <li><strong>pytest:</strong> Boilerplate kodları en aza indiren, bağımlılıkları yönetmek için `fixture` yapıları sunan popüler üçüncü parti test kütüphanesidir.</li>
+                    <li><strong>unittest.mock:</strong> Dış bağımlılıkları (örneğin internete bağlanan bir API çağrısı, veritabanı bağlantısı) taklit etmek (mock) için kullanılır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>testing_mocking.py</span></div>
+                    <pre><code class="language-python">import unittest
+from unittest.mock import patch
+import doctest
+
+# 1. doctest destekli örnek fonksiyon
+def bolme(x, y):
+    """
+    İki sayıyı böler.
+    &gt;&gt;&gt; bolme(6, 2)
+    3.0
+    &gt;&gt;&gt; bolme(5, 0)
+    Traceback (most recent call last):
+    ZeroDivisionError: division by zero
+    """
+    return x / y
+
+# 2. unittest.TestCase Tanımı
+class MatematikTesti(unittest.TestCase):
+    
+    def setUp(self):
+        # Her test fonksiyonu çalışmadan önce hazırlık yapar
+        self.sayilar = [1, 2, 3, 4]
+        
+    def tearDown(self):
+        # Her test fonksiyonu bittikten sonra temizlik yapar
+        del self.sayilar
+
+    def test_toplam(self):
+        self.assertEqual(sum(self.sayilar), 10)
+        self.assertTrue(5 not in self.sayilar)
+
+    def test_bolme_hatasi(self):
+        with self.assertRaises(ZeroDivisionError):
+            bolme(10, 0)
+
+# 3. Mocking (Taklit Etme) Testi
+class DisServis:
+    def api_sorgula(self):
+        # Gerçekte dış dünyaya giden API çağrısı yapar
+        return "Gerçek Veri"
+
+def rapor_uret(servis: DisServis):
+    veri = servis.api_sorgula()
+    return f"Sonuç: {veri}"
+
+class ServisTesti(unittest.TestCase):
+    # api_sorgula metodunu geçici olarak taklit ediyoruz
+    @patch.object(DisServis, 'api_sorgula', return_value="Taklit Veri")
+    def test_rapor_uret(self, mock_metot):
+        servis = DisServis()
+        sonuc = rapor_uret(servis)
+        self.assertEqual(sonuc, "Sonuç: Taklit Veri")
+        # Metodun çağrılıp çağrılmadığını kontrol ediyoruz
+        mock_metot.assert_called_once()
+
+# Doctest'leri ve unit testleri çalıştırıyoruz
+if __name__ == "__main__":
+    doctest.testmod() # Doctest çalıştırır
+    unittest.main(exit=False) # Unit testleri çalıştırır
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="logging">
+            <h2>19. Loglama Mekanizması (Logging)</h2>
+            <div class="sub">
+                <p>
+                    Uygulamaların çalışma anındaki log verilerini `print` yerine `logging` modülüyle yönetmek; çıktıların önem derecelerine göre filtrelenebilmesi, farklı hedef dosyalara/sunuculara yönlendirilebilmesi ve formatlanabilmesi için şarttır.
+                </p>
+                <ul>
+                    <li><strong>Log Seviyeleri (Sırasıyla):</strong> `DEBUG` (en detaylı), `INFO` (bilgilendirme), `WARNING` (uyarı), `ERROR` (hata), `CRITICAL` (çökme seviyesinde hata).</li>
+                    <li><strong>Handlers:</strong> Logların nereye yazılacağını belirler. Konsol için `StreamHandler`, dosya için `FileHandler`, büyük log dosyalarını belirli boyuta ulaştığında bölmek için `RotatingFileHandler` kullanılır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>logging_setup.py</span></div>
+                    <pre><code class="language-python">import logging
+from logging.handlers import RotatingFileHandler
+
+# 1. Logger Nesnesi Oluşturma
+logger = logging.getLogger("UygulamaLogger")
+logger.setLevel(logging.DEBUG) # Minimum yakalama seviyesi
+
+# 2. Handler ve Formatter Tanımlama
+# Konsola basacak handler
+konsol_handler = logging.StreamHandler()
+konsol_handler.setLevel(logging.INFO)
+
+# Dosyaya basacak ve boyutu 1MB'ı aşınca 5 yedek alarak dönecek handler (Rotating)
+dosya_handler = RotatingFileHandler("uygulama.log", maxBytes=1024*1024, backupCount=5)
+dosya_handler.setLevel(logging.DEBUG)
+
+# Log formatı tanımlıyoruz (Zaman - LoggerAdı - Seviye - Mesaj)
+formatlayici = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+konsol_handler.setFormatter(formatlayici)
+dosya_handler.setFormatter(formatlayici)
+
+# Handler'ları logger'a ekliyoruz
+logger.addHandler(konsol_handler)
+logger.addHandler(dosya_handler)
+
+# 3. Logları Yazdırma
+logger.info("Uygulama başarıyla başlatıldı.")
+logger.debug("Veritabanı bağlantısı detayları yükleniyor...")
+logger.warning("Bellek kullanımı %80 sınırını aştı!")
+
+try:
+    1 / 0
+except ZeroDivisionError:
+    # exc_info=True hata izini (traceback) loga otomatik ekler
+    logger.error("Matematiksel hata oluştu!", exc_info=True)
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="typing">
+            <h2>20. Tip İpuçları & Statik Analiz (Typing)</h2>
+            <div class="sub">
+                <p>
+                    Python çalışma zamanında dinamik tipli kalmaya devam etse de, tip ipuçları (type hints) sayesinde `mypy` gibi araçlarla derleme öncesinde olası mantıksal tip hataları tespit edilebilir.
+                </p>
+                <ul>
+                    <li><strong>Union & Optional:</strong> `Union[int, str]` değişkenin int veya str olabileceğini belirtir. `Optional[int]` ise `Union[int, None]` ile aynı anlama gelir.</li>
+                    <li><strong>TypeVar (Generics):</strong> Herhangi bir tipi dinamik olarak korumak ve şablon (generic) yapılar oluşturmak için kullanılır.</li>
+                    <li><strong>Protocol:</strong> Java'daki Interface veya Go'daki struct interface mantığıdır. Statik ördek tipi (duck typing) kontrolü yapmayı sağlar.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>type_hints.py</span></div>
+                    <pre><code class="language-python">from typing import List, Dict, Tuple, Set, Optional, Union, Any, TypeVar, Protocol, TypedDict, Final
+
+# 1. Temel Belirtimler
+yas: int = 30
+aktif: bool = True
+sabit_deger: Final[str] = "DEĞİŞMEZ"
+
+# 2. Karmaşık Yapılar (Python 3.9+ uyumlu standart koleksiyonlarla belirtim)
+sayilar: List[int] = [1, 2, 3]
+kullanici_bilgi: Dict[str, Union[str, int]] = {"ad": "kutay", "yas": 25}
+opsiyonel_deger: Optional[float] = None # float veya None alabilir
+
+# 3. TypedDict (Sözlükler için yapısal şablon)
+class Kisi(TypedDict):
+    isim: str
+    yas: int
+
+kisi_1: Kisi = {"isim": "Ahmet", "yas": 28}
+
+# 4. TypeVar (Generics)
+T = TypeVar('T') # Herhangi bir jenerik tip
+
+def ilk_eleman(liste: List[T]) -> T:
+    return liste[0]
+
+# 5. Protocol (Yapısal Alttipler / Arayüzler)
+# Bu arayüze uyan nesnelerin 'uc' metoduna sahip olması gerekir
+class Ucurulabilir(Protocol):
+    def uc(self) -> str:
+        ...
+
+class Kus:
+    def uc(self) -> str:
+        return "Kuş uçuyor."
+
+def ucusa_gecir(nesne: Ucurulabilir):
+    print(nesne.uc())
+
+ucusa_gecir(Kus()) # Ucurulabilir protokolüne uyduğu için sorunsuzdur
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="datetime">
+            <h2>21. Tarih, Zaman & Performans Sayaçları</h2>
+            <div class="sub">
+                <p>
+                    Zaman damgası alma, iki tarih arasındaki farkı hesaplama ve sistem performansını hassas ölçme işlemleri için yerleşik kütüphaneler mevcuttur.
+                </p>
+                <ul>
+                    <li><strong>timedelta:</strong> Tarih veya zaman nesneleri üzerinde toplama, çıkarma ve fark alma işlemlerini gün/saniye bazında kolaylaştırır.</li>
+                    <li><strong>strftime & strptime:</strong>
+                        <ul>
+                            <li>`strftime` (String From Time): Tarih nesnesini belirtilen formatta metne (str) çevirir.</li>
+                            <li>`strptime` (String Parse Time): Metin halindeki tarihi parse ederek nesneye dönüştürür.</li>
+                        </ul>
+                    </li>
+                    <li><strong>perf_counter():</strong> CPU bazlı çok yüksek hassasiyetli bir zaman sayacıdır. Fonksiyon çalışma sürelerini ölçmek (benchmark) için `time.time()` yerine her zaman bu kullanılmalıdır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>date_time_perf.py</span></div>
+                    <pre><code class="language-python">from datetime import datetime, timedelta, date
+import time
+from zoneinfo import ZoneInfo # Python 3.9+ dahili zaman dilimleri
+
+# 1. datetime ve timedelta İşlemleri
+simdi = datetime.now()
+yarim_saat_sonra = simdi + timedelta(minutes=30)
+dun = date.today() - timedelta(days=1)
+
+print("Şimdi:", simdi)
+print("Fark:", yarim_saat_sonra - simdi)
+
+# 2. Tarih Formatlama ve Ayrıştırma (strftime / strptime)
+formatli_metin = simdi.strftime("%Y-%m-%d %H:%M:%S")
+print("Strftime:", formatli_metin)
+
+tarih_metni = "2026-06-12 15:30:00"
+ayristirilmis_tarih = datetime.strptime(tarih_metni, "%Y-%m-%d %H:%M:%S")
+
+# 3. Zaman Dilimleri (ZoneInfo - Python 3.9+)
+istanbul_zamani = datetime.now(ZoneInfo("Europe/Istanbul"))
+utc_zamani = datetime.now(ZoneInfo("UTC"))
+print("İstanbul:", istanbul_zamani)
+
+# 4. perf_counter() ile Performans Analizi
+baslangic = time.perf_counter()
+
+# Zaman alacak örnek döngü
+toplam = sum(x*x for x in range(1000000))
+
+bitis = time.perf_counter()
+print(f"Çalışma Süresi: {bitis - baslangic:.6f} saniye")
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="math">
+            <h2>22. Matematik, İstatistik & Hassas Sayılar</h2>
+            <div class="sub">
+                <p>
+                    Python standart matematik işlemleri için hızlı C tabanlı `math` modülünü, rastgelelik için `random` modülünü ve bilimsel/finansal hesaplamalar için özel sayı tiplerini sunar.
+                </p>
+                <ul>
+                    <li><strong>Decimal vs Float:</strong> Float veri tipi ikilik tabanda (binary) ondalık değer sakladığı için `0.1 + 0.2` gibi işlemlerde hassasiyet hatası verir. Finansal uygulamalarda kusursuz ondalık duyarlılık sağlamak için `decimal.Decimal` sınıfı kullanılmalıdır.</li>
+                    <li><strong>Fraction:</strong> Rasyonel sayıları pay ve payda şeklinde kayıpsız olarak saklar (örn: `1/3`).</li>
+                    <li><strong>Random:</strong> Kriptografik amaçlı olmayan rastgele sayı üreticidir. Şifreleme veya güvenlik için kriptografik `secrets` modülü tercih edilmelidir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>math_precision.py</span></div>
+                    <pre><code class="language-python">import math
+import random
+import statistics
+from decimal import Decimal
+from fractions import Fraction
+
+# 1. Float Duyarlılık Sorunu ve Decimal Çözümü
+float_toplam = 0.1 + 0.2
+print("Float Toplam:", float_toplam) # 0.30000000000000004 -> HATA!
+
+# Decimal için sayılar string olarak girilmelidir
+decimal_toplam = Decimal("0.1") + Decimal("0.2")
+print("Decimal Toplam:", decimal_toplam) # 0.3 -> KUSURSUZ!
+
+# 2. Fraction (Rasyonel Sayılar)
+r1 = Fraction(1, 3)
+r2 = Fraction(1, 6)
+print("Rasyonel Toplam:", r1 + r2) # 1/2
+
+# 3. Math ve İstatistik Fonksiyonları
+print("Faktöriyel:", math.factorial(5)) # 120
+print("GCD (EBOB):", math.gcd(48, 60))  # 12
+
+sayilar = [1, 2, 2, 3, 4, 10]
+print("Ortalama:", statistics.mean(sayilar))
+print("Medyan:", statistics.median(sayilar))
+print("Standart Sapma:", statistics.stdev(sayilar))
+
+# 4. Random İşlemleri ve Seed kullanımı
+random.seed(42) # Sonuçların tekrarlanabilir olmasını sağlar
+print("Rastgele Seçim:", random.choice(["Elma", "Armut", "Muz"]))
+
+dizi = [1, 2, 3, 4, 5]
+random.shuffle(dizi) # Yerinde karıştırır
+print("Karıştırılmış:", dizi)
+
+print("Rastgele Örneklem (2 Eleman):", random.sample(dizi, 2))
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="fstrings">
+            <h2>23. F-Strings & Gelişmiş Metin Biçimlendirme</h2>
+            <div class="sub">
+                <p>
+                    Python'da metin formatlama tarihsel süreçte `%` operatörü, `.format()` metodu ve son olarak Python 3.6 ile eklenen **f-string** yapısı olarak gelişmiştir. f-string en hızlı ve en okunaklı yöntemdir.
+                </p>
+                <ul>
+                    <li><strong>Format Specifiers:</strong> Sayıların ondalık basamak sınırlarını belirleme (`.2f`), hizalama, karakter dolgusu ekleme ve binlik ayracı (virgül) atama işlemlerini doğrudan string içinde yapmayı sağlar.</li>
+                    <li><strong>F-string Debug (x=):</strong> Python 3.8+ ile gelen bu özellik sayesinde `f"{degisken=}"` ifadesi, konsola `degisken=deger` şeklinde çıktı verir. Hızlı hata ayıklamada loglama için mükemmeldir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>formatting_fstrings.py</span></div>
+                    <pre><code class="language-python"># 1. Biçimlendirme Yöntemlerinin Evrimi
+isim = "Kutay"
+# Eski tarz % (C formatı)
+yontem1 = "Merhaba %s" % isim
+# format() metodu
+yontem2 = "Merhaba {}".format(isim)
+# Modern f-string
+yontem3 = f"Merhaba {isim}"
+
+# 2. Format Belirleyiciler (Width, Precision, Alignment)
+pi = 3.14159265
+yazdir_pi = f"Pi sayısı: {pi:.3f}" # Ondalık sınırı -> '3.142'
+
+buyuk_sayi = 1000000000
+print(f"Binlik Ayracı: {buyuk_sayi:,}") # '1,000,000,000'
+
+# Hizalama: '>' sağa, '<' sola, '^' ortalar. Genişlik: 15 karakter. Dolgu: '_'
+hizali = f"{isim:_^15}" # '_____Kutay_____'
+print(hizali)
+
+# 3. f-string Debug Modu (Python 3.8+)
+en = 10
+boy = 20
+# Değişken adını ve değerini birlikte basar
+print(f"{en=}, {boy=}, alan={en*boy}") # en=10, boy=20, alan=200
+
+# 4. f-string İçinde İfadeler ve Metot Çağrıları
+print(f"Büyük Harf: {isim.upper()}")
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="comprehensions">
+            <h2>24. Comprehensions (Tek Satırda Koleksiyonlar)</h2>
+            <div class="sub">
+                <p>
+                    Python, döngüleri ve koşul ifadelerini tek bir satırda birleştirerek list, dict ve set yapılarını hızlı ve optimize şekilde üretmeyi sağlayan syntax yapısına sahiptir.
+                </p>
+                <ul>
+                    <li><strong>List Comprehension:</strong> Listenin doğrudan tek satırda oluşturulmasıdır. Arka planda optimize edilmiş byte-code çalıştırır ve klasik döngüye göre daha hızlıdır.</li>
+                    <li><strong>Dict & Set Comprehension:</strong> Benzer mantıkla süslü parantez `{}` ile sırasıyla anahtar-değer veya eşsiz küme üretimi yapar.</li>
+                    <li><strong>Walrus Operatörü ile Kullanım:</strong> Hesaplama maliyeti yüksek fonksiyon sonuçlarının filtre ve atama aşamalarında tekrar hesaplanmasını önlemek amacıyla comprehension içinde walrus operatörü (`:=`) kullanılabilir.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>comprehensions_depth.py</span></div>
+                    <pre><code class="language-python"># 1. List, Set ve Dict Comprehension
+sayilar = [1, 2, 3, 4, 5, 6]
+
+# Çift sayıların karesi (List)
+kareler = [x**2 for x in sayilar if x % 2 == 0] # [4, 16, 36]
+
+# Set Comprehension (Eşsiz küme üretir)
+kume = {x % 3 for x in sayilar} # {0, 1, 2}
+
+# Dict Comprehension
+sozluk = {x: f"Sayı-{x}" for x in sayilar if x < 4} # {1: 'Sayı-1', 2: 'Sayı-2', 3: 'Sayı-3'}
+
+# 2. Nested (İç İçe) Comprehension
+# Çok boyutlu bir listeyi (matris) düzleştirme
+matris = [[1, 2], [3, 4], [5, 6]]
+duz_liste = [eleman for satir in matris for eleman in satir] # [1, 2, 3, 4, 5, 6]
+
+# 3. Walrus Operatörü ile Optimizasyon
+# Ağır hesaplama yapan bir fonksiyon simülasyonu
+def agir_hesapla(n):
+    return n * 3 + 1
+
+# Ağır fonksiyonun sonucunu 'y' içine atıp aynı satırda hem filtreliyor hem listeye ekliyoruz
+# Bu sayede agir_hesapla(n) fonksiyonu her n için 2 kere değil, sadece 1 kere çağrılır.
+sonuclar = [y for x in range(5) if (y := agir_hesapla(x)) > 5]
+print("Walrus Comprehension Sonucu:", sonuclar)
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="builtins">
+            <h2>25. Yerleşik Fonksiyonlar (Built-in Functions)</h2>
+            <div class="sub">
+                <p>
+                    Python import edilmeden doğrudan kullanılabilen zengin yerleşik (built-in) fonksiyonlar barındırır. Bunların doğru kullanımı temiz kod yazımı ve yüksek performans sağlar.
+                </p>
+                <ul>
+                    <li><strong>enumerate() & zip():</strong> `enumerate()` elemanla birlikte sırasını (indis) döner. `zip()` ise birden fazla iterable diziyi eşleştirerek indis bazlı birleştirir.</li>
+                    <li><strong>any() & all():</strong> `any()` dizideki en az bir eleman True ise True döner. `all()` ise tüm elemanların True olmasını şart koşar.</li>
+                    <li><strong>eval() & exec():</strong> Dinamik kod çalıştırma araçlarıdır. String halindeki kodları yürütürler. Güvenlik açığı yaratabileceği için kullanıcı girdisiyle asla kullanılmamalıdır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>builtins_usage.py</span></div>
+                    <pre><code class="language-python"># 1. Enumerate ve Zip Kullanımı
+isimler = ["Kutay", "Can", "Elif"]
+notlar = [90, 85, 95]
+
+# Enumerate
+for sira, ad in enumerate(isimler, start=1):
+    print(f"{sira}. Öğrenci: {ad}")
+
+# Zip ile eşleştirme
+for ad, notu in zip(isimler, notlar):
+    print(f"{ad} -> Notu: {notu}")
+
+# 2. Any ve All Mantığı
+durumlar = [True, False, True]
+print("Herhangi biri doğru mu?:", any(durumlar)) # True
+print("Hepsi doğru mu?:", all(durumlar))        # False
+
+# 3. Sıralama (Sorted ve Key kullanımı)
+sozluk_listesi = [{"ad": "A", "yas": 30}, {"ad": "B", "yas": 20}]
+# Yaşa göre sıralama yapıyoruz
+sirali = sorted(sozluk_listesi, key=lambda x: x["yas"])
+
+# 4. Dinamik Kod Çalıştırma (eval / exec) - GÜVENLİK UYARILI
+ifade = "2 * 5 + 3"
+print("Eval Sonucu:", eval(ifade)) # 13 (Basit ifadeler için)
+
+kod_blogu = """
+def dinamik_topla(a, b):
+    return a + b
+"""
+exec(kod_blogu) # Kod bloğunu derler ve çalışma zamanına ekler
+print("Dinamik topla:", dinamik_topla(5, 7)) # 12
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="venv">
+            <h2>26. Sanal Ortamlar & Bağımlılık Yönetimi</h2>
+            <div class="sub">
+                <p>
+                    Uygulamaların kullandığı paketlerin küresel (global) sistem kütüphanelerini kirletmesini engellemek ve sürüm çakışmalarının önüne geçmek için projeye özel izole sanal ortamlar kurulmalıdır.
+                </p>
+                <ul>
+                    <li><strong>venv (Python Dahili Modülü):</strong> Herhangi bir dış kütüphane gerektirmeden sistemdeki Python motoruyla izole bir klasör üretilmesini sağlar.</li>
+                    <li><strong>pip:</strong> Python paket indeksindeki (PyPI) paketleri indiren ve kuran paket yöneticisidir.</li>
+                    <li><strong>Poetry & Pipenv:</strong> requirements.txt yerine `pyproject.toml` veya `Pipfile` kullanarak bağımlılık ağacını çözen ve paket çakışmalarını engelleyen modern araçlardır.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>terminal_commands.sh</span></div>
+                    <pre><code class="language-python"># 1. Dahili venv ile Sanal Ortam Kurulumu
+python -m venv .venv
+
+# 2. Sanal Ortamı Aktif Etme (Aktive Edilince Terminal Başında (.venv) Görünür)
+# macOS / Linux için:
+source .venv/bin/activate
+# Windows için (CMD):
+.venv\Scripts\activate.bat
+# Windows için (PowerShell):
+.venv\Scripts\Activate.ps1
+
+# 3. Bağımlılık Yönetimi (Kurma, Listeleme, Dondurma)
+pip install requests
+pip freeze &gt; requirements.txt # Kurulu tüm paketleri sürümleriyle dosyaya yazar
+
+# Yeni bir ortamda requirements.txt dosyasındaki tüm paketleri kurma
+pip install -r requirements.txt
+
+# 4. Sanal Ortamdan Çıkış Yapma
+deactivate
+
+# 5. Modern Paket Yöneticisi (Poetry - Giriş Komutları)
+# poetry new my-project  -&gt; Yeni proje yapısı oluşturur
+# poetry add requests   -&gt; pyproject.toml'a paketi ekler ve izole kurar
+# poetry run python main.py -&gt; Sanal ortam içinde script çalıştırır
+</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="libraries">
+            <h2>27. Yaygın Python Kütüphaneleri</h2>
+            <div class="sub">
+                <p>
+                    Python'ı veri bilimi, web geliştirme, otomasyon ve makine öğrenmesinde dünya çapında baskın kılan en büyük etken, devasa açık kaynak ekosistemidir. Bu bölümde en çok kullanılan kütüphaneleri <strong>kategorilere ayırarak</strong> tanıtıyor, her biri için çalışan kod örnekleri sunuyoruz. Tüm kütüphaneler <code>pip install kütüphane_adı</code> ile kurulabilir.
+                </p>
+
+                <!-- ==================== 27.1 VERİ BİLİMİ ==================== -->
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">📊 27.1 — Veri Bilimi &amp; Analiz</h3>
+                <p style="margin-bottom:1rem;">Veri bilimi Python'ın en parlak alanıdır. Aşağıdaki üçlü (<strong>NumPy → Pandas → Matplotlib</strong>) neredeyse her projede birlikte kullanılır.</p>
+
+                <!-- NumPy -->
+                <h3 style="margin-top:1.5rem;">🔢 NumPy — Sayısal Hesaplama Temeli</h3>
+                <p>NumPy (Numerical Python), çok boyutlu diziler (<code>ndarray</code>) üzerinde C/Fortran hızında vektörel işlemler yapmanızı sağlar. Bilimsel hesaplamanın temel taşıdır; Pandas, Scikit-learn ve TensorFlow gibi tüm büyük kütüphaneler NumPy dizilerine dayanır.</p>
+                <ul>
+                    <li><strong>ndarray:</strong> Homojen, sabit boyutlu çok boyutlu dizi. Python listesinden 50x daha hızlıdır.</li>
+                    <li><strong>Broadcasting:</strong> Farklı boyuttaki dizileri otomatik genişleterek eleman bazlı işlem yapar.</li>
+                    <li><strong>Lineer Cebir:</strong> <code>np.linalg</code> modülü ile matris çarpımı, determinant, özdeğer hesapları.</li>
+                </ul>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>numpy_ornekleri.py</span></div>
+                    <pre><code class="language-python">import numpy as np
+
+# 1D ve 2D diziler oluşturma
+vektor = np.array([1, 2, 3, 4, 5])
+matris = np.array([[1, 2, 3], [4, 5, 6], [7, 8, 9]])
+
+# Vektörel işlemler (döngüsüz, C hızında)
+print("Kare:", vektor ** 2)           # [ 1  4  9 16 25]
+print("Toplam:", vektor.sum())         # 15
+print("Ortalama:", vektor.mean())      # 3.0
+print("Std Sapma:", vektor.std())      # 1.414...
+
+# Matris işlemleri
+print("Transpoze:\n", matris.T)
+print("Determinant:", np.linalg.det(matris))
+
+# Dilimleme ve filtreleme
+print("3'ten büyükler:", vektor[vektor > 3])  # [4 5]
+
+# Rastgele sayı üretimi
+rastgele = np.random.randn(3, 3)  # 3x3 standart normal dağılım
+print("Rastgele matris:\n", rastgele)
+
+# Broadcasting: Farklı boyutlu dizilerle işlem
+satir = np.array([10, 20, 30])
+sonuc = matris + satir  # Her satıra [10,20,30] eklenir
+print("Broadcasting sonucu:\n", sonuc)
+</code></pre>
+                </div>
+
+                <!-- Pandas -->
+                <h3 style="margin-top:2rem;">🐼 Pandas — Veri Analizi &amp; Manipülasyonu</h3>
+                <p>Pandas, tablo biçimindeki verileri yönetmek için <code>DataFrame</code> ve <code>Series</code> yapılarını sunar. CSV, Excel, SQL, JSON gibi kaynaklardan veri okuyup, filtreleme, gruplama, pivot tablo ve zaman serisi analizi yapabilirsiniz. Veri bilimcilerin %90'ının günlük olarak kullandığı kütüphanedir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>pandas_ornekleri.py</span></div>
+                    <pre><code class="language-python">import pandas as pd
+
+# DataFrame oluşturma (dict'ten)
+df = pd.DataFrame({
+    "İsim": ["Ahmet", "Elif", "Can", "Zeynep", "Ali"],
+    "Bölüm": ["Yazılım", "Veri", "Yazılım", "Veri", "Yazılım"],
+    "Maaş": [12000, 15000, 11000, 14000, 13000],
+    "Deneyim_Yıl": [3, 5, 2, 4, 3]
+})
+
+# Temel istatistikler
+print(df.describe())
+print("Ortalama maaş:", df["Maaş"].mean())
+
+# Filtreleme: Maaşı 12000'den fazla olanlar
+yuksek_maas = df[df["Maaş"] > 12000]
+print("Yüksek Maaşlılar:\n", yuksek_maas)
+
+# Gruplama ve toplama (GroupBy)
+bolum_ozet = df.groupby("Bölüm").agg(
+    ortalama_maas=("Maaş", "mean"),
+    toplam_kisi=("İsim", "count")
+)
+print("Bölüm Özeti:\n", bolum_ozet)
+
+# Sıralama
+print("Maaşa göre sıralı:\n", df.sort_values("Maaş", ascending=False))
+
+# Yeni sütun ekleme
+df["Yıllık_Maliyet"] = df["Maaş"] * 12
+
+# CSV'ye yazma ve okuma
+df.to_csv("calisanlar.csv", index=False)
+df_okunan = pd.read_csv("calisanlar.csv")
+</code></pre>
+                </div>
+
+                <!-- Matplotlib & Seaborn -->
+                <h3 style="margin-top:2rem;">📈 Matplotlib &amp; Seaborn — Veri Görselleştirme</h3>
+                <p><strong>Matplotlib</strong>, Python'ın en temel grafik kütüphanesidir; çizgi, çubuk, pasta, histogram ve scatter grafikleri çizebilirsiniz. <strong>Seaborn</strong> ise Matplotlib üzerine inşa edilmiş, istatistiksel grafikleri çok daha az kodla ve daha estetik üreten üst düzey bir kütüphanedir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>matplotlib_seaborn.py</span></div>
+                    <pre><code class="language-python">import matplotlib.pyplot as plt
+import numpy as np
+
+# --- Matplotlib: Temel Çizgi Grafiği ---
+x = np.linspace(0, 10, 100)  # 0-10 arası 100 nokta
+y = np.sin(x)
+
+plt.figure(figsize=(10, 5))
+plt.plot(x, y, color="#10B981", linewidth=2, label="sin(x)")
+plt.plot(x, np.cos(x), color="#38BDF8", linewidth=2, linestyle="--", label="cos(x)")
+plt.title("Trigonometrik Fonksiyonlar")
+plt.xlabel("x")
+plt.ylabel("y")
+plt.legend()
+plt.grid(alpha=0.3)
+plt.savefig("grafik.png", dpi=150)
+plt.show()
+
+# --- Matplotlib: Alt Grafikler (Subplots) ---
+fig, axes = plt.subplots(1, 3, figsize=(15, 4))
+
+axes[0].bar(["A", "B", "C"], [30, 50, 20], color=["#C084FC", "#10B981", "#38BDF8"])
+axes[0].set_title("Çubuk Grafik")
+
+axes[1].scatter(np.random.randn(50), np.random.randn(50), alpha=0.6)
+axes[1].set_title("Scatter (Saçılım)")
+
+axes[2].hist(np.random.randn(1000), bins=30, color="#C084FC", edgecolor="black")
+axes[2].set_title("Histogram")
+
+plt.tight_layout()
+plt.show()
+
+# --- Seaborn: Daha Az Kodla İstatistiksel Grafikler ---
+import seaborn as sns
+import pandas as pd
+
+df = pd.DataFrame({
+    "Bölüm": ["Yazılım"]*20 + ["Veri"]*20,
+    "Maaş": list(np.random.normal(12000, 2000, 20)) +
+            list(np.random.normal(15000, 2500, 20))
+})
+
+plt.figure(figsize=(8, 5))
+sns.boxplot(data=df, x="Bölüm", y="Maaş", palette="viridis")
+plt.title("Bölüme Göre Maaş Dağılımı")
+plt.show()
+</code></pre>
+                </div>
+
+                <!-- Scikit-learn -->
+                <h3 style="margin-top:2rem;">🤖 Scikit-learn — Makine Öğrenmesi</h3>
+                <p>Scikit-learn, klasik makine öğrenmesi algoritmalarını (sınıflandırma, regresyon, kümeleme, boyut indirgeme) tutarlı bir API altında sunar. <code>fit → predict → score</code> döngüsü ile hızlı deneyler yapabilirsiniz. Özellik mühendisliği, çapraz doğrulama ve pipeline gibi ileri düzey araçlar da barındırır.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>sklearn_ornek.py</span></div>
+                    <pre><code class="language-python">from sklearn.model_selection import train_test_split
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.metrics import accuracy_score, classification_report
+from sklearn.datasets import load_iris
+
+# Hazır veri seti yükleme
+iris = load_iris()
+X, y = iris.data, iris.target
+
+# Eğitim / test ayrımı (%80 eğitim, %20 test)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+# Model oluştur ve eğit
+model = RandomForestClassifier(n_estimators=100, random_state=42)
+model.fit(X_train, y_train)
+
+# Tahmin ve değerlendirme
+tahminler = model.predict(X_test)
+print("Doğruluk:", accuracy_score(y_test, tahminler))
+print(classification_report(y_test, tahminler,
+    target_names=iris.target_names))
+
+# Özellik önem sırası
+for isim, onem in zip(iris.feature_names, model.feature_importances_):
+    print(f"  {isim}: {onem:.4f}")
+</code></pre>
+                </div>
+
+                <!-- TensorFlow & PyTorch -->
+                <h3 style="margin-top:2rem;">🧠 TensorFlow &amp; PyTorch — Derin Öğrenme</h3>
+                <p><strong>TensorFlow</strong> (Google) ve <strong>PyTorch</strong> (Meta) derin öğrenme dünyasının iki temel çerçevesidir. Sinir ağları, CNN, RNN, Transformer gibi modelleri GPU üzerinde eğitmeyi sağlarlar. Araştırma alanında PyTorch baskınken, üretim ortamında ikisi de yaygın olarak kullanılır.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>deep_learning.py</span></div>
+                    <pre><code class="language-python"># --- PyTorch ile Basit Sinir Ağı ---
+import torch
+import torch.nn as nn
+import torch.optim as optim
+
+# Basit bir sınıflandırma modeli
+class BasitModel(nn.Module):
+    def __init__(self, girdi_boyut, cikti_boyut):
+        super().__init__()
+        self.katmanlar = nn.Sequential(
+            nn.Linear(girdi_boyut, 64),
+            nn.ReLU(),
+            nn.Dropout(0.2),
+            nn.Linear(64, 32),
+            nn.ReLU(),
+            nn.Linear(32, cikti_boyut)
+        )
+
+    def forward(self, x):
+        return self.katmanlar(x)
+
+# Model oluşturma
+model = BasitModel(girdi_boyut=4, cikti_boyut=3)
+optimizer = optim.Adam(model.parameters(), lr=0.001)
+kayip_fn = nn.CrossEntropyLoss()
+
+# Örnek eğitim döngüsü (pseudocode)
+# for epoch in range(100):
+#     tahmin = model(X_train_tensor)
+#     kayip = kayip_fn(tahmin, y_train_tensor)
+#     optimizer.zero_grad()
+#     kayip.backward()
+#     optimizer.step()
+
+print("Model mimarisi:\n", model)
+print("Toplam parametre:", sum(p.numel() for p in model.parameters()))
+
+# --- TensorFlow / Keras ile Eşdeğeri ---
+# import tensorflow as tf
+# model = tf.keras.Sequential([
+#     tf.keras.layers.Dense(64, activation='relu', input_shape=(4,)),
+#     tf.keras.layers.Dropout(0.2),
+#     tf.keras.layers.Dense(32, activation='relu'),
+#     tf.keras.layers.Dense(3, activation='softmax')
+# ])
+# model.compile(optimizer='adam', loss='sparse_categorical_crossentropy',
+#               metrics=['accuracy'])
+# model.fit(X_train, y_train, epochs=100, batch_size=16)
+</code></pre>
+                </div>
+
+                <!-- ==================== 27.2 WEB ==================== -->
+                <h3 style="margin-top:2.5rem; color: var(--accent-blue);">🌐 27.2 — Web Geliştirme</h3>
+                <p style="margin-bottom:1rem;">Python'da web geliştirme için üç ana çerçeve öne çıkar: minimalist <strong>Flask</strong>, tam donanımlı <strong>Django</strong> ve modern asenkron <strong>FastAPI</strong>.</p>
+
+                <!-- Flask -->
+                <h3 style="margin-top:1.5rem;">🧪 Flask — Minimalist Web Çerçevesi</h3>
+                <p>Flask, "micro-framework" felsefesiyle yalnızca temel bileşenleri sağlar: URL yönlendirme, şablon motoru (Jinja2) ve geliştirme sunucusu. Veritabanı, kimlik doğrulama gibi özellikler eklentilerle (extension) gelir. Küçük-orta projeler ve API'ler için idealdir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>flask_app.py</span></div>
+                    <pre><code class="language-python">from flask import Flask, jsonify, request
+
+app = Flask(__name__)
+
+# Basit GET endpoint
+@app.route("/")
+def ana_sayfa():
+    return "&lt;h1&gt;Merhaba Flask!&lt;/h1&gt;"
+
+# JSON dönen API endpoint'i
+@app.route("/api/kullanicilar")
+def kullanici_listesi():
+    kullanicilar = [
+        {"id": 1, "isim": "Ahmet", "rol": "admin"},
+        {"id": 2, "isim": "Elif", "rol": "kullanıcı"}
+    ]
+    return jsonify(kullanicilar)
+
+# Parametreli rota + POST
+@app.route("/api/kullanici/&lt;int:kullanici_id&gt;", methods=["GET", "PUT"])
+def kullanici_detay(kullanici_id):
+    if request.method == "PUT":
+        veri = request.get_json()
+        return jsonify({"güncellendi": kullanici_id, "veri": veri})
+    return jsonify({"id": kullanici_id, "isim": "Kullanıcı"})
+
+# Hata yakalama
+@app.errorhandler(404)
+def sayfa_bulunamadi(e):
+    return jsonify({"hata": "Sayfa bulunamadı"}), 404
+
+if __name__ == "__main__":
+    app.run(debug=True, port=5000)
+</code></pre>
+                </div>
+
+                <!-- FastAPI -->
+                <h3 style="margin-top:2rem;">⚡ FastAPI — Modern Asenkron API Çerçevesi</h3>
+                <p>FastAPI, Python tip ipuçlarını (type hints) kullanarak otomatik veri doğrulama, serileştirme ve <strong>OpenAPI/Swagger dokümantasyonu</strong> üretir. Asenkron (<code>async/await</code>) desteği sayesinde yüksek eşzamanlılık performansı sunar. Pydantic ile entegre çalışır.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>fastapi_app.py</span></div>
+                    <pre><code class="language-python">from fastapi import FastAPI, HTTPException, Query
+from pydantic import BaseModel, Field
+from typing import Optional
+
+app = FastAPI(title="Ürün API", version="1.0")
+
+# Pydantic şemaları (otomatik doğrulama)
+class UrunOlustur(BaseModel):
+    isim: str = Field(..., min_length=1, max_length=100)
+    fiyat: float = Field(..., gt=0, description="Sıfırdan büyük olmalı")
+    stok: int = Field(default=0, ge=0)
+    kategori: Optional[str] = None
+
+class UrunYanit(UrunOlustur):
+    id: int
+
+# Bellek içi depo (demo amaçlı)
+urunler: dict[int, dict] = {}
+sayac = 0
+
+@app.post("/urunler", response_model=UrunYanit, status_code=201)
+async def urun_olustur(urun: UrunOlustur):
+    global sayac
+    sayac += 1
+    urun_dict = {"id": sayac, **urun.model_dump()}
+    urunler[sayac] = urun_dict
+    return urun_dict
+
+@app.get("/urunler")
+async def urun_listele(
+    kategori: Optional[str] = Query(None, description="Kategoriye göre filtrele"),
+    limit: int = Query(10, ge=1, le=100)
+):
+    sonuclar = list(urunler.values())
+    if kategori:
+        sonuclar = [u for u in sonuclar if u.get("kategori") == kategori]
+    return sonuclar[:limit]
+
+@app.get("/urunler/{urun_id}", response_model=UrunYanit)
+async def urun_getir(urun_id: int):
+    if urun_id not in urunler:
+        raise HTTPException(status_code=404, detail="Ürün bulunamadı")
+    return urunler[urun_id]
+
+# Çalıştırma: uvicorn fastapi_app:app --reload
+# Swagger UI: http://localhost:8000/docs
+</code></pre>
+                </div>
+
+                <!-- Django -->
+                <h3 style="margin-top:2rem;">🏗️ Django — Tam Donanımlı Web Çerçevesi</h3>
+                <p>Django, "batteries-included" (her şey dahil) felsefesiyle gelir: ORM, admin paneli, kimlik doğrulama, form işleme, şablon motoru, güvenlik korumaları ve migration sistemi dahildir. Büyük ölçekli projeler (Instagram, Pinterest, Disqus) için tercih edilir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>django_ornek.py</span></div>
+                    <pre><code class="language-python"># Django Proje Yapısı ve Temel Kavramlar
+
+# 1. Proje oluşturma (terminal komutları):
+# django-admin startproject proje_adi
+# python manage.py startapp blog
+
+# 2. Model tanımı (blog/models.py)
+from django.db import models
+
+class Makale(models.Model):
+    baslik = models.CharField(max_length=200)
+    icerik = models.TextField()
+    yazar = models.ForeignKey("auth.User", on_delete=models.CASCADE)
+    yayin_tarihi = models.DateTimeField(auto_now_add=True)
+    aktif = models.BooleanField(default=True)
+
+    class Meta:
+        ordering = ["-yayin_tarihi"]
+        verbose_name_plural = "Makaleler"
+
+    def __str__(self):
+        return self.baslik
+
+# 3. View (blog/views.py)
+from django.shortcuts import render, get_object_or_404
+from django.http import JsonResponse
+
+def makale_listesi(request):
+    makaleler = Makale.objects.filter(aktif=True)
+    return render(request, "blog/liste.html", {"makaleler": makaleler})
+
+def makale_api(request):
+    makaleler = list(Makale.objects.values("id", "baslik", "yayin_tarihi"))
+    return JsonResponse(makaleler, safe=False)
+
+# 4. URL tanımı (blog/urls.py)
+from django.urls import path
+urlpatterns = [
+    path("makaleler/", makale_listesi, name="makale-liste"),
+    path("api/makaleler/", makale_api, name="makale-api"),
+]
+
+# 5. Yönetim komutları:
+# python manage.py makemigrations  → Migration dosyası üretir
+# python manage.py migrate         → Veritabanını günceller
+# python manage.py createsuperuser → Admin kullanıcı oluşturur
+# python manage.py runserver       → Geliştirme sunucusu başlatır
+</code></pre>
+                </div>
+
+                <!-- Requests & httpx -->
+                <h3 style="margin-top:2rem;">🔗 Requests &amp; httpx — HTTP İstemcileri</h3>
+                <p><strong>Requests</strong> Python'ın en çok indirilen kütüphanesidir; HTTP istekleri göndermeyi son derece basitleştirir. <strong>httpx</strong> ise Requests API'siyle uyumlu, aynı zamanda <code>async/await</code> desteği sunan modern alternatifidir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>http_istemciler.py</span></div>
+                    <pre><code class="language-python">import requests
+
+# --- Requests: Senkron HTTP ---
+
+# GET isteği
+yanit = requests.get("https://jsonplaceholder.typicode.com/posts/1")
+print("Durum Kodu:", yanit.status_code)  # 200
+print("JSON Yanıt:", yanit.json()["title"])
+
+# POST isteği
+yeni_veri = {"title": "Yeni Yazı", "body": "İçerik", "userId": 1}
+yanit = requests.post(
+    "https://jsonplaceholder.typicode.com/posts",
+    json=yeni_veri,
+    headers={"Authorization": "Bearer TOKEN"}
+)
+print("Oluşturuldu, ID:", yanit.json()["id"])
+
+# Hata kontrolü
+yanit.raise_for_status()  # 4xx/5xx ise HTTPError fırlatır
+
+# --- httpx: Asenkron HTTP ---
+import httpx
+import asyncio
+
+async def asenkron_istek():
+    async with httpx.AsyncClient() as client:
+        # Paralel istekler
+        gorevler = [
+            client.get(f"https://jsonplaceholder.typicode.com/posts/{i}")
+            for i in range(1, 6)
+        ]
+        yanitlar = await asyncio.gather(*gorevler)
+        for y in yanitlar:
+            print(f"Post {y.json()['id']}: {y.json()['title'][:30]}...")
+
+# asyncio.run(asenkron_istek())
+</code></pre>
+                </div>
+
+                <!-- ==================== 27.3 VERİTABANI ==================== -->
+                <h3 style="margin-top:2.5rem; color: var(--accent-blue);">🗄️ 27.3 — Veritabanı &amp; ORM</h3>
+
+                <!-- SQLAlchemy -->
+                <h3 style="margin-top:1.5rem;">🏛️ SQLAlchemy — Python'ın ORM Standartı</h3>
+                <p>SQLAlchemy, Python nesnelerini veritabanı tablolarına eşleyen güçlü bir <strong>ORM</strong> (Object-Relational Mapper) kütüphanesidir. PostgreSQL, MySQL, SQLite gibi birçok veritabanı ile çalışır. Hem düşük seviye SQL Expression Language hem de yüksek seviye ORM API'si sunar.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>sqlalchemy_ornek.py</span></div>
+                    <pre><code class="language-python">from sqlalchemy import create_engine, Column, Integer, String, Float, ForeignKey
+from sqlalchemy.orm import declarative_base, Session, relationship
+
+# Veritabanı bağlantısı (SQLite dosya tabanlı)
+engine = create_engine("sqlite:///magaza.db", echo=False)
+Base = declarative_base()
+
+# Model tanımları
+class Kategori(Base):
+    __tablename__ = "kategoriler"
+    id = Column(Integer, primary_key=True)
+    isim = Column(String(50), nullable=False, unique=True)
+    urunler = relationship("Urun", back_populates="kategori")
+
+class Urun(Base):
+    __tablename__ = "urunler"
+    id = Column(Integer, primary_key=True)
+    isim = Column(String(100), nullable=False)
+    fiyat = Column(Float, nullable=False)
+    kategori_id = Column(Integer, ForeignKey("kategoriler.id"))
+    kategori = relationship("Kategori", back_populates="urunler")
+
+    def __repr__(self):
+        return f"Urun(isim='{self.isim}', fiyat={self.fiyat})"
+
+# Tabloları oluştur
+Base.metadata.create_all(engine)
+
+# CRUD işlemleri
+with Session(engine) as session:
+    # CREATE
+    elektronik = Kategori(isim="Elektronik")
+    session.add(elektronik)
+    session.add(Urun(isim="Laptop", fiyat=25000, kategori=elektronik))
+    session.add(Urun(isim="Telefon", fiyat=15000, kategori=elektronik))
+    session.commit()
+
+    # READ: Sorgu örnekleri
+    tum_urunler = session.query(Urun).all()
+    pahali = session.query(Urun).filter(Urun.fiyat > 20000).first()
+    print("Pahalı ürün:", pahali)
+
+    # UPDATE
+    pahali.fiyat = 24000
+    session.commit()
+
+    # DELETE
+    # session.delete(pahali)
+    # session.commit()
+</code></pre>
+                </div>
+
+                <!-- ==================== 27.4 SCRAPING ==================== -->
+                <h3 style="margin-top:2.5rem; color: var(--accent-blue);">🕷️ 27.4 — Web Scraping &amp; Otomasyon</h3>
+
+                <!-- BeautifulSoup -->
+                <h3 style="margin-top:1.5rem;">🍜 BeautifulSoup — HTML/XML Ayrıştırma</h3>
+                <p>BeautifulSoup (bs4), HTML ve XML belgelerini parse ederek etiketlere, sınıflara ve niteliklere göre veri çekmenizi sağlar. Genellikle <code>requests</code> ile birlikte kullanılır: requests sayfayı indirir, BeautifulSoup içeriği parse eder.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>beautifulsoup_ornek.py</span></div>
+                    <pre><code class="language-python">from bs4 import BeautifulSoup
+import requests
+
+# Örnek HTML parse etme
+html = """
+&lt;html&gt;
+  &lt;body&gt;
+    &lt;h1 class="baslik"&gt;Python Rehberi&lt;/h1&gt;
+    &lt;div class="icerik"&gt;
+      &lt;ul id="konular"&gt;
+        &lt;li class="konu aktif"&gt;NumPy&lt;/li&gt;
+        &lt;li class="konu"&gt;Pandas&lt;/li&gt;
+        &lt;li class="konu"&gt;Flask&lt;/li&gt;
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+"""
+soup = BeautifulSoup(html, "html.parser")
+
+# Etiket ile arama
+baslik = soup.find("h1", class_="baslik")
+print("Başlık:", baslik.text)  # "Python Rehberi"
+
+# Çoklu eleman seçme (CSS selector)
+konular = soup.select("li.konu")
+for konu in konular:
+    aktif = "✓" if "aktif" in konu.get("class", []) else " "
+    print(f"  [{aktif}] {konu.text}")
+
+# Gerçek web sayfasından veri çekme
+# yanit = requests.get("https://example.com")
+# soup = BeautifulSoup(yanit.text, "html.parser")
+# baslıklar = soup.find_all("h2")
+</code></pre>
+                </div>
+
+                <!-- Scrapy -->
+                <h3 style="margin-top:2rem;">🕸️ Scrapy — Endüstriyel Web Kazıma Çerçevesi</h3>
+                <p>Scrapy, büyük ölçekli web kazıma projeleri için tasarlanmış tam bir çerçevedir. Asenkron I/O, otomatik sayfalama, veri pipeline'ları, middleware ve yerleşik rate-limiting gibi üretim seviyesi özellikler barındırır. Binlerce sayfa kazıma işlemlerinde BeautifulSoup'tan çok daha verimlidir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>scrapy_ornek.py</span></div>
+                    <pre><code class="language-python">import scrapy
+
+class HaberSpider(scrapy.Spider):
+    """Bir haber sitesinden başlıkları kazıyan örnek spider."""
+    name = "haber_spider"
+    start_urls = ["https://example-news.com/"]
+
+    # Her sayfadaki başlıkları çıkar
+    def parse(self, response):
+        for makale in response.css("article.haber-karti"):
+            yield {
+                "baslik": makale.css("h2::text").get(),
+                "ozet": makale.css("p.ozet::text").get(),
+                "link": makale.css("a::attr(href)").get(),
+            }
+
+        # Sayfalama: Sonraki sayfaya geç
+        sonraki = response.css("a.sonraki-sayfa::attr(href)").get()
+        if sonraki:
+            yield response.follow(sonraki, self.parse)
+
+# Çalıştırma (terminal):
+# scrapy crawl haber_spider -o haberler.json
+
+# Proje oluşturma:
+# scrapy startproject proje_adi
+# scrapy genspider spider_adi example.com
+</code></pre>
+                </div>
+
+                <!-- ==================== 27.5 DOĞRULAMA & SERİLEŞTİRME ==================== -->
+                <h3 style="margin-top:2.5rem; color: var(--accent-blue);">✅ 27.5 — Veri Doğrulama &amp; Serileştirme</h3>
+
+                <!-- Pydantic -->
+                <h3 style="margin-top:1.5rem;">🛡️ Pydantic — Tip Tabanlı Veri Doğrulama</h3>
+                <p>Pydantic, Python tip ipuçlarını kullanarak çalışma zamanında veri doğrulama, serileştirme ve ayar yönetimi sağlar. FastAPI'nin temelini oluşturur. Yanlış tipte veri geldiğinde otomatik dönüştürme yapar veya ayrıntılı hata mesajları üretir.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>pydantic_ornek.py</span></div>
+                    <pre><code class="language-python">from pydantic import BaseModel, Field, field_validator, model_validator
+from typing import Optional
+from datetime import datetime
+
+class Adres(BaseModel):
+    sokak: str
+    sehir: str
+    posta_kodu: str = Field(..., pattern=r"^\d{5}$")
+
+class Kullanici(BaseModel):
+    id: int
+    isim: str = Field(..., min_length=2, max_length=50)
+    eposta: str
+    yas: int = Field(default=18, ge=0, le=150)
+    adres: Optional[Adres] = None
+    kayit_tarihi: datetime = Field(default_factory=datetime.now)
+
+    # Özel alan doğrulayıcı
+    @field_validator("eposta")
+    @classmethod
+    def eposta_kontrol(cls, v):
+        if "@" not in v:
+            raise ValueError("Geçerli bir e-posta adresi giriniz")
+        return v.lower()
+
+    # Model seviyesinde doğrulama
+    @model_validator(mode="after")
+    def yas_kontrol(self):
+        if self.yas < 13:
+            raise ValueError("Kullanıcı 13 yaşından büyük olmalı")
+        return self
+
+# Başarılı doğrulama
+k = Kullanici(id=1, isim="Ahmet", eposta="AHMET@Mail.com", yas=25)
+print(k.model_dump())  # dict'e çevir
+print(k.model_dump_json(indent=2))  # JSON string
+
+# Hatalı veri → ValidationError
+try:
+    Kullanici(id="abc", isim="A", eposta="gecersiz", yas=-5)
+except Exception as e:
+    print("Doğrulama hataları:", e)
+</code></pre>
+                </div>
+
+                <!-- ==================== 27.6 CLI & GELİŞTİRİCİ ARAÇLARI ==================== -->
+                <h3 style="margin-top:2.5rem; color: var(--accent-blue);">🖥️ 27.6 — CLI &amp; Geliştirici Araçları</h3>
+
+                <!-- Click & Typer -->
+                <h3 style="margin-top:1.5rem;">⌨️ Click &amp; Typer — Komut Satırı Araçları</h3>
+                <p><strong>Click</strong>, dekoratör tabanlı CLI (Komut Satırı Arayüzü) oluşturmayı sağlar. <strong>Typer</strong> ise Click üzerine inşa edilmiş, Python tip ipuçlarını kullanarak daha az kodla CLI yaratan modern alternatiftir (FastAPI'nin CLI karşılığı).</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>cli_araclari.py</span></div>
+                    <pre><code class="language-python"># --- Typer ile Modern CLI ---
+import typer
+from typing import Optional
+from enum import Enum
+
+app = typer.Typer(help="Dosya yönetim aracı")
+
+class Format(str, Enum):
+    json = "json"
+    csv = "csv"
+    tablo = "tablo"
+
+@app.command()
+def listele(
+    dizin: str = typer.Argument(".", help="Listelenecek dizin"),
+    uzanti: Optional[str] = typer.Option(None, "--uzanti", "-u", help="Dosya uzantısı filtresi"),
+    detayli: bool = typer.Option(False, "--detayli", "-d", help="Detaylı çıktı"),
+    format: Format = typer.Option(Format.tablo, help="Çıktı formatı")
+):
+    """Dizindeki dosyaları listeler."""
+    typer.echo(f"📂 {dizin} dizini listeleniyor... (format: {format.value})")
+    if uzanti:
+        typer.echo(f"  Filtre: *.{uzanti}")
+
+@app.command()
+def sil(
+    dosya: str = typer.Argument(..., help="Silinecek dosya"),
+    onayla: bool = typer.Option(False, "--evet", "-y")
+):
+    """Dosya siler (onay gerektirir)."""
+    if not onayla:
+        onayla = typer.confirm(f"'{dosya}' silinsin mi?")
+    if onayla:
+        typer.echo(f"🗑️ {dosya} silindi.")
+    else:
+        typer.echo("İptal edildi.")
+        raise typer.Abort()
+
+# Çalıştırma: python cli_araclari.py listele --uzanti py --detayli
+if __name__ == "__main__":
+    app()
+</code></pre>
+                </div>
+
+                <!-- Rich -->
+                <h3 style="margin-top:2rem;">🎨 Rich — Zengin Terminal Çıktısı</h3>
+                <p>Rich, terminalde renkli metin, tablolar, progress bar, syntax highlighting, markdown render ve hata mesajı biçimlendirmesi gibi zengin çıktılar üretir. <code>print()</code> yerine <code>rich.print()</code> kullanarak anında renk ve biçim desteği kazanırsınız.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>rich_ornek.py</span></div>
+                    <pre><code class="language-python">from rich.console import Console
+from rich.table import Table
+from rich.progress import track
+from rich.panel import Panel
+from rich import print as rprint
+import time
+
+console = Console()
+
+# Renkli ve biçimlendirilmiş çıktı
+rprint("[bold green]Başarılı![/bold green] İşlem tamamlandı.")
+rprint("[red]Hata:[/red] Dosya bulunamadı.")
+rprint("[bold blue]Bilgi:[/bold blue] Yükleme [italic]devam ediyor[/italic]...")
+
+# Tablo oluşturma
+tablo = Table(title="🐍 Python Kütüphaneleri")
+tablo.add_column("Kütüphane", style="cyan", justify="left")
+tablo.add_column("Alan", style="magenta")
+tablo.add_column("Yıldız", justify="right", style="green")
+
+tablo.add_row("NumPy", "Bilimsel Hesaplama", "26k")
+tablo.add_row("Pandas", "Veri Analizi", "43k")
+tablo.add_row("FastAPI", "Web API", "78k")
+tablo.add_row("Rich", "Terminal UI", "50k")
+
+console.print(tablo)
+
+# Panel (kutucuk)
+console.print(Panel(
+    "[bold]Rich[/bold] ile terminal çıktılarınız\nprofesyonel görünür!",
+    title="💡 İpucu",
+    border_style="bright_blue"
+))
+
+# Progress bar
+for adim in track(range(10), description="İşleniyor..."):
+    time.sleep(0.1)
+</code></pre>
+                </div>
+
+                <!-- Pillow -->
+                <h3 style="margin-top:2rem;">🖼️ Pillow — Görüntü İşleme</h3>
+                <p>Pillow (PIL fork), Python'da görüntü açma, düzenleme, dönüştürme ve kaydetme işlemleri için kullanılan standart kütüphanedir. Kırpma, yeniden boyutlandırma, filtre uygulama, metin ekleme ve format dönüştürme gibi işlemleri destekler.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>pillow_ornek.py</span></div>
+                    <pre><code class="language-python">from PIL import Image, ImageFilter, ImageDraw, ImageFont
+
+# Görüntü açma ve bilgi
+img = Image.open("foto.jpg")
+print(f"Boyut: {img.size}, Format: {img.format}, Mod: {img.mode}")
+
+# Yeniden boyutlandırma (en-boy oranını koru)
+img.thumbnail((800, 600))
+
+# Kırpma (sol, üst, sağ, alt)
+kirpilmis = img.crop((100, 100, 500, 400))
+
+# Filtreler
+bulank = img.filter(ImageFilter.GaussianBlur(radius=5))
+keskin = img.filter(ImageFilter.SHARPEN)
+
+# Görüntü üzerine metin çizme
+cizim = ImageDraw.Draw(img)
+cizim.text((10, 10), "Python ile işlendi", fill="white")
+cizim.rectangle([50, 50, 200, 150], outline="red", width=3)
+
+# Format dönüştürerek kaydetme
+img.save("cikti.png", format="PNG", optimize=True)
+img.save("cikti.webp", format="WEBP", quality=85)
+
+# Toplu işlem örneği
+import os
+for dosya in os.listdir("fotolar/"):
+    if dosya.endswith((".jpg", ".png")):
+        im = Image.open(f"fotolar/{dosya}")
+        im.thumbnail((400, 400))
+        im.save(f"kucuk/{dosya}", quality=80)
+</code></pre>
+                </div>
+
+                <!-- Celery -->
+                <h3 style="margin-top:2rem;">📬 Celery — Dağıtık Görev Kuyruğu</h3>
+                <p>Celery, arka plan görevlerini (e-posta gönderme, rapor üretme, veri işleme) mesaj kuyruğu (Redis, RabbitMQ) üzerinden dağıtık olarak çalıştırmak için kullanılır. Zamanlı görevler (cron-like), yeniden deneme mekanizması ve zincirleme görev iş akışları destekler.</p>
+                <div class="code-wrapper">
+<button class="copy-btn">Kopyala</button>
+
+                    <div class="code-header"><span>celery_ornek.py</span></div>
+                    <pre><code class="language-python">from celery import Celery, chain, group
+
+# Celery uygulaması (Redis broker ile)
+app = Celery("gorevler", broker="redis://localhost:6379/0")
+
+# Basit görev tanımı
+@app.task(bind=True, max_retries=3)
+def eposta_gonder(self, alici, konu, icerik):
+    """Arka planda e-posta gönderir."""
+    try:
+        # E-posta gönderme kodu...
+        print(f"📧 {alici} adresine '{konu}' gönderildi")
+        return {"durum": "gönderildi", "alici": alici}
+    except Exception as exc:
+        # Hata durumunda 60 saniye sonra tekrar dene
+        raise self.retry(exc=exc, countdown=60)
+
+@app.task
+def rapor_olustur(veri_id):
+    """Ağır hesaplama gerektiren rapor üretimi."""
+    import time
+    time.sleep(10)  # Uzun süren işlem simülasyonu
+    return {"rapor_id": veri_id, "durum": "hazır"}
+
+# Görev çağırma (asenkron)
+# sonuc = eposta_gonder.delay("a@b.com", "Merhaba", "İçerik")
+# print(sonuc.id)       # Görev ID'si
+# print(sonuc.status)   # PENDING → SUCCESS
+# print(sonuc.get())    # Sonucu bekle ve al
+
+# Zamanlı görev (periyodik)
+app.conf.beat_schedule = {
+    "gunluk-rapor": {
+        "task": "gorevler.rapor_olustur",
+        "schedule": 86400.0,  # 24 saat (saniye)
+        "args": ("gunluk",)
+    }
+}
+</code></pre>
+                </div>
+
+                <!-- Özet Tablosu -->
+                <h3 style="margin-top:2.5rem; color: var(--accent);">📋 Kütüphane Özet Tablosu</h3>
+                <p style="margin-bottom: 1rem;">Aşağıda tüm kütüphanelerin hızlı karşılaştırma tablosunu bulabilirsiniz:</p>
+                <div style="overflow-x:auto;">
+                <table style="width:100%; border-collapse:collapse; font-size:0.9rem;">
+                    <thead>
+                        <tr style="background:var(--bg-code); border-bottom:2px solid var(--accent);">
+                            <th style="padding:10px 12px; text-align:left; color:var(--accent);">Kütüphane</th>
+                            <th style="padding:10px 12px; text-align:left; color:var(--accent);">Kategori</th>
+                            <th style="padding:10px 12px; text-align:left; color:var(--accent);">Kullanım Alanı</th>
+                            <th style="padding:10px 12px; text-align:left; color:var(--accent);">Kurulum</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>NumPy</strong></td>
+                            <td style="padding:8px 12px;">Veri Bilimi</td>
+                            <td style="padding:8px 12px;">Sayısal hesaplama, n-boyutlu diziler</td>
+                            <td style="padding:8px 12px;"><code>pip install numpy</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Pandas</strong></td>
+                            <td style="padding:8px 12px;">Veri Bilimi</td>
+                            <td style="padding:8px 12px;">Veri analizi, DataFrame, CSV/Excel</td>
+                            <td style="padding:8px 12px;"><code>pip install pandas</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Matplotlib</strong></td>
+                            <td style="padding:8px 12px;">Görselleştirme</td>
+                            <td style="padding:8px 12px;">Grafik çizimi, veri görselleştirme</td>
+                            <td style="padding:8px 12px;"><code>pip install matplotlib</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Seaborn</strong></td>
+                            <td style="padding:8px 12px;">Görselleştirme</td>
+                            <td style="padding:8px 12px;">İstatistiksel grafikler</td>
+                            <td style="padding:8px 12px;"><code>pip install seaborn</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Scikit-learn</strong></td>
+                            <td style="padding:8px 12px;">ML</td>
+                            <td style="padding:8px 12px;">Klasik makine öğrenmesi</td>
+                            <td style="padding:8px 12px;"><code>pip install scikit-learn</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>PyTorch</strong></td>
+                            <td style="padding:8px 12px;">Derin Öğrenme</td>
+                            <td style="padding:8px 12px;">Sinir ağları, GPU eğitimi</td>
+                            <td style="padding:8px 12px;"><code>pip install torch</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>TensorFlow</strong></td>
+                            <td style="padding:8px 12px;">Derin Öğrenme</td>
+                            <td style="padding:8px 12px;">Sinir ağları, üretim dağıtımı</td>
+                            <td style="padding:8px 12px;"><code>pip install tensorflow</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Flask</strong></td>
+                            <td style="padding:8px 12px;">Web</td>
+                            <td style="padding:8px 12px;">Minimalist web sunucu</td>
+                            <td style="padding:8px 12px;"><code>pip install flask</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>FastAPI</strong></td>
+                            <td style="padding:8px 12px;">Web</td>
+                            <td style="padding:8px 12px;">Asenkron REST API, Swagger</td>
+                            <td style="padding:8px 12px;"><code>pip install fastapi</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Django</strong></td>
+                            <td style="padding:8px 12px;">Web</td>
+                            <td style="padding:8px 12px;">Tam donanımlı web çerçevesi</td>
+                            <td style="padding:8px 12px;"><code>pip install django</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Requests</strong></td>
+                            <td style="padding:8px 12px;">HTTP</td>
+                            <td style="padding:8px 12px;">HTTP istemcisi</td>
+                            <td style="padding:8px 12px;"><code>pip install requests</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>SQLAlchemy</strong></td>
+                            <td style="padding:8px 12px;">Veritabanı</td>
+                            <td style="padding:8px 12px;">ORM, veritabanı yönetimi</td>
+                            <td style="padding:8px 12px;"><code>pip install sqlalchemy</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>BeautifulSoup</strong></td>
+                            <td style="padding:8px 12px;">Scraping</td>
+                            <td style="padding:8px 12px;">HTML ayrıştırma, veri kazıma</td>
+                            <td style="padding:8px 12px;"><code>pip install beautifulsoup4</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Scrapy</strong></td>
+                            <td style="padding:8px 12px;">Scraping</td>
+                            <td style="padding:8px 12px;">Büyük ölçekli web kazıma</td>
+                            <td style="padding:8px 12px;"><code>pip install scrapy</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Pydantic</strong></td>
+                            <td style="padding:8px 12px;">Doğrulama</td>
+                            <td style="padding:8px 12px;">Veri doğrulama, serileştirme</td>
+                            <td style="padding:8px 12px;"><code>pip install pydantic</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Typer</strong></td>
+                            <td style="padding:8px 12px;">CLI</td>
+                            <td style="padding:8px 12px;">Komut satırı araçları</td>
+                            <td style="padding:8px 12px;"><code>pip install typer</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Rich</strong></td>
+                            <td style="padding:8px 12px;">CLI</td>
+                            <td style="padding:8px 12px;">Zengin terminal çıktısı</td>
+                            <td style="padding:8px 12px;"><code>pip install rich</code></td>
+                        </tr>
+                        <tr style="border-bottom:1px solid var(--border-color);">
+                            <td style="padding:8px 12px;"><strong>Pillow</strong></td>
+                            <td style="padding:8px 12px;">Görüntü</td>
+                            <td style="padding:8px 12px;">Görüntü işleme, format dönüşümü</td>
+                            <td style="padding:8px 12px;"><code>pip install pillow</code></td>
+                        </tr>
+                        <tr>
+                            <td style="padding:8px 12px;"><strong>Celery</strong></td>
+                            <td style="padding:8px 12px;">Görev Kuyruğu</td>
+                            <td style="padding:8px 12px;">Arka plan görevleri, zamanlama</td>
+                            <td style="padding:8px 12px;"><code>pip install celery</code></td>
+                        </tr>
+                    </tbody>
+                </table>
+                </div>
+            </div>
+        </section><section class="section" id="gui">
+            <h2>28. Masaüstü (GUI) Uygulama Geliştirme</h2>
+            <div class="content-card">
+                <p>Python web ve veri bilimi kadar masaüstü arayüz (GUI) geliştirmede de oldukça güçlü araçlara sahiptir. Modern uygulamalar geliştirmek için birden çok kütüphane alternatifi bulunur.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">🖥️ 28.1 — PyQt6 / PySide6</h3>
+                <p>C++ tabanlı Qt framework'ünün Python bağlayıcısıdır. Endüstri standardı ve en profesyonel GUI geliştirme aracıdır. Native (yerel) işletim sistemi görünümü sunar.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>pyqt_ornek.py</span></div>
+                    <pre><code class="language-python">import sys
+from PyQt6.QtWidgets import QApplication, QWidget, QPushButton, QVBoxLayout
+
+def butona_tiklandi():
+    print("PyQt6 Butonuna Tıklandı!")
+
+app = QApplication(sys.argv)
+pencere = QWidget()
+pencere.setWindowTitle("PyQt6 Uygulaması")
+pencere.resize(300, 200)
+
+layout = QVBoxLayout()
+buton = QPushButton("Bana Tıkla")
+buton.clicked.connect(butona_tiklandi)
+
+layout.addWidget(buton)
+pencere.setLayout(layout)
+
+pencere.show()
+sys.exit(app.exec())</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">🎨 28.2 — Tkinter ve CustomTkinter</h3>
+                <p><strong>Tkinter</strong> Python'ın standart kütüphanesinde gelen (kurulum gerektirmeyen) arayüz kütüphanesidir. Ancak görünümü oldukça eskidir. <strong>CustomTkinter</strong> ise Tkinter üzerine modern ve karanlık mod destekli yepyeni bir görünüm giydiren modern bir alternatiftir.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>customtkinter_ornek.py</span></div>
+                    <pre><code class="language-python">import customtkinter as ctk
+
+# Tema ayarları
+ctk.set_appearance_mode("dark")
+ctk.set_default_color_theme("blue")
+
+app = ctk.CTk()
+app.geometry("400x240")
+app.title("Modern Tkinter Uygulaması")
+
+def butona_tiklandi():
+    print("CustomTkinter Butonuna Tıklandı!")
+
+buton = ctk.CTkButton(master=app, text="Modern Buton", command=butona_tiklandi)
+buton.place(relx=0.5, rely=0.5, anchor=ctk.CENTER)
+
+app.mainloop()</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="wasm">
+            <h2>29. Tarayıcıda Python (WebAssembly / PyScript)</h2>
+            <div class="content-card">
+                <p>Python geleneksel olarak bir arka plan (backend) veya sistem dili olmuştur. Ancak <strong>WebAssembly (Wasm)</strong> sayesinde artık tarayıcıda doğrudan, sunucuya ihtiyaç duymadan çalışabilmektedir.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">🕸️ 29.1 — PyScript Nedir?</h3>
+                <p>PyScript, kullanıcıların HTML içinde standart Python kodunu <code>&lt;py-script&gt;</code> veya benzeri etiketlerle yazmasına olanak tanıyan, Anaconda tarafından geliştirilmiş bir framework'tür. Arka planda <strong>Pyodide</strong> (C-Python'ın WebAssembly'ye derlenmiş hali) kullanır.</p>
+                
+                <div class="code-block">
+                    <div class="code-header"><span>index.html (PyScript Örneği)</span></div>
+                    <pre><code class="language-html">&lt;!DOCTYPE html&gt;
+&lt;html lang="tr"&gt;
+&lt;head&gt;
+    &lt;meta charset="UTF-8"&gt;
+    &lt;title&gt;PyScript Demo&lt;/title&gt;
+    &lt;!-- PyScript kütüphanesini dahil ediyoruz --&gt;
+    &lt;link rel="stylesheet" href="https://pyscript.net/latest/pyscript.css" /&gt;
+    &lt;script defer src="https://pyscript.net/latest/pyscript.js"&gt;&lt;/script&gt;
+&lt;/head&gt;
+&lt;body&gt;
+    &lt;h1&gt;Python Tarayıcıda Çalışıyor!&lt;/h1&gt;
+    
+    &lt;!-- HTML içine yazılan Python kodu --&gt;
+    &lt;py-script&gt;
+import datetime
+now = datetime.datetime.now()
+print(f"Şu anki zaman: {now.strftime('%Y-%m-%d %H:%M:%S')}")
+
+# DOM (Belge Nesne Modeli) manipülasyonu
+def butona_tiklandi(*args, **kwargs):
+    print("HTML Butonuna Python'dan tepki verildi!")
+    Element('sonuc').element.innerText = 'PyScript Harika!'
+    &lt;/py-script&gt;
+
+    &lt;button py-click="butona_tiklandi()"&gt;Tıkla&lt;/button&gt;
+    &lt;p id="sonuc"&gt;&lt;/p&gt;
+&lt;/body&gt;
+&lt;/html&gt;</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">📦 29.2 — Pyodide ile NumPy ve Pandas</h3>
+                <p>WebAssembly'nin en büyük avantajı sadece basit komutlar değil, aynı zamanda C uzantılı <strong>NumPy, Pandas ve Matplotlib</strong> gibi kütüphaneleri de tarayıcıya indirebilmesidir. Böylece veri bilimi uygulamaları tamamen istemci tarafında (tarayıcıda) çalıştırılabilir.</p>
+                <div class="info-box note">
+                    <div class="alert-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Neden Kullanmalı?
+                    </div>
+                    <p>Sunucu maliyetlerini düşürür, arka plana bağımlılığı ortadan kaldırır ve kullanıcı tarafında yüksek güvenlikli izole edilmiş bir (sandbox) ortam sağlar. Eğitim portalları veya statik sitelerde (GitHub Pages vs.) Python yetenekleri sunmak için biçilmiş kaftandır.</p>
+                </div>
+            </div>
+        </section><section class="section" id="security">
+            <h2>30. Python'da Güvenlik (Security Best Practices)</h2>
+            <div class="content-card">
+                <p>Uygulamalarınızda güvenlik açığına sebep olabilecek yaygın Python hatalarından kaçınmak profesyonel geliştirmenin ayrılmaz bir parçasıdır. Her zaman girdi doğrulaması yapmalı ve sistem seviyesindeki erişimlere dikkat etmelisiniz.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">🛡️ 30.1 — Tehlikeli Fonksiyonlardan Kaçınma</h3>
+                <p><code>eval()</code>, <code>exec()</code> veya <code>pickle</code> gibi yapılar, dışarıdan gelen (güvenilmeyen) verilerle çalıştırıldığında uygulamanızın tamamen ele geçirilmesine (Remote Code Execution - RCE) neden olabilir.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>guvenlik_uyarilari.py</span></div>
+                    <pre><code class="language-python"># ❌ KÖTÜ KULLANIM (Asla yapmayın)
+kullanici_girdisi = "__import__('os').system('rm -rf /')"
+# eval(kullanici_girdisi) # Sistemi yok edebilir!
+
+# ✅ İYİ KULLANIM (Sadece güvenli tip dönüşümü için ast.literal_eval kullanın)
+import ast
+guvenli_girdi = "[1, 2, 3]"
+liste = ast.literal_eval(guvenli_girdi)
+print(liste)</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">🔑 30.2 — Şifre ve Parola Yönetimi</h3>
+                <p>Parolaları asla düz metin (plain text) olarak saklamayın veya <code>random</code> modülünü güvenlik gerektiren kriptografik işlemler için kullanmayın. Bunun yerine <code>secrets</code> ve <code>passlib</code> (veya <code>bcrypt</code>) tercih edin.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>sifreleme_ornek.py</span></div>
+                    <pre><code class="language-python">import secrets
+import string
+import bcrypt
+
+# 1. Kriptografik Olarak Güvenli Rastgele Şifre Üretme
+alfabe = string.ascii_letters + string.digits + string.punctuation
+guvenli_sifre = ''.join(secrets.choice(alfabe) for i in range(16))
+print("Üretilen Güvenli Şifre:", guvenli_sifre)
+
+# 2. Şifreyi Hash'leme (Veritabanına kaydetmeden önce)
+# Bcrypt ile şifreyi tuzlayarak (salting) özetini çıkarma
+byte_sifre = "benim_gizli_sifrem_123".encode('utf-8')
+tuz = bcrypt.gensalt()
+hashli_sifre = bcrypt.hashpw(byte_sifre, tuz)
+
+# 3. Şifre Doğrulama (Login ekranında)
+girilen_sifre = "benim_gizli_sifrem_123".encode('utf-8')
+if bcrypt.checkpw(girilen_sifre, hashli_sifre):
+    print("Giriş Başarılı!")
+else:
+    print("Hatalı Şifre!")</code></pre>
+                </div>
+                
+                <div class="info-box note">
+                    <div class="alert-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Bandit Kullanımı
+                    </div>
+                    <p>Kodunuzdaki olası güvenlik açıklarını otomatik taramak için <code>pip install bandit</code> aracıyla kodlarınızı denetleyebilirsiniz: <code>bandit -r projem/</code></p>
+                </div>
+            </div>
+        </section><section class="section" id="adv-typing">
+            <h2>31. Gelişmiş Tip İpuçları (Advanced Typing)</h2>
+            <div class="content-card">
+                <p>Python her ne kadar dinamik tipli bir dil olsa da, büyük projelerde statik tip denetimi (Static Type Checking) hataları erken yakalamak için kritik öneme sahiptir. Temel tiplerin (<code>int</code>, <code>str</code> vb.) ötesine geçtiğimizde <code>typing</code> modülünün gelişmiş yapıları devreye girer.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">🦆 31.1 — Protocol (Duck Typing İçin)</h3>
+                <p>Python'da Duck Typing ("Eğer ördek gibi yürüyorsa ördektir") esastır. <code>Protocol</code>, kalıtıma gerek kalmadan nesnelerin belirli metotlara sahip olmasını zorunlu kılar (Go dilindeki arayüzler gibidir).</p>
+                <div class="code-block">
+                    <div class="code-header"><span>protocol_ornek.py</span></div>
+                    <pre><code class="language-python">from typing import Protocol
+
+class Ucabilir(Protocol):
+    def uc(self) -> str:
+        ...
+
+# Kalıtım (inheritance) yapmıyoruz! Sadece uc() metoduna sahip.
+class Kus:
+    def uc(self) -> str:
+        return "Kuş uçuyor 🐦"
+
+class Ucak:
+    def uc(self) -> str:
+        return "Uçak havalanıyor ✈️"
+
+# Bu fonksiyona sadece Ucabilir protokolüne uyan nesneler gelebilir.
+def ucur(nesne: Ucabilir) -> None:
+    print(nesne.uc())
+
+ucur(Kus())  # Geçerli
+ucur(Ucak()) # Geçerli</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">🧬 31.2 — Generic Sınıflar (TypeVar)</h3>
+                <p>Aynı veri yapısının farklı veri tipleriyle çalışmasını istiyorsanız Generic sınıfları kullanmalısınız.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>generic_ornek.py</span></div>
+                    <pre><code class="language-python">from typing import TypeVar, Generic, List
+
+# T adında genel tip değişkeni
+T = TypeVar('T')
+
+# Kutu sınıfı herhangi bir T tipiyle çalışabilir
+class Kutu(Generic[T]):
+    def __init__(self, icerik: T):
+        self._icerik = icerik
+    
+    def icerigi_al(self) -> T:
+        return self._icerik
+
+# String türünde kutu
+metin_kutusu = Kutu[str]("Merhaba")
+# Int türünde kutu
+sayi_kutusu = Kutu[int](42)</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="pypi-publish">
+            <h2>32. PyPI'da Kendi Paketimizi Yayınlama</h2>
+            <div class="content-card">
+                <p>Kendi yazdığınız faydalı kütüphaneleri veya araçları dünyayla paylaşmak için resmi Python paket deposu olan <strong>PyPI (Python Package Index)</strong> üzerine yükleyebilirsiniz. Bu sayede herkes uygulamanızı <code>pip install paket_adiniz</code> komutuyla indirebilir.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">📦 32.1 — Proje Dizin Yapısı</h3>
+                <p>Standart bir Python paketinin temel dizin mimarisi şu şekilde olmalıdır:</p>
+                <div class="code-block">
+                    <pre><code class="language-text">benim_paketim_projesi/
+├── src/
+│   └── benim_paketim/
+│       ├── __init__.py
+│       └── ana_modul.py
+├── tests/
+│   └── test_ana.py
+├── pyproject.toml    # ⚙️ Modern yapılandırma dosyası (setup.py yerine)
+├── README.md         # 📖 Projenin tanıtımı
+└── LICENSE           # 📜 Lisans türü (MIT, GPL vb.)</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">🛠️ 32.2 — pyproject.toml Yapılandırması</h3>
+                <p>Artık eski usül <code>setup.py</code> yerine modern <strong>build</strong> sistemleri (örneğin <em>Hatchling</em> veya <em>Setuptools</em>) ile <code>pyproject.toml</code> dosyası kullanılmaktadır.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>pyproject.toml</span></div>
+                    <pre><code class="language-toml">[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "benim_harika_paketim"
+version = "0.1.0"
+authors = [
+  { name="Adınız Soyadınız", email="mail@ornek.com" },
+]
+description = "Bu paket konsola renkli yazılar yazdırır."
+readme = "README.md"
+requires-python = "&gt;=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "rich&gt;=10.0.0",
+]</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">🚀 32.3 — Paketi Derleme ve Yükleme</h3>
+                <p>Paketi hazırladıktan sonra derleyip (build) PyPI sunucularına göndermek (upload) için sırasıyla şu iki komutu terminalinizde çalıştırmanız yeterlidir:</p>
+                <div class="code-block">
+                    <div class="code-header"><span>Terminal</span></div>
+                    <pre><code class="language-bash"># 1. Paketi derlemek için build aracını kurun ve çalıştırın
+python -m pip install --upgrade build
+python -m build
+
+# 2. Twine aracı ile derlenen (.whl ve .tar.gz) dosyaları PyPI'a yükleyin
+python -m pip install --upgrade twine
+python -m twine upload dist/*</code></pre>
+                </div>
+                <div class="info-box note">
+                    <div class="alert-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        TestPyPI Kullanımı
+                    </div>
+                    <p>Paketinizi direkt olarak gerçek PyPI'a yüklemeden önce, test amaçlı kurulan <strong>TestPyPI</strong> sunucusuna yükleyerek denemeler yapabilirsiniz. Bunun için upload komutuna <code>--repository testpypi</code> argümanını ekleyebilirsiniz.</p>
+                </div>
+            </div>
+        </section><section class="section" id="c-extensions">
+            <h2>33. C Uzantıları ve Cython (Performans)</h2>
+            <div class="content-card">
+                <p>Python'un yorumlanan bir dil olması matematiksel ve döngü ağırlıklı işlemlerde performans darboğazı yaratabilir. Bu durumda C hızında çalışan kütüphaneler yazmak veya mevcut Python kodunuzu C'ye derlemek hayat kurtarır.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">⚡ 33.1 — ctypes ile C Kütüphanesi Çağırma</h3>
+                <p>Python'ın yerleşik <code>ctypes</code> modülü, sistemde bulunan veya kendi yazdığınız (<code>.dll</code>, <code>.so</code>) C kütüphanelerindeki fonksiyonları çağırmanıza olanak tanır.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>ctypes_ornek.py</span></div>
+                    <pre><code class="language-python">import ctypes
+import os
+
+# İşletim sistemine göre C standart kütüphanesini yükle
+if os.name == 'nt':
+    libc = ctypes.cdll.msvcrt  # Windows
+else:
+    libc = ctypes.CDLL("libc.so.6")  # Linux/Mac
+
+# C'deki printf fonksiyonunu doğrudan çağıralım
+# ctypes ile C stringleri bayt (b"") formatında olmalıdır.
+libc.printf(b"Python'dan dogrudan C cagrisi yapildi!\\n")</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">🚀 33.2 — Cython ile C Hızına Ulaşmak</h3>
+                <p><strong>Cython</strong>, Python kodunuza statik tipler (ör. <code>cdef int</code>) ekleyerek kodun C koduna dönüşmesini ve makine dilinde derlenmesini sağlayan muazzam bir dildir.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>hesapla.pyx (Cython Kodu)</span></div>
+                    <pre><code class="language-python"># Saf Python ile yazılmış hali (Yavaş)
+# def topla_python(n):
+#     toplam = 0
+#     for i in range(n): toplam += i
+#     return toplam
+
+# Cython ile yazılmış C-Tipi hali (Çok Hızlı)
+cpdef long topla_cython(int n):
+    cdef long toplam = 0
+    cdef int i
+    for i in range(n):
+        toplam += i
+    return toplam</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="socket-prog">
+            <h2>34. Ağ (Socket) Programlama</h2>
+            <div class="content-card">
+                <p>Flask veya FastAPI gibi yüksek seviye web araçları arka planda soketlerle iletişim kurar. Python'ın <code>socket</code> modülü ile doğrudan işletim sistemi seviyesinde TCP/UDP bağlantıları kurabilir, kendi web sunucunuzu sıfırdan yazabilirsiniz.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">🔌 34.1 — Basit TCP İstemcisi (Client)</h3>
+                <div class="code-block">
+                    <div class="code-header"><span>tcp_client.py</span></div>
+                    <pre><code class="language-python">import socket
+
+# 1. AF_INET (IPv4), SOCK_STREAM (TCP) soketi oluştur
+istemci = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+
+# 2. Google'ın 80 (HTTP) portuna bağlan
+istemci.connect(('www.google.com', 80))
+
+# 3. HTTP GET isteği gönder (Veriler bayt (b"") olarak gönderilir)
+istemci.sendall(b"GET / HTTP/1.1\\r\\nHost: www.google.com\\r\\n\\r\\n")
+
+# 4. Yanıtı al (En fazla 4096 bayt oku)
+yanit = istemci.recv(4096)
+print(yanit.decode('utf-8'))
+
+# 5. Bağlantıyı kapat
+istemci.close()</code></pre>
+                </div>
+
+                <h3 style="margin-top:2rem;">📡 34.2 — Basit TCP Sunucusu (Server)</h3>
+                <div class="code-block">
+                    <div class="code-header"><span>tcp_server.py</span></div>
+                    <pre><code class="language-python">import socket
+
+sunucu = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+# Port kullanımda hatasını önlemek için (SO_REUSEADDR)
+sunucu.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
+
+# '0.0.0.0' tüm IP'lerden gelen bağlantılara açık, 9999 ise port
+sunucu.bind(('0.0.0.0', 9999))
+sunucu.listen(5) # Maksimum 5 bağlantıyı beklet
+
+print("Sunucu 9999 portunda dinliyor...")
+
+while True:
+    # İstemci bağlandığında kabul et
+    istemci_soketi, adres = sunucu.accept()
+    print(f"Bağlantı geldi: {adres}")
+    
+    # İstemciye merhaba mesajı gönder
+    istemci_soketi.sendall(b"Sunucudan Merhaba! Baglantiniz basarili.\\n")
+    istemci_soketi.close()</code></pre>
+                </div>
+            </div>
+        </section><section class="section" id="cicd-actions">
+            <h2>35. Sürekli Entegrasyon (CI/CD - GitHub Actions)</h2>
+            <div class="content-card">
+                <p>Profesyonel Python projelerinde kod kalitesini (linting) ve doğruluğunu (testing) her bir değişiklikte otomatik olarak kontrol etmek standart bir süreçtir. GitHub Actions bu işlemleri otomatikleştirmenin en popüler yoludur.</p>
+                
+                <h3 style="margin-top:2rem; color: var(--accent-blue);">🤖 35.1 — Otomatik Test ve Linting Pipeline'ı</h3>
+                <p>Aşağıdaki konfigürasyon dosyası (<code>.github/workflows/python-app.yml</code>), projenize her push yapıldığında veya Pull Request açıldığında kodunuzu otomatik olarak test eder.</p>
+                <div class="code-block">
+                    <div class="code-header"><span>python-app.yml</span></div>
+                    <pre><code class="language-yaml">name: Python Uygulamasi CI
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+
+    steps:
+    - uses: actions/checkout@v3
+    
+    - name: Python ${{ matrix.python-version }} kurulumu
+      uses: actions/setup-python@v3
+      with:
+        python-version: ${{ matrix.python-version }}
+        
+    - name: Bagimliliklari yukle
+      run: |
+        python -m pip install --upgrade pip
+        pip install flake8 pytest
+        if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+        
+    - name: Flake8 ile kod standartlarini denetle (Linting)
+      run: |
+        # syntax hatalari veya tanimsiz isimler varsa sureci durdur
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # uyari niteligindeki satirlar
+        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+        
+    - name: Pytest ile birim testleri (Unit Tests) calistir
+      run: |
+        pytest</code></pre>
+                </div>
+                <div class="info-box note">
+                    <div class="alert-title">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                        Neden Matrix Kullanıyoruz?
+                    </div>
+                    <p><code>matrix: python-version: ["3.9", "3.10", "3.11"]</code> sayesinde aynı kod aynı anda 3 farklı Python sürümü için izole makinelerde test edilir. Böylece uygulamanızın geriye dönük uyumluluğunu (backward compatibility) garanti altına alırsınız.</p>
+                </div>
+            </div>
+        </section>
+    </div>
+</div>
+
+<!-- 2. STICKY HEADER & SECTIONS PROGRESS BAR -->
+<div id="progressBar">
+    <div class="prog-bar-inner">
+        <div class="prog-fill" id="progFill"></div>
+    </div>
+    <div class="prog-text">
+        <span id="progSectionName">Bölüm - <strong>-</strong></span>
+        <span class="prog-val" id="progPercent">%0</span>
+    </div>
+</div>
+
+<!-- Scroll to Top -->
+<div class="scroll-top" id="scrollTop" title="Yukarı Çık">
+    <svg viewBox="0 0 48 48">
+        <circle cx="24" cy="24" r="22" stroke="var(--bg4)" stroke-width="2.5" fill="none"></circle>
+        <circle class="progress-ring" id="progressRing" cx="24" cy="24" r="22"></circle>
+    </svg>
+    <span>↑</span>
+</div>
+
+<script>
+    const keywords = {
+        'JVM': 'Java Virtual Machine - Java programlarını çalıştıran sanal makine',
+        'GIL': 'Global Interpreter Lock - CPython thread çalışma kilidi',
+        'ORM': 'Object-Relational Mapping - Veritabanı tablolarını sınıflara eşleme',
+        'Composition': 'Sınıfların diğer sınıfların nesnelerini içermesi (has-a ilişkisi)',
+        'Encapsulation': 'Veri gizleme ve koruma prensibi'
+    };
+
+    const contentSections = document.getElementById('contentSections');
+
+    // 2. Statistics Calculation
+    const calculateStats = () => {
+        document.getElementById('totalSectionsCount').innerText = `${document.querySelectorAll('.section').length} Bölüm`;
+    };
+    calculateStats();
+
+    // 3. Glossary & Tooltip System
+    const applyTooltips = () => {
+        const walk = document.createTreeWalker(contentSections, NodeFilter.SHOW_TEXT, null, false);
+        let node;
+        const replacements = [];
+        
+        while ((node = walk.nextNode())) {
+            if (node.parentNode.nodeName === 'CODE' || node.parentNode.nodeName === 'PRE' || node.parentNode.classList.contains('tooltip')) continue;
+            
+            let text = node.nodeValue;
+            let replaced = false;
+            let tempDiv = document.createElement('div');
+            
+            for (const [key, desc] of Object.entries(keywords)) {
+                const regex = new RegExp(`\\b(${key})\\b`, 'g');
+                if (regex.test(text)) {
+                    text = text.replace(regex, `<span class="tooltip" data-tip="${desc}">$1</span>`);
+                    replaced = true;
+                }
+            }
+            if (replaced) {
+                tempDiv.innerHTML = text;
+                replacements.push({ node, newNodes: Array.from(tempDiv.childNodes) });
+            }
+        }
+        
+        replacements.forEach(({ node, newNodes }) => {
+            const parent = node.parentNode;
+            newNodes.forEach(nn => parent.insertBefore(nn.cloneNode(true), node));
+            parent.removeChild(node);
+        });
+    };
+    applyTooltips();
+
+    // Copy Code Button
+    document.querySelectorAll('.copy-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            const code = e.target.nextElementSibling.innerText;
+            navigator.clipboard.writeText(code);
+            e.target.innerText = "Kopyalandı!";
+            e.target.style.background = "var(--accent)";
+            e.target.style.color = "#000";
+            
+            // Realistic Canvas Blue Fire Effect
+            const rect = e.target.getBoundingClientRect();
+            const canvas = document.createElement('canvas');
+            canvas.style.position = 'absolute';
+            canvas.style.left = `${rect.left + window.scrollX - 20}px`;
+            canvas.style.top = `${rect.top + window.scrollY - 60}px`;
+            canvas.style.width = `${rect.width + 40}px`;
+            canvas.style.height = `${rect.height + 60}px`;
+            canvas.style.pointerEvents = 'none';
+            canvas.style.zIndex = '1000';
+            document.body.appendChild(canvas);
+            
+            const dpr = window.devicePixelRatio || 1;
+            canvas.width = (rect.width + 40) * dpr;
+            canvas.height = (rect.height + 60) * dpr;
+            const ctx = canvas.getContext('2d');
+            ctx.scale(dpr, dpr);
+
+            const particles = [];
+            for (let i = 0; i < 45; i++) {
+                particles.push({
+                    x: 20 + Math.random() * rect.width,
+                    y: 60 + rect.height / 2,
+                    vx: (Math.random() - 0.5) * 1.2,
+                    vy: -(Math.random() * 2 + 1.5),
+                    life: Math.random() * 0.6 + 0.4,
+                    size: Math.random() * 10 + 5
+                });
+            }
+
+            const renderFire = () => {
+                ctx.clearRect(0, 0, canvas.width / dpr, canvas.height / dpr);
+                ctx.globalCompositeOperation = 'lighter';
+                
+                let active = false;
+                for (let p of particles) {
+                    if (p.life > 0) {
+                        active = true;
+                        p.x += p.vx;
+                        p.y += p.vy;
+                        p.life -= 0.012;
+                        
+                        const alpha = Math.max(0, p.life);
+                        const radius = Math.max(0, p.size * p.life);
+                        
+                        ctx.beginPath();
+                        ctx.arc(p.x, p.y, radius, 0, Math.PI * 2);
+                        
+                        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, radius);
+                        grad.addColorStop(0, `rgba(200, 255, 255, ${alpha})`);
+                        grad.addColorStop(0.2, `rgba(0, 150, 255, ${alpha * 0.8})`);
+                        grad.addColorStop(1, `rgba(0, 50, 255, 0)`);
+                        
+                        ctx.fillStyle = grad;
+                        ctx.fill();
+                    }
+                }
+                
+                if (active) {
+                    requestAnimationFrame(renderFire);
+                } else {
+                    canvas.remove();
+                }
+            };
+            requestAnimationFrame(renderFire);
+
+            setTimeout(() => {
+                e.target.innerText = "Kopyala";
+                e.target.style.background = "";
+                e.target.style.color = "";
+            }, 2000);
+        });
+    });
+
+    // 4. ScrollSpy & Progress Bar
+    const tocItems = document.querySelectorAll('.toc-item');
+    const sections = document.querySelectorAll('.section');
+    const progFill = document.getElementById('progFill');
+    const progSectionName = document.getElementById('progSectionName');
+    const progPercent = document.getElementById('progPercent');
+    const progressRing = document.getElementById('progressRing');
+    const scrollTopBtn = document.getElementById('scrollTop');
+
+    let scrollTimeout;
+
+    window.addEventListener('scroll', () => {
+        if(sections.length === 0) return;
+        let currentSection = sections[0];
+        let scrollY = window.scrollY;
+        
+        sections.forEach(sec => {
+            const secTop = sec.offsetTop - 200; // Offset for better UX
+            if (scrollY >= secTop) {
+                currentSection = sec;
+            }
+        });
+
+        // TOC active state & entering animation
+        tocItems.forEach(item => {
+            if (item.dataset.id === currentSection.id) {
+                if (!item.classList.contains('active')) {
+                    item.classList.add('toc-entering');
+                    setTimeout(() => item.classList.remove('toc-entering'), 300);
+                }
+                item.classList.add('active');
+            } else {
+                item.classList.remove('active', 'toc-entering');
+            }
+        });
+
+        // Bottom Progress Bar
+        const secHeight = currentSection.offsetHeight;
+        const secTop = currentSection.offsetTop;
+        const scrolledInSec = Math.max(0, scrollY - secTop + (window.innerHeight / 2));
+                let secPercent = Math.min(100, Math.max(0, Math.floor((scrolledInSec / secHeight) * 100)));
+        
+        // Ensure 100% when scrolled to the absolute bottom of the page
+        if (Math.ceil(scrollY + window.innerHeight) >= document.body.scrollHeight - 10) {
+            secPercent = 100;
+        }
+        
+        const h2 = currentSection.querySelector('h2');
+        if(h2) {
+            const titleText = h2.innerText;
+            const splitMatch = titleText.match(/^(\d+)\.\s*(.*)/);
+            if(splitMatch) {
+                progSectionName.innerHTML = `Bölüm ${splitMatch[1]} - <strong>${splitMatch[2]}</strong>`;
+            } else {
+                progSectionName.innerHTML = `Bölüm - <strong>${titleText}</strong>`;
+            }
+        }
+        
+        progPercent.innerText = `%${secPercent}`;
+        progFill.style.width = `${secPercent}%`;
+        
+        // Smooth CSS animation applied via gradientMove
+
+        // Scroll to top button & Ring (now using section progress)
+        const offset = 138.23 - (secPercent / 100) * 138.23;
+        progressRing.style.strokeDashoffset = offset;
+
+        if (scrollY > 400) {
+            scrollTopBtn.classList.add('visible');
+        } else {
+            scrollTopBtn.classList.remove('visible');
+        }
+    });
+
+        scrollTopBtn.addEventListener('click', () => {
+        if(sections.length === 0) return;
+        let currentSection = sections[0];
+        let scrollY = window.scrollY;
+        
+        sections.forEach(sec => {
+            if (scrollY >= sec.offsetTop - 200) {
+                currentSection = sec;
+            }
+        });
+        
+        // Scroll to the top of the current section, accounting for the top bar height
+        const headerOffset = 80;
+        window.scrollTo({ top: currentSection.offsetTop - headerOffset, behavior: 'smooth' });
+    });
+
+    // 5. Search Engine with Highlighting
+    const searchInput = document.getElementById('searchInput');
+
+    document.addEventListener('keydown', (e) => {
+        if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+            e.preventDefault();
+            searchInput.focus();
+        }
+    });
+
+    searchInput.addEventListener('input', (e) => {
+        const term = e.target.value.toLowerCase().trim();
+        
+        // Filter Sidebar
+        tocItems.forEach(item => {
+            const text = item.querySelector('.toc-text').innerText.toLowerCase();
+            if (term === '' || text.includes(term)) {
+                item.style.display = 'flex';
+            } else {
+                item.style.display = 'none';
+            }
+        });
+        
+        // Clear previous highlights
+        document.querySelectorAll('mark.search-hl').forEach(mark => {
+            const parent = mark.parentNode;
+            parent.replaceChild(document.createTextNode(mark.textContent), mark);
+            parent.normalize();
+        });
+
+        // Add new highlights if term is long enough
+        if (term.length >= 2) {
+            const walk = document.createTreeWalker(contentSections, NodeFilter.SHOW_TEXT, null, false);
+            let node;
+            const nodesToHighlight = [];
+            
+            while ((node = walk.nextNode())) {
+                if (node.parentNode.nodeName === 'CODE' || node.parentNode.nodeName === 'PRE' || node.parentNode.nodeName === 'MARK') continue;
+                if (node.nodeValue.toLowerCase().includes(term)) {
+                    nodesToHighlight.push(node);
+                }
+            }
+            
+            nodesToHighlight.forEach(n => {
+                // Escape term for regex
+                const escapedTerm = term.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                const regex = new RegExp(`(${escapedTerm})`, 'gi');
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = n.nodeValue.replace(regex, '<mark class="search-hl">$1</mark>');
+                
+                const parent = n.parentNode;
+                Array.from(tempDiv.childNodes).forEach(child => {
+                    parent.insertBefore(child.cloneNode(true), n);
+                });
+                parent.removeChild(n);
+            });
+        }
+    });
+
+    // 6. Theme Toggle (Sun/Moon)
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', (e) => {
+        document.body.classList.toggle('light-mode');
+        const isLight = document.body.classList.contains('light-mode');
+        if(isLight) {
+            themeToggle.innerText = '🌙';
+            themeToggle.title = 'Dark Mode';
+        } else {
+            themeToggle.innerText = '☀️';
+            themeToggle.title = 'Light Mode';
+        }
+        
+        // Fun Starry Burst Effect
+        const rect = e.target.getBoundingClientRect();
+        const x = (rect.left + rect.width / 2) / window.innerWidth;
+        const y = (rect.top + rect.height / 2) / window.innerHeight;
+        
+        confetti({
+            particleCount: 50,
+            spread: 360,
+            startVelocity: 30,
+            origin: { x, y },
+            colors: isLight ? ['#FFD43B', '#F59E0B'] : ['#E0E0E0', '#4B8BBE'],
+            ticks: 200,
+            gravity: 0.5,
+            shapes: ['circle'],
+            disableForReducedMotion: true
+        });
+    });
+    
+    // 7. Hero Title Fun Effect
+    const heroH1 = document.querySelector('.hero h1');
+    if (heroH1) {
+        heroH1.style.cursor = 'pointer';
+        heroH1.addEventListener('click', (e) => {
+            confetti({
+                particleCount: 150,
+                spread: 120,
+                origin: { x: e.clientX / window.innerWidth, y: e.clientY / window.innerHeight },
+                colors: ['#4B8BBE', '#FFD43B', '#F43F5E', '#34D399'],
+                disableForReducedMotion: true
+            });
+        });
+    }
+
+    // Initial trigger for progress bar
+    window.dispatchEvent(new Event('scroll'));
+</script>
+<!-- Prism.js Syntax Highlighter -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-python.min.js"></script>
+<!-- Canvas Confetti -->
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+</body>
+</html>

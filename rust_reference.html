@@ -1,0 +1,1488 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rust & Sistem Programlama Başvuru Rehberi</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0E0D0B;
+      --bg2: #151310;
+      --bg3: #1C1A16;
+      --bg4: #24211D;
+      --border: #332D26;
+      --border2: #4A4137;
+      --accent: #E57324;
+      --accent2: #B85618;
+      --cyan: #A7A19E;
+      --text: #E8E6E3;
+      --text-muted: #A19D98;
+    }
+
+    body.light-mode {
+      --bg: #F8F9FA;
+      --bg2: #FFFFFF;
+      --bg3: #F1F3F5;
+      --bg4: #E9ECEF;
+      --border: #DEE2E6;
+      --border2: #CED4DA;
+      --accent: #E57324;
+      --accent2: #B85618;
+      --cyan: #5C5957;
+      --text: #212529;
+      --text-muted: #495057;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      display: flex;
+      transition: background-color 0.3s, color 0.3s;
+      padding-bottom: 60px; /* Space for bottom progress bar */
+      overflow-x: hidden;
+    }
+
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+    }
+
+    /* Sidebar */
+    .sidebar {
+      width: 320px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      height: 100vh;
+      background: var(--bg2);
+      border-right: 1px solid var(--border);
+      padding: 1.5rem 1rem;
+      overflow-y: auto;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      z-index: 100;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .sidebar-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.25rem;
+      color: var(--accent);
+    }
+
+    #themeToggle {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      width: 36px;
+      height: 36px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      font-size: 1.2rem;
+    }
+
+    #themeToggle:hover {
+      background: var(--bg4);
+      border-color: var(--accent);
+    }
+
+    .search-box {
+      position: relative;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    .search-box input:focus {
+      border-color: var(--accent);
+    }
+
+    .toc {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+      margin-top: 0.5rem;
+    }
+
+    .toc-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      text-decoration: none;
+      color: var(--text-muted);
+      padding: 0.4rem 0.5rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      transition: all 0.3s ease;
+      position: relative;
+    }
+
+    .toc-item:hover {
+      background: var(--bg3);
+      color: var(--text);
+    }
+
+    .toc-item-content {
+      display: flex;
+      align-items: center;
+      flex: 1;
+      overflow: hidden;
+    }
+
+    .toc-num {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      opacity: 0.6;
+      margin-right: 0.75rem;
+      transition: all 0.3s;
+    }
+
+    .toc-title {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .toc-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--border2);
+      margin-left: 0.75rem;
+      transition: all 0.3s;
+      flex-shrink: 0;
+    }
+
+    /* Active State & ScrollSpy Animations */
+    .toc-item.active {
+      color: var(--accent);
+      background: var(--bg3);
+    }
+
+    .toc-item.active .toc-num {
+      color: var(--accent);
+      opacity: 1;
+    }
+
+    .toc-item.active .toc-dot {
+      background: var(--accent);
+      animation: dotPulse 1.5s infinite;
+    }
+
+    .toc-item.toc-entering {
+      animation: slideLeft 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    }
+
+    @keyframes slideLeft {
+      0% { transform: translateX(10px); opacity: 0.5; }
+      100% { transform: translateX(-5px); opacity: 1; }
+    }
+
+    @keyframes dotPulse {
+      0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 115, 36, 0.6); }
+      70% { transform: scale(1.5); box-shadow: 0 0 0 6px rgba(229, 115, 36, 0); }
+      100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(229, 115, 36, 0); }
+    }
+
+    /* Content Area */
+    .content {
+      margin-left: 320px;
+      padding: 3rem 4rem;
+      max-width: 1000px;
+      width: 100%;
+    }
+
+    .meta-header {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      margin-bottom: 2rem;
+    }
+
+    .read-time {
+      font-size: 0.9rem;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: var(--bg3);
+      padding: 0.5rem 1rem;
+      border-radius: 20px;
+      border: 1px solid var(--border);
+    }
+
+    .section {
+      margin-bottom: 6rem;
+      scroll-margin-top: 3rem;
+      opacity: 0;
+      transform: translateY(30px);
+      transition: all 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .section.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    .section h2 {
+      font-size: 2.2rem;
+      margin-bottom: 2rem;
+      color: var(--text);
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1rem;
+      display: flex;
+      align-items: baseline;
+      gap: 1rem;
+    }
+
+    .section h2 span {
+      color: var(--accent);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1.5rem;
+    }
+
+    .sub {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+    }
+
+    .sub p {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+    }
+
+    .card {
+      background: var(--bg2);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    }
+
+    .card:hover {
+      border-color: var(--accent);
+      transform: translateY(-5px);
+      box-shadow: 0 10px 30px rgba(229, 115, 36, 0.15);
+    }
+
+    .card h3 {
+      margin-bottom: 1rem;
+      color: var(--text);
+      font-size: 1.25rem;
+    }
+
+    /* Info Boxes */
+    .info-box {
+      margin: 1.5rem 0;
+      padding: 1.2rem 1.5rem;
+      border-left: 4px solid var(--accent);
+      background: var(--bg3);
+      border-radius: 0 8px 8px 0;
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+    .info-box.error {
+      border-left-color: #E03131;
+    }
+    .info-box.best-practice {
+      border-left-color: #2F9E44;
+    }
+    .info-box strong {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: var(--text);
+      font-size: 1.05rem;
+    }
+
+    /* Code Blocks */
+    .code-wrapper {
+      position: relative;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      overflow: hidden;
+      margin-top: 1rem;
+    }
+
+    .code-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      background: var(--bg4);
+      border-bottom: 1px solid var(--border);
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.8rem;
+      color: var(--text-muted);
+    }
+
+    .copy-btn {
+      background: transparent;
+      border: 1px solid var(--border2);
+      color: var(--text-muted);
+      border-radius: 4px;
+      padding: 0.3rem 0.6rem;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.75rem;
+      transition: all 0.2s;
+    }
+
+    .copy-btn:hover {
+      background: var(--accent);
+      color: var(--bg);
+      border-color: var(--accent);
+    }
+
+    pre {
+      margin: 0;
+      padding: 1.2rem;
+      overflow-x: auto;
+    }
+
+    code {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.9rem;
+      color: var(--text);
+    }
+
+    /* Syntax Highlighting */
+    .sh-keyword { color: var(--accent); font-weight: 500; }
+    .sh-string { color: var(--cyan); }
+    .sh-comment { color: var(--text-muted); font-style: italic; }
+    .sh-function { color: #F0C674; }
+    .sh-type { color: #81A2BE; }
+    .sh-macro { color: #B294BB; }
+
+    /* Glossary & Tooltip */
+    .glossary-term {
+      position: relative;
+      color: var(--accent);
+      cursor: help;
+      border-bottom: 1px dashed var(--accent);
+      transition: color 0.2s;
+      font-weight: 500;
+    }
+
+    .glossary-term:hover {
+      color: var(--accent2);
+    }
+
+    .glossary-tooltip {
+      position: absolute;
+      bottom: 120%;
+      left: 50%;
+      transform: translateX(-50%) translateY(10px);
+      background: var(--bg4);
+      border: 1px solid var(--border2);
+      padding: 0.75rem 1rem;
+      border-radius: 8px;
+      width: max-content;
+      max-width: 280px;
+      font-size: 0.85rem;
+      color: var(--text);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1000;
+      text-align: center;
+      pointer-events: none;
+      line-height: 1.4;
+      font-weight: 400;
+    }
+
+    .glossary-term:hover .glossary-tooltip {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .glossary-tooltip::after {
+      content: '';
+      position: absolute;
+      top: 100%;
+      left: 50%;
+      margin-left: -6px;
+      border-width: 6px;
+      border-style: solid;
+      border-color: var(--border2) transparent transparent transparent;
+    }
+
+    /* Bottom Progress Bar */
+    #progressBar {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 60px;
+      background: var(--bg2);
+      border-top: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      padding: 0 2rem;
+      z-index: 200;
+      gap: 2rem;
+      transition: background 0.3s, border-color 0.3s;
+    }
+
+    .prog-info {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      min-width: 300px;
+    }
+
+    .prog-num {
+      font-family: 'JetBrains Mono', monospace;
+      color: var(--accent);
+      font-weight: 600;
+      font-size: 1.3rem;
+      background: var(--bg3);
+      padding: 0.2rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid var(--border);
+    }
+
+    .prog-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      color: var(--text);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-size: 1.05rem;
+    }
+
+    .prog-track {
+      flex: 1;
+      height: 8px;
+      background: var(--bg4);
+      border-radius: 4px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .prog-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--accent);
+      border-radius: 4px;
+      transition: width 0.15s ease-out;
+      position: relative;
+      box-shadow: 0 0 12px var(--accent);
+    }
+
+    .prog-fill::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+      animation: movingGlow 1.5s infinite linear;
+    }
+
+    @keyframes movingGlow {
+      0% { transform: translateX(-100%); }
+      100% { transform: translateX(100%); }
+    }
+
+    .prog-percent {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 1rem;
+      color: var(--cyan);
+      min-width: 60px;
+      text-align: right;
+      font-weight: 500;
+    }
+
+    /* Scroll To Top Ring */
+    #scrollTop {
+      position: fixed;
+      bottom: 80px;
+      right: 30px;
+      width: 54px;
+      height: 54px;
+      cursor: pointer;
+      z-index: 150;
+      opacity: 0;
+      visibility: hidden;
+      transition: all 0.3s;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+    }
+
+    #scrollTop.visible {
+      opacity: 1;
+      visibility: visible;
+    }
+
+    #scrollTop:hover {
+      transform: translateY(-5px);
+      background: var(--bg4);
+      border-color: var(--accent);
+    }
+
+    .progress-ring {
+      position: absolute;
+      top: 1px;
+      left: 1px;
+      transform: rotate(-90deg);
+    }
+
+    .progress-ring__circle {
+      transition: stroke-dashoffset 0.1s linear;
+      stroke: var(--accent);
+    }
+
+    .arrow {
+      color: var(--text);
+      font-size: 1.2rem;
+      z-index: 1;
+    }
+
+    @media (max-width: 1024px) {
+      .sidebar { transform: translateX(-100%); transition: 0.3s; }
+      .content { margin-left: 0; padding: 2rem; max-width: 100%; }
+      #progressBar { padding: 0 1rem; }
+      .prog-info { min-width: auto; flex: 1; }
+      .prog-title { max-width: 150px; }
+      .prog-track { display: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <h2>Rust Reference</h2>
+      <button id="themeToggle" title="Temayı Değiştir">☀️</button>
+    </div>
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="Rehberde ara...">
+    </div>
+    <nav class="toc" id="tocNav">
+      <!-- Generated by JS -->
+    </nav>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="content">
+    <div class="meta-header">
+    </div>
+
+    <!-- 01 -->
+    <section class="section" id="s1" data-title="Bellek Yönetimi: Ownership">
+      <h2><span>01.</span> Bellek Yönetimi: Ownership (Mülkiyet) Sistemi</h2>
+      <div class="sub">
+        <p>Rust'ın bellek yönetme felsefesi geleneksel dillerden ayrılır. Çöp toplayıcı (Garbage Collector) veya manuel <code>free()</code> çağrıları yerine, sahiplik kuralları ve <strong>RAII (Resource Acquisition Is Initialization)</strong> prensibine dayanır. Veri kapsam (scope) dışına çıktığı an bellek otomatik olarak temizlenir.</p>
+        
+        <div class="card">
+          <h3>Üç Temel Ownership Kuralı</h3>
+          <ul>
+            <li>Rust'taki her değerin bir sahibi (<strong>owner</strong>) vardır.</li>
+            <li>Aynı anda sadece <strong>tek bir sahip</strong> olabilir.</li>
+            <li>Sahip kapsam (scope) dışına çıktığında, değer silinir (<strong>dropped</strong>).</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Move, Copy ve Clone Semantikleri</h3>
+          <p>Stack üzerinde yaşayan basit veriler kopyalanır (<strong>Copy</strong>), ancak heap üzerinde yaşayan veriler (örneğin <code>String</code>) varsayılan olarak taşınır (<strong>Move</strong>). Heap verisini derin kopyalamak istiyorsanız <strong>Clone</strong> kullanmalısınız.</p>
+          
+          <div class="info-box error">
+            <strong>Compile Error: Use of moved value</strong>
+            Taşınmış (moved) bir veriyi tekrar kullanmaya çalıştığınızda derleyici anında hata verir.
+          </div>
+
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>ownership.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>fn main() {
+    // 1. Copy Semantiği (Stack)
+    let x = 5;
+    let y = x; // x kopyalandı, ikisi de geçerli.
+
+    // 2. Move Semantiği (Heap)
+    let s1 = String::from("Rust");
+    let s2 = s1; // s1'in sahipliği s2'ye taşındı (moved)
+    
+    // println!("{}", s1); // HATA! s1 artık geçerli değil.
+
+    // 3. Clone Semantiği
+    let s3 = s2.clone(); // Derin kopya (Deep copy)
+    println!("s2: {}, s3: {}", s2, s3); // İkisi de geçerli
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 02 -->
+    <section class="section" id="s2" data-title="Ödünç Alma & Borrow Checker">
+      <h2><span>02.</span> Ödünç Alma (Borrowing) & Borrow Checker</h2>
+      <div class="sub">
+        <p>Her değerin sahipliğini transfer etmek yorucu olabilir. Referanslar (<code>&amp;</code>) aracılığıyla verilere geçici erişim hakkı sağlamaya <strong>Borrowing (Ödünç Alma)</strong> denir. Derleyicinin kalbi olan <strong>Borrow Checker</strong>, bu referansların kurallara uygunluğunu denetler.</p>
+        
+        <div class="card">
+          <h3>Kutsal Borrow Checker Kuralları</h3>
+          <p>Herhangi bir veri için aşağıdaki iki durumdan <strong>sadece biri</strong> geçerli olabilir:</p>
+          <ul>
+            <li>Sınırsız sayıda salt-okunur (immutable) referans (<code>&amp;T</code>).</li>
+            <li>Sadece <strong>bir adet</strong> değiştirilebilir (mutable) referans (<code>&amp;mut T</code>).</li>
+          </ul>
+          
+          <div class="info-box best-practice">
+            <strong>Aliasing + Mutation = Hata</strong>
+            Rust, aynı anda birden fazla okuyucuya izin verirken, yazıcı varken kimsenin okumasına veya başka bir yazıcının olmasına izin vermez. Bu mekanizma <strong>Data Race (Veri Yarışı)</strong> durumlarını tamamen derleme zamanında yok eder.
+          </div>
+
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>borrowing.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>fn main() {
+    let mut data = String::from("Sistem Programlama");
+
+    // Salt-okunur ödünç almalar (Sorunsuz)
+    let r1 = &amp;data;
+    let r2 = &amp;data;
+    println!("Okunanlar: {} ve {}", r1, r2);
+    // r1 ve r2'nin kapsamı burada biter
+
+    // Değiştirilebilir ödünç alma
+    let r3 = &amp;mut data;
+    r3.push_str(" (Rust)");
+    
+    // let r4 = &amp;data; // HATA! r3 aktifken okuma yapılamaz.
+    println!("Güncel: {}", r3);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 03 -->
+    <section class="section" id="s3" data-title="Yaşam Süreleri (Lifetimes)">
+      <h2><span>03.</span> Yaşam Süreleri (Lifetimes)</h2>
+      <div class="sub">
+        <p>Borrow Checker'ın en yakın arkadaşı <strong>Lifetimes</strong> mekanizmasıdır. Bir referansın işaret ettiği verinin bellekte ne kadar süreyle geçerli kalacağını belirler ve <strong>Dangling Pointer (Boşta Kalan Gösterici)</strong> hatalarını önler.</p>
+        
+        <div class="card">
+          <h3>Lifetime Elision ve Explicit Syntax</h3>
+          <p>Çoğu zaman derleyici örtülü ömür kuralları (<em>Lifetime Elision</em>) sayesinde referans ömürlerini kendi tahmin eder. Ancak tahmin edemediği durumlarda açık (explicit) olarak <code>&lt;'a&gt;</code> sözdizimi ile belirtilmesi gerekir.</p>
+
+          <div class="info-box error">
+            <strong>Dangling Reference</strong>
+            Bir veri kapsam dışına çıkıp yok edildiğinde, ona işaret eden bir referansın hala yaşamasına Rust izin vermez.
+          </div>
+
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>lifetimes.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>// 'a: Her iki parametrenin ve dönüş değerinin ömrünü birbirine bağlar
+fn longest&lt;'a&gt;(x: &amp;'a str, y: &amp;'a str) -&gt; &amp;'a str {
+    if x.len() > y.len() {
+        x
+    } else {
+        y
+    }
+}
+
+fn main() {
+    let string1 = String::from("uzun metin");
+    let result;
+    {
+        let string2 = String::from("kısa");
+        // result = longest(string1.as_str(), string2.as_str()); 
+        // HATA! string2 kapsam dışına çıkacağı için result dangling olur.
+    }
+    
+    // 'static ömrü: Programın sonuna kadar yaşar
+    let s: &amp;'static str = "Ben hep buradayım.";
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 04 -->
+    <section class="section" id="s4" data-title="Hata Yönetimi: Kayıpsız Güvenlik">
+      <h2><span>04.</span> Hata Yönetimi: Kayıpsız Güvenlik</h2>
+      <div class="sub">
+        <p>Rust'ta <code>null</code> değeri veya <code>try/catch</code> bloklu geleneksel <strong>Exceptions</strong> (İstisnalar) yoktur. Bunun yerine güçlü enum yapıları ve pattern matching vardır.</p>
+        
+        <div class="card">
+          <h3>Panics vs. Result/Option</h3>
+          <ul>
+            <li><strong>Kurtarılamaz Hatalar (Panic):</strong> <code>panic!("Hata!")</code> çağrılır. İşletim sistemi programı sonlandırır.</li>
+            <li><strong>Kurtarılabilir Hatalar (Result/Option):</strong> Hata durumu bir değer olarak döner, derleyici sizi onu işlemeye zorlar.</li>
+          </ul>
+
+          <div class="info-box best-practice">
+            <strong>Soru İşareti (?) Operatörü</strong>
+            Bir fonksiyondan Result/Option dönerken hata (Err/None) geldiyse işlemi anında durdurup hatayı bir üst kapsama fırlatmak (Error Propagation) için <code>?</code> operatörü en iyi pratiktir.
+          </div>
+
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>error_handling.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>use std::fs::File;
+use std::io::{self, Read};
+
+// Kurtarılabilir Hata: Result&lt;String, io::Error&gt; Döner
+fn read_username_from_file() -&gt; Result&lt;String, io::Error&gt; {
+    let mut username = String::new();
+    
+    // ? operatörü Err ise anında fonksiyondan çıkar ve hatayı döner
+    let mut file = File::open("hello.txt")?;
+    file.read_to_string(&amp;mut username)?;
+    
+    Ok(username) // Başarılı sonuç Ok() içine sarılır
+}
+
+fn main() {
+    // Pattern matching ile unwrap pratiği
+    match read_username_from_file() {
+        Ok(name) =&gt; println!("Kullanıcı adı: {}", name),
+        Err(e) =&gt; println!("Dosya okuma hatası: {}", e),
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 05 -->
+    <section class="section" id="s5" data-title="Akıllı Göstericiler">
+      <h2><span>05.</span> Akıllı Göstericiler (Smart Pointers)</h2>
+      <div class="sub">
+        <p>Referanslar (<code>&amp;</code>) sadece bellek adresi işaret ederken, <strong>Akıllı Göstericiler</strong> (Smart Pointers) metadata ve ekstra yeteneklere (örn. reference counting) sahiptir ve <strong>Drop trait</strong> ile belleği otomatik temizlerler.</p>
+        
+        <div class="card">
+          <h3>Box&lt;T&gt;: Heap Tahsisi</h3>
+          <p>Veriyi Stack yerine <strong>Heap</strong> bellekte tutmak için kullanılır. Özellikle derleme zamanında boyutu bilinmeyen (örn. <em>Recursive Types</em>) yapıları sarmalamak için idealdir.</p>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>box_example.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>// Recursive veri yapısı örneği (Linked List benzeri)
+enum List {
+    Cons(i32, Box&lt;List&gt;),
+    Nil,
+}
+
+use crate::List::{Cons, Nil};
+
+fn main() {
+    // Heap üzerinde saklanan iç içe yapı
+    let list = Cons(1, Box::new(Cons(2, Box::new(Nil))));
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Rc&lt;T&gt; ve Arc&lt;T&gt;: Çoklu Sahiplik</h3>
+          <p>Bazen bir verinin birden fazla sahibi olması gerekir. <strong>Rc (Reference Counted)</strong>, işaretçi sayısını sayarak veri kullanımda olduğu sürece heap'te tutar. Çok thread'li ortamlar için atomik versiyonu olan <strong>Arc (Atomic Reference Counted)</strong> kullanılır.</p>
+          
+          <div class="info-box error">
+            <strong>Compile Error: Rc Thread-Safe Değildir!</strong>
+            <code>Rc&lt;T&gt;</code>'yi başka bir thread'e taşımaya çalışırsanız derleyici "<code>Rc&lt;T&gt; cannot be sent between threads safely</code>" hatası verir.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>RefCell&lt;T&gt;: İçsel Değiştirilebilirlik (Interior Mutability)</h3>
+          <p>Değişmez (immutable) bir referans üzerinden veriyi değiştirmeye olanak tanır. Borrow Checker kurallarını derleme (compile) zamanından, <strong>çalışma (runtime)</strong> zamanına kaydırır.</p>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>refcell.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>use std::cell::RefCell;
+
+fn main() {
+    let data = RefCell::new(5);
+    
+    // Immutable değişken üzerinden mutable işlem yapma
+    *data.borrow_mut() += 10;
+    
+    println!("Sonuç: {}", data.borrow()); // Çıktı: 15
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 06 -->
+    <section class="section" id="s6" data-title="Eşzamanlılık (Concurrency)">
+      <h2><span>06.</span> Concurrency (Eşzamanlılık) & Send/Sync</h2>
+      <div class="sub">
+        <p>Rust'ın <strong>Korkusuz Eşzamanlılık (Fearless Concurrency)</strong> yaklaşımı, Data Race gibi klasik bug'ları tip sistemi ile derleme aşamasında tamamen engeller.</p>
+        
+        <div class="card">
+          <h3>Send ve Sync Marker Protokolleri</h3>
+          <ul>
+            <li><strong>Send:</strong> Bir veri tipinin sahipliği (ownership) başka bir thread'e güvenle aktarılabilir mi? (Çoğu tip <code>Send</code>'dir, ancak <code>Rc&lt;T&gt;</code> değildir.)</li>
+            <li><strong>Sync:</strong> Bir veri tipi birden fazla thread tarafından referans ile (<code>&amp;T</code>) güvenle okunabilir mi? (Bir tip <code>Sync</code> ise, <code>&amp;T</code> <code>Send</code>'dir.)</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Veri Paylaşım Kalıpları: Arc&lt;Mutex&lt;T&gt;&gt;</h3>
+          <p>Birden fazla thread'in aynı veriyi güvenle değiştirmesi için <strong>Shared State</strong> kullanılır. <code>Arc</code> çoklu referans sayımını sağlarken, <code>Mutex</code> (Mutual Exclusion) veriyi kilitleyerek Veri Yarışını (Data Race) engeller.</p>
+          
+          <div class="info-box best-practice">
+            <strong>Mutex Poisoning</strong>
+            Bir thread kilidi (lock) elinde tutarken panic olursa, Mutex zehirlenir (poisoned). Rust, <code>lock().unwrap()</code> ile sizi bu durumu yönetmeye zorlar.
+          </div>
+
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>concurrency.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>use std::sync::{Arc, Mutex};
+use std::thread;
+
+fn main() {
+    // Hem thread-safe referans sayacı (Arc) hem de kilit (Mutex)
+    let counter = Arc::new(Mutex::new(0));
+    let mut handles = vec![];
+
+    for _ in 0..10 {
+        let counter_clone = Arc::clone(&amp;counter);
+        let handle = thread::spawn(move || {
+            // Kilidi al ve veriyi değiştir (RAII: Scope sonunda kilit otomatik açılır)
+            let mut num = counter_clone.lock().unwrap();
+            *num += 1;
+        });
+        handles.push(handle);
+    }
+
+    for handle in handles {
+        handle.join().unwrap();
+    }
+
+    println!("Sonuç: {}", *counter.lock().unwrap()); // Çıktı: 10
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section class="section" id="s7" data-title="Traits, Generics & Polimorfizm">
+      <h2><span>07.</span> Traits, Generics & Polimorfizm</h2>
+      <div class="sub">
+        <p>Object-Oriented dillerdeki arayüzlere (Interfaces) benzeyen <strong>Traits</strong>, Rust'ta davranışları (behavior) tanımlar ve Polimorfizm sağlar.</p>
+        
+        <div class="card">
+          <h3>Statik Dağıtım vs Dinamik Dağıtım</h3>
+          <ul>
+            <li><strong>Statik Dağıtım (impl Trait):</strong> Derleme zamanında Monomorphization yapılarak her tip için özel fonksiyon üretilir. Sıfır maliyetlidir (Zero-cost abstraction) ama binary boyutunu artırır.</li>
+            <li><strong>Dinamik Dağıtım (dyn Trait):</strong> Çalışma zamanında (runtime) vtable mekanizması ile çözümlenir. Pointer (örn: <code>Box&lt;dyn Trait&gt;</code>) gerektirir, binary küçüktür ama ufak bir performans maliyeti vardır.</li>
+          </ul>
+        </div>
+
+        <div class="card">
+          <h3>Trait Bounds & Generics</h3>
+          <p>Jenerik fonksiyonları (Generics) belirli yeteneklere sahip tiplerle sınırlandırmak (kısıtlamak) için kullanılır.</p>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>traits.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>use std::fmt::Display;
+
+// where sentaksı ile temiz Trait Bounds kullanımı
+fn notify_and_print&lt;T, U&gt;(item: &amp;T, data: &amp;U) 
+    where T: Display + Clone,
+          U: Clone + std::fmt::Debug
+{
+    println!("Bildirim: {}", item);
+    println!("Data: {:?}", data);
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="section" id="s8" data-title="Unsafe Rust & FFI">
+      <h2><span>08.</span> Unsafe Rust & FFI (Foreign Function Interface)</h2>
+      <div class="sub">
+        <p>Rust'ın garanti ettiği bellek güvenliği her durumda yeterli olmayabilir. İşletim sistemiyle, C kütüphaneleriyle veya gömülü donanımlarla konuşurken <strong>Unsafe Rust</strong> kullanılır.</p>
+        
+        <div class="card">
+          <h3>Unsafe Rust'ın 5 Süper Gücü</h3>
+          <p>Derleyicinin emniyet kemerini çözdüğü yerler:</p>
+          <ol>
+            <li>Ham göstericilerin (<em>Raw Pointers</em>: <code>*const T</code>, <code>*mut T</code>) dereference edilmesi.</li>
+            <li>Unsafe fonksiyonların ve metotların çağrılması.</li>
+            <li>Mutable statik (global) değişkenlerin değiştirilmesi.</li>
+            <li>Unsafe trait'lerin implemente edilmesi.</li>
+            <li><code>union</code> alanlarına erişim sağlanması.</li>
+          </ol>
+          <div class="info-box best-practice">
+            <strong>Safe Wrapper Deseni</strong>
+            Hiçbir zaman doğrudan <code>unsafe</code> fonksiyonları kullanıcıya açmayın. Unsafe C kodlarını güvenli (Safe) bir Rust API'si (Wrapper) içine sararak bellek güvenliği ihlalini sınırlandırın.
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>FFI (C Kütüphanelerini Bağlama)</h3>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>ffi.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>// C dilinin abs() fonksiyonunu bağlıyoruz
+extern "C" {
+    fn abs(input: i32) -&gt; i32;
+}
+
+// Güvenli (Safe) Wrapper
+pub fn safe_abs(input: i32) -&gt; i32 {
+    // Unsafe bloğu sadece C sınırında (boundary) kullanıyoruz
+    unsafe {
+        abs(input)
+    }
+}
+
+// C uyumlu (C-compatible) Struct (Memory Layout)
+#[repr(C)]
+pub struct FfiStruct {
+    pub x: f32,
+    pub y: f32,
+}
+
+fn main() {
+    let result = safe_abs(-42);
+    println!("Mutlak değer: {}", result); // 42
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section class="section" id="s9" data-title="İleri Düzey Tür Sistemleri">
+      <h2><span>09.</span> İleri Düzey Tür Sistemleri & Lifetimes Kalıpları</h2>
+      <div class="sub">
+        <p>Rust'ın tip sistemi, derleme aşamasında en karmaşık kuralları bile ifade etmenize olanak tanır. State-machine'leri sadece tip sistemiyle doğrulamak bile mümkündür.</p>
+        
+        <div class="card">
+          <h3>PhantomData ve Tip Sistemi Hileleri</h3>
+          <p>Çalışma zamanında (runtime) bellekte <strong>0 byte</strong> yer kaplayan <code>PhantomData&lt;T&gt;</code>, sadece derleyiciye (statik analizör) "Ben T tipinde veya lifetime'ında bir veri taşıyor gibi davranıyorum" mesajı vermek için kullanılır.</p>
+          <div class="info-box best-practice">
+            <strong>Production Tip: State Typestate Pattern</strong>
+            Sistem durumlarını (örneğin "Açık Kapı" ve "Kapalı Kapı") Struct parametreleri olarak kodlayıp, geçersiz durum geçişlerini derleme anında durdurmak için PhantomData kullanılır.
+          </div>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>phantom.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>use std::marker::PhantomData;
+
+// State tipleri
+struct Draft;
+struct Published;
+
+// Makale yapısı o anki state'i tip sisteminde tutar
+struct Article&lt;State&gt; {
+    content: String,
+    state: PhantomData&lt;State&gt;,
+}
+
+impl Article&lt;Draft&gt; {
+    // Sadece Draft durumundayken publish yapılabilir
+    fn publish(self) -&gt; Article&lt;Published&gt; {
+        Article {
+            content: self.content,
+            state: PhantomData,
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Lifetime Bounds & Blanket Implementations</h3>
+          <p><code>T: 'a</code> sözdizimi, "T içindeki tüm referanslar en az 'a kadar yaşamalı" anlamına gelir. <strong>Blanket Implementations</strong> ise belirli bir koşulu sağlayan her tipe toplu olarak trait kazandırır (Örn: "Display implemente eden her şeye ToString kazandır").</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 10 -->
+    <section class="section" id="s10" data-title="Makrolar (Macros)">
+      <h2><span>10.</span> Makrolar & Metaprogramlama (Macros)</h2>
+      <div class="sub">
+        <p>Rust'ta "Makrolar kodu yazan koddur" (Metaprogramming). Fonksiyonlardan farklı olarak, makrolar parametre sayısında esnektir ve kodu AST seviyesinde değiştirir.</p>
+        
+        <div class="card">
+          <h3>Declarative Macros (Bildirimsel Makrolar)</h3>
+          <p><code>macro_rules!</code> kullanılarak yazılır. Match pattern'leri (expr, ident, tt vb.) ile token ağaçları işlenir.</p>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>declarative.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>macro_rules! create_hashmap {
+    ( $( $key:expr =&gt; $val:expr ),* ) =&gt; {
+        {
+            let mut map = std::collections::HashMap::new();
+            $(
+                map.insert($key, $val);
+            )*
+            map
+        }
+    };
+}
+
+fn main() {
+    let my_map = create_hashmap!(1 =&gt; "Bir", 2 =&gt; "İki");
+}</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Procedural Macros (Süreçsel Makrolar)</h3>
+          <p>Procedural makrolar, Rust kodunu bir <code>TokenStream</code> olarak alıp, derleme sırasında analiz eder ve yeni bir <code>TokenStream</code> üretir. En popüler kullanım alanları <code>#[derive(Serialize)]</code> veya <code>#[tokio::main]</code> gibi yapılardır. Bu işlem genellikle <code>syn</code> ve <code>quote</code> kütüphaneleriyle birlikte yapılır.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="section" id="s11" data-title="Cargo & Optimizasyonlar">
+      <h2><span>11.</span> Profiling, Güvenli Paketleme & Cargo Optimizasyonları</h2>
+      <div class="sub">
+        <p>Geliştirme süreci bittiğinde projeyi Production (Üretim) aşamasına hazırlamak için derleyici flag'leri ve kod kalite araçları büyük rol oynar.</p>
+        
+        <div class="card">
+          <h3>Cargo.toml Release Profil Optimizasyonları</h3>
+          <p>Rust varsayılan Release modunda bile bazı optimizasyonları derleme süresini kısaltmak için kapalı tutar. Boyutu küçültmek ve hızı maksimize etmek için bu flag'ler kullanılır.</p>
+          <div class="info-box best-practice">
+            <strong>Performance Note: LTO ve Codegen Units</strong>
+            LTO (Link Time Optimization), projeyi tek bir birim olarak ele alıp ölü kodları (dead code) temizler ve performansı %10-20 artırır. <code>codegen-units = 1</code> ise derlemeyi yavaşlatsa da çalışma anı performansını iyileştirir.
+          </div>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>Cargo.toml</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>[profile.release]
+opt-level = 3        # Maksimum hız optimizasyonu (default)
+lto = "fat"          # Link Time Optimization: Bütün kod analiz edilir
+codegen-units = 1    # Derleme ünitelerini tek parça yap (daha yavaş derlenir, hızlı çalışır)
+panic = "abort"      # Panik anında stack unwinding yapma, direkt çıkış yap (binary'yi küçültür)
+strip = true         # Symbol'leri kaldır (binary boyutunu aşırı küçültür)</code></pre>
+          </div>
+        </div>
+
+        <div class="card">
+          <h3>Kod Kalitesi ve Güvenlik Süreçleri</h3>
+          <ul>
+            <li><strong>Clippy:</strong> Rust'ın resmi linter'ı. <code>cargo clippy</code> komutuyla daha idiomatic (Rust felsefesine uygun) kod yazmanızı önerir.</li>
+            <li><strong>Cargo Audit:</strong> <code>cargo audit</code> komutu kullanılarak `Cargo.lock` dosyanızdaki tüm bağımlılıkların bilinen güvenlik açıklarına karşı taranması sağlanır.</li>
+            <li><strong>Criterion:</strong> Mikro-benchmark yazarak iki farklı algoritma implementasyonunun (örn: HashMap vs BTreeMap) performans ölçümleri için kullanılır.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- 12 -->
+    <section class="section" id="s12" data-title="Async Rust & Tokio">
+      <h2><span>12.</span> Async Rust: Future, Tokio Runtime & Event Loop</h2>
+      <div class="sub">
+        <p>Modern sistem programlamada I/O beklemeleri sırasında thread'leri bloklamadan milyonlarca isteği eşzamanlı işleyebilmek için <strong>Async Rust</strong> kullanılır. Rust, JS veya Go'dan farklı olarak Asenkron motoru dilin çekirdeğinde sunmaz; <code>Future</code> trait'i ile sözleşme yapar ve işleyişi <strong>Tokio</strong> gibi bağımsız Runtime kütüphanelerine bırakır.</p>
+        
+        <div class="card">
+          <h3>Future Traiti ve Lazy Mekanizması</h3>
+          <p>Rust'ta asenkron bloklar <strong>Lazy'dir (Tembel)</strong>. Bir <code>async fn</code> çağırdığınızda fonksiyon çalışmaz, sadece bir <code>Future</code> objesi döner. İşlemin ilerlemesi için bir Executor'ın ona <code>.await</code> diyerek <code>poll()</code> yapması gerekir.</p>
+        </div>
+
+        <div class="card">
+          <h3>Tokio Runtime ve Eşzamanlı Görevler (Tasks)</h3>
+          <p>Tokio, Work-Stealing algoritmasına sahip çok thread'li (multi-threaded) bir event-loop sunar. <code>tokio::spawn</code> ile aynı thread havuzu içinde binlerce hafif görev (green-thread/task) başlatılabilir.</p>
+          <div class="info-box best-practice">
+            <strong>Production Tip: Select Makrosu ile Timeout</strong>
+            Asenkron I/O işlemlerinde bir görevin sonsuza kadar askıda kalmasını önlemek için <code>tokio::select!</code> ile birden çok future aynı anda bekletilir. İlk biten kazanır.
+          </div>
+          <div class="code-wrapper">
+            <div class="code-header">
+              <span>async_main.rs</span>
+              <button class="copy-btn">Kopyala</button>
+            </div>
+            <pre><code>use tokio::time::{sleep, Duration};
+
+async fn fetch_data() -&gt; String {
+    sleep(Duration::from_secs(2)).await; // Non-blocking bekleme
+    "API Verisi Alındı".to_string()
+}
+
+#[tokio::main] // Tokio event-loop'u başlatır
+async fn main() {
+    println!("İstek gönderiliyor...");
+
+    // select! makrosu: Race condition konsepti
+    tokio::select! {
+        res = fetch_data() =&gt; {
+            println!("Başarılı: {}", res);
+        }
+        _ = sleep(Duration::from_secs(1)) =&gt; {
+            // Eğer fetch_data 1 saniyeyi geçerse bu blok çalışır
+            println!("Hata: İstek Zaman Aşımına Uğradı! (Timeout)");
+        }
+    }
+}</code></pre>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Progress Bar Bottom -->
+  <div id="progressBar">
+    <div class="prog-info">
+      <span class="prog-num">01</span>
+      <span class="prog-title">Giriş ve Kurulum</span>
+    </div>
+    <div class="prog-track">
+      <div class="prog-fill"></div>
+    </div>
+    <div class="prog-percent">%0</div>
+  </div>
+
+  <!-- Scroll Top -->
+  <div id="scrollTop" title="Yukarı Çık">
+    <svg class="progress-ring" width="50" height="50">
+      <circle class="progress-ring__circle" stroke-width="3" fill="transparent" r="23" cx="25" cy="25"/>
+    </svg>
+    <span class="arrow">↑</span>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+
+      // 1. Theme Toggle
+      const themeToggle = document.getElementById('themeToggle');
+      if (themeToggle) {
+        themeToggle.addEventListener('click', () => {
+          document.body.classList.toggle('light-mode');
+          themeToggle.textContent = document.body.classList.contains('light-mode') ? '🌙' : '☀️';
+        });
+      }
+
+      // 2. Glossary System
+      const dictionary = {
+        'Ownership': 'Rust\\\'ın bellek yönetimini derleme zamanında sağlayan temel kural seti.',
+        'Borrow Checker': 'Referansların geçerliliğini ve kurallara uygunluğunu denetleyen derleyici bileşeni.',
+        'Lifetime': 'Bir referansın bellekte geçerli kaldığı süre.',
+        'RAII': 'Resource Acquisition Is Initialization: Kaynakların nesne ömrüne bağlanması.',
+        'Smart Pointer': 'Sadece bellek adresi tutmakla kalmayıp, ek metadata ve yetenekler sunan veri yapıları.',
+        'Data Race': 'İki thread\\\'in aynı anda aynı veriye erişmesi ve en az birinin yazma işlemi yapması durumu.',
+        'Unsafe Rust': 'Rust\\\'ın güvenlik garantilerinin geçici olarak devre dışı bırakıldığı, manuel kontrol sağlanan bloklar.'
+      };
+
+      try {
+        const paragraphs = document.querySelectorAll('.sub p');
+        paragraphs.forEach(p => {
+          let html = p.innerHTML;
+          Object.keys(dictionary).forEach(term => {
+            const regex = new RegExp('\\b(' + term + ')\\b', 'gi');
+            html = html.replace(regex, `<span class="glossary-term">$1<span class="glossary-tooltip">${dictionary[term]}</span></span>`);
+          });
+          p.innerHTML = html;
+        });
+      } catch (e) {
+        console.error("Glossary Error:", e);
+      }
+
+      // 3. Syntax Highlighting
+      const highlightRust = (code) => {
+        // Comments
+        code = code.replace(/(\/\/.*)/g, '<span class="sh-comment">$1</span>');
+        // Strings
+        code = code.replace(/("(?:\\.|[^"\\\\])*")/g, '<span class="sh-string">$1</span>');
+        // Macros
+        code = code.replace(/\b([a-z_][a-z0-9_]*!)/g, '<span class="sh-macro">$1</span>');
+        // Types (Capitalized)
+        code = code.replace(/\b([A-Z][a-zA-Z0-9_]*)\b/g, '<span class="sh-type">$1</span>');
+        // Keywords
+        const keywords = ['fn', 'let', 'mut', 'use', 'pub', 'trait', 'impl', 'struct', 'enum', 'match', 'if', 'else', 'return', 'unsafe', 'extern', 'move', 'async', 'await', 'where'];
+        const kwRegex = new RegExp('\\b(' + keywords.join('|') + ')\\b', 'g');
+        code = code.replace(kwRegex, '<span class="sh-keyword">$1</span>');
+        // Functions
+        code = code.replace(/\b([a-z_][a-zA-Z0-9_]*)(?=\s*\()/g, '<span class="sh-function">$1</span>');
+        return code;
+      };
+
+      document.querySelectorAll('pre code').forEach(block => {
+        block.innerHTML = highlightRust(block.innerHTML);
+      });
+
+      // 4. Section Entrance Animations
+      const sections = document.querySelectorAll('.section');
+      const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('visible');
+          }
+        });
+      }, { threshold: 0.1 });
+      sections.forEach(sec => observer.observe(sec));
+
+      // 5. TOC Generation
+      const tocNav = document.getElementById('tocNav');
+      if (tocNav && sections.length > 0) {
+        sections.forEach((sec, idx) => {
+          const num = String(idx + 1).padStart(2, '0');
+          const title = sec.getAttribute('data-title') || '';
+          const id = sec.id;
+          
+          const a = document.createElement('a');
+          a.href = `#${id}`;
+          a.className = 'toc-item';
+          a.innerHTML = `
+            <div class="toc-item-content">
+              <span class="toc-num">${num}</span>
+              <span class="toc-title">${title}</span>
+            </div>
+            <span class="toc-dot"></span>
+          `;
+          tocNav.appendChild(a);
+        });
+      }
+
+      const tocItems = document.querySelectorAll('.toc-item');
+      const progNum = document.querySelector('.prog-num');
+      const progTitle = document.querySelector('.prog-title');
+      const progFill = document.querySelector('.prog-fill');
+      const progPercent = document.querySelector('.prog-percent');
+      
+      const updateActiveSection = () => {
+        let activeSec = null;
+        sections.forEach(sec => {
+          const rect = sec.getBoundingClientRect();
+          if (rect.top <= window.innerHeight / 2 && rect.bottom >= window.innerHeight / 3) {
+            activeSec = sec;
+          }
+        });
+
+        if (!activeSec && sections.length > 0) {
+          activeSec = sections[0]; // fallback
+        }
+
+        if (activeSec) {
+          const id = activeSec.id;
+          const numSpan = activeSec.querySelector('h2 span');
+          const num = numSpan ? numSpan.textContent.replace('.', '') : '01';
+          const title = activeSec.getAttribute('data-title') || '';
+
+          if (progNum) progNum.textContent = num;
+          if (progTitle) progTitle.textContent = title;
+
+          tocItems.forEach(item => {
+            if (item.getAttribute('href') === `#${id}`) {
+              if (!item.classList.contains('active')) {
+                tocItems.forEach(i => i.classList.remove('active', 'toc-entering'));
+                item.classList.add('active');
+                void item.offsetWidth; 
+                item.classList.add('toc-entering');
+              }
+            }
+          });
+        }
+        return activeSec;
+      };
+
+      // 6. Progress Bar & Scroll To Top
+      const scrollTopBtn = document.getElementById('scrollTop');
+      const circle = document.querySelector('.progress-ring__circle');
+      
+      let circumference = 100;
+      if (circle) {
+        const radius = circle.r.baseVal.value;
+        circumference = radius * 2 * Math.PI;
+        circle.style.strokeDasharray = `${circumference} ${circumference}`;
+        circle.style.strokeDashoffset = circumference;
+      }
+
+      const handleScrollProgress = () => {
+        const activeSec = updateActiveSection();
+        const scrollPos = window.scrollY;
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+
+        if (activeSec && progFill && progPercent) {
+          const rect = activeSec.getBoundingClientRect();
+          const totalDist = rect.height;
+          let scrolledInSec = (window.innerHeight / 2) - rect.top;
+          
+          if (scrolledInSec < 0) scrolledInSec = 0;
+          if (scrolledInSec > totalDist) scrolledInSec = totalDist;
+          
+          let secPercent = 0;
+          if (totalDist > 0) {
+             secPercent = Math.round((scrolledInSec / totalDist) * 100);
+          }
+          
+          // Fix 100% bug at absolute bottom
+          if (scrollPos >= docHeight - 10) {
+              secPercent = 100;
+          }
+          if (secPercent > 100) secPercent = 100;
+
+          progFill.style.width = `${secPercent}%`;
+          progPercent.textContent = `%${secPercent}`;
+
+          // Progress circle shows module progress now
+          if (circle) {
+            const offset = circumference - ((secPercent / 100) * circumference);
+            circle.style.strokeDashoffset = offset;
+          }
+        }
+
+        if (scrollTopBtn) {
+          if (scrollPos > 300) {
+            scrollTopBtn.classList.add('visible');
+          } else {
+            scrollTopBtn.classList.remove('visible');
+          }
+        }
+      };
+
+      window.addEventListener('scroll', handleScrollProgress);
+      window.addEventListener('resize', handleScrollProgress);
+      setTimeout(handleScrollProgress, 100);
+
+      if (scrollTopBtn) {
+        scrollTopBtn.addEventListener('click', () => {
+          const activeSec = updateActiveSection();
+          if (activeSec) {
+             const rect = activeSec.getBoundingClientRect();
+             // If we are somewhat below the top of the active section, scroll to its top.
+             if (rect.top < -50) {
+                 window.scrollTo({ top: window.scrollY + rect.top - 100, behavior: 'smooth' });
+             } else {
+                 // Already at top, go to previous section
+                 const prev = activeSec.previousElementSibling;
+                 if (prev && prev.classList.contains('section')) {
+                     const prevRect = prev.getBoundingClientRect();
+                     window.scrollTo({ top: window.scrollY + prevRect.top - 100, behavior: 'smooth' });
+                 } else {
+                     // No previous, go top of page
+                     window.scrollTo({ top: 0, behavior: 'smooth' });
+                 }
+             }
+          } else {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }
+        });
+      }
+
+      // 7. Copy Buttons
+      const copyBtns = document.querySelectorAll('.copy-btn');
+      copyBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+          const codeEl = btn.closest('.code-wrapper').querySelector('code');
+          if (codeEl) {
+            const textToCopy = codeEl.innerText || codeEl.textContent;
+            navigator.clipboard.writeText(textToCopy).then(() => {
+              const originalText = btn.innerText;
+              btn.innerText = 'Kopyalandı!';
+              btn.style.color = 'var(--accent)';
+              setTimeout(() => {
+                btn.innerText = originalText;
+                btn.style.color = '';
+              }, 2000);
+            });
+          }
+        });
+      });
+
+      // 8. Search Engine (Fixed)
+      const searchInput = document.getElementById('searchInput');
+      if (searchInput) {
+        searchInput.addEventListener('input', (e) => {
+          const term = e.target.value.toLowerCase();
+          sections.forEach((sec, idx) => {
+            const title = sec.getAttribute('data-title');
+            const safeTitle = title ? title.toLowerCase() : '';
+            const contentText = sec.textContent.toLowerCase();
+            const shouldShow = safeTitle.includes(term) || contentText.includes(term);
+            
+            if (shouldShow) {
+              sec.style.display = 'block';
+              setTimeout(() => sec.classList.add('visible'), 50); // Ensure CSS transition triggers
+            } else {
+              sec.style.display = 'none';
+              sec.classList.remove('visible');
+            }
+
+            // Also hide/show corresponding TOC item
+            const tocItemsArray = Array.from(document.querySelectorAll('.toc-item'));
+            if (tocItemsArray[idx]) {
+              tocItemsArray[idx].style.display = shouldShow ? 'flex' : 'none';
+            }
+          });
+          
+          // Re-trigger scroll logic to update active section
+          handleScrollProgress();
+        });
+      }
+
+    });
+  </script>
+</body>
+</html>

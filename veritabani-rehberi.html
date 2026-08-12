@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>Veri Tabanı Rehberi</title>
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;600&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#0d1117;--bg2:#161b22;--bg3:#1c2128;--bg4:#21262d;
+  --border:#30363d;--border2:#444c56;
+  --text:#e6edf3;--text2:#8b949e;--text3:#6e7681;
+  --accent:#58a6ff;--accent2:#3fb950;--accent3:#f0883e;
+  --accent4:#ff7b72;--accent5:#bc8cff;--accent6:#39d353;
+  --sql:#58a6ff;--nosql:#3fb950;--kv:#f0883e;--graph:#bc8cff;
+  --radius:8px;--radius2:12px;
+}
+[data-theme="light"] {
+  --bg:#ffffff;--bg2:#f6f8fa;--bg3:#eaeef2;--bg4:#d0d7de;
+  --border:#d0d7de;--border2:#afb8c1;
+  --text:#1f2328;--text2:#656d76;--text3:#8c959f;
+  --accent:#0969da;--accent2:#1a7f37;--accent3:#bc4c00;
+  --accent4:#d1242f;--accent5:#8250df;--accent6:#1a7f37;
+  --sql:#0969da;--nosql:#1a7f37;--kv:#bc4c00;--graph:#8250df;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--bg);color:var(--text);
+  font-family:'DM Sans',sans-serif;font-size:15px;line-height:1.7;
+  padding:0 16px;
+}
+.layout-wrapper{display:grid;grid-template-columns:260px minmax(0,860px) 260px;gap:50px;max-width:100%;margin:0 auto;padding:40px 0;justify-content:center}
+.sidebar{position:sticky;top:40px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius2);padding:24px;align-self:start}
+.sidebar-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px}
+.sidebar h3{font-size:13px;text-transform:uppercase;letter-spacing:.08em;color:var(--text3);margin:0}
+.theme-btn{background:var(--bg3);border:1px solid var(--border);color:var(--text);border-radius:var(--radius);padding:4px 8px;cursor:pointer;font-size:14px;transition:all .2s;display:flex;align-items:center;justify-content:center}
+.theme-btn:hover{border-color:var(--border2);transform:scale(1.05)}
+.sidebar ul{list-style:none;padding:0;margin:0}
+.sidebar li{margin-bottom:12px}
+.sidebar li:last-child{margin-bottom:0}
+.sidebar a{display:block;color:var(--text2);text-decoration:none;font-size:14px;transition:all .2s;border-radius:var(--radius);padding:8px 12px;margin:0 -12px}
+.sidebar a:hover{color:var(--text);background:var(--bg3)}
+.sidebar .n1{color:var(--accent);font-weight:600;margin-right:4px}
+.sidebar .n2{color:var(--accent2);font-weight:600;margin-right:4px}
+.sidebar .n3{color:var(--accent3);font-weight:600;margin-right:4px}
+.sidebar .n4{color:var(--accent5);font-weight:600;margin-right:4px}
+@media(max-width:1400px){.layout-wrapper{grid-template-columns:260px minmax(0,860px);gap:40px}}
+@media(max-width:900px){.layout-wrapper{display:flex;flex-direction:column;gap:0}.sidebar{position:static;width:100%;margin-bottom:40px}}
+.container{margin:0;padding:0 0 80px;min-width:0}
+
+/* HEADER */
+.hero{
+  text-align:center;padding:60px 0 48px;
+  border-bottom:1px solid var(--border);margin-bottom:56px;
+}
+.hero-badge{
+  display:inline-block;background:var(--bg3);border:1px solid var(--border2);
+  color:var(--text2);font-size:12px;letter-spacing:.08em;text-transform:uppercase;
+  padding:4px 14px;border-radius:20px;margin-bottom:24px;
+}
+.hero h1{
+  font-size:clamp(28px,5vw,48px);font-weight:600;
+  background:linear-gradient(135deg,var(--accent),var(--accent5));
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;line-height:1.2;margin-bottom:16px;
+}
+.hero p{color:var(--text2);font-size:16px;max-width:560px;margin:0 auto}
+
+/* SECTIONS */
+.section{margin-bottom:72px}
+.section-header{
+  display:flex;align-items:center;gap:12px;margin-bottom:28px;
+  padding-bottom:16px;border-bottom:1px solid var(--border);
+}
+.section-num{
+  width:32px;height:32px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:13px;font-weight:600;flex-shrink:0;
+}
+.num-1{background:rgba(88,166,255,.15);color:var(--accent)}
+.num-2{background:rgba(63,185,80,.15);color:var(--accent2)}
+.num-3{background:rgba(240,136,62,.15);color:var(--accent3)}
+.num-4{background:rgba(188,140,255,.15);color:var(--accent5)}
+h2{font-size:22px;font-weight:600}
+h3{font-size:17px;font-weight:500;margin-bottom:12px;margin-top:28px}
+h4{font-size:14px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;color:var(--text2);margin-bottom:10px;margin-top:24px}
+p{color:var(--text2);margin-bottom:14px}
+p:last-child{margin-bottom:0}
+strong{color:var(--text);font-weight:500}
+
+/* DB TYPE CARDS */
+.db-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:16px;margin-bottom:32px}
+.db-card{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius2);padding:20px;transition:border-color .2s;
+  position:relative;overflow:hidden;
+}
+.db-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+}
+.db-card.sql::before{background:var(--sql)}
+.db-card.nosql::before{background:var(--nosql)}
+.db-card.kv::before{background:var(--kv)}
+.db-card.graph::before{background:var(--graph)}
+.db-card:hover{border-color:var(--border2)}
+.db-card .type-badge{
+  font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:.07em;
+  padding:3px 10px;border-radius:20px;display:inline-block;margin-bottom:12px;
+}
+.sql .type-badge{background:rgba(88,166,255,.15);color:var(--sql)}
+.nosql .type-badge{background:rgba(63,185,80,.15);color:var(--nosql)}
+.kv .type-badge{background:rgba(240,136,62,.15);color:var(--kv)}
+.graph .type-badge{background:rgba(188,140,255,.15);color:var(--graph)}
+.db-card h3{font-size:16px;margin-top:0;margin-bottom:8px}
+.db-card p{font-size:13px;color:var(--text3)}
+
+/* DETAIL BLOCKS */
+.db-detail{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius2);margin-bottom:28px;overflow:hidden;
+}
+.db-detail-header{
+  padding:18px 24px;display:flex;align-items:center;gap:14px;
+  border-bottom:1px solid var(--border);
+}
+.db-icon{
+  width:40px;height:40px;border-radius:10px;
+  display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;
+}
+.db-detail-header h3{margin:0;font-size:18px}
+.db-detail-header .sub{font-size:13px;color:var(--text3);margin:2px 0 0}
+.db-detail-body{padding:20px 24px}
+.two-col{display:grid;grid-template-columns:1fr 1fr;gap:20px}
+@media(max-width:600px){.two-col{grid-template-columns:1fr}}
+.pro-con{background:var(--bg3);border-radius:var(--radius);padding:14px 16px}
+.pro-con h4{font-size:12px;margin-bottom:10px}
+.pro-con ul{list-style:none;padding:0}
+.pro-con li{font-size:13px;color:var(--text2);padding:4px 0;display:flex;gap:8px;align-items:flex-start}
+.pro-con li::before{flex-shrink:0;margin-top:2px}
+.pros li::before{content:'✓';color:var(--accent2)}
+.cons li::before{content:'✗';color:var(--accent4)}
+.scenario{
+  background:rgba(88,166,255,.06);border:1px solid rgba(88,166,255,.2);
+  border-radius:var(--radius);padding:14px 16px;margin-bottom:16px;
+}
+.scenario p{font-size:13px;margin:0}
+.scenario strong{color:var(--accent)}
+.badges{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.badge{
+  font-size:12px;padding:3px 10px;border-radius:20px;
+  background:var(--bg4);border:1px solid var(--border2);color:var(--text2);
+}
+
+/* CODE BLOCKS */
+.code-block{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius2);overflow:hidden;margin:20px 0;
+}
+.code-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 16px;background:var(--bg3);border-bottom:1px solid var(--border);
+}
+.code-header .lang{font-size:12px;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.code-header .dots{display:flex;gap:6px}
+.code-header .dot{width:10px;height:10px;border-radius:50%}
+.dot-r{background:#ff5f57}.dot-y{background:#ffbd2e}.dot-g{background:#28c840}
+pre{
+  padding:20px;overflow-x:auto;font-family:'JetBrains Mono',monospace;
+  font-size:13px;line-height:1.7;
+}
+.comment{color:#6e7681}.keyword{color:#ff7b72}.string{color:#a5d6ff}
+.func{color:#d2a8ff}.num{color:#f0883e}.type{color:#ffa657}.op{color:#79c0ff}
+.table-name{color:#3fb950}.field{color:#e6edf3}
+
+/* GLOSSARY */
+.glossary-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.gloss-item{
+  background:var(--bg2);border:1px solid var(--border);
+  border-radius:var(--radius);padding:16px;
+}
+.gloss-item .abbr{
+  font-family:'JetBrains Mono',monospace;font-size:13px;font-weight:600;
+  color:var(--accent);margin-bottom:6px;
+}
+.gloss-item .full{font-size:12px;color:var(--accent3);margin-bottom:6px;font-style:italic}
+.gloss-item .desc{font-size:13px;color:var(--text2)}
+
+/* CRUD TABLE */
+.crud-table{width:100%;border-collapse:collapse;font-size:14px}
+.crud-table th,.crud-table td{
+  padding:11px 16px;text-align:left;border-bottom:1px solid var(--border);
+}
+.crud-table th{
+  background:var(--bg3);color:var(--text3);font-size:12px;
+  text-transform:uppercase;letter-spacing:.06em;font-weight:600;
+}
+.crud-table td:first-child{font-family:'JetBrains Mono',monospace;color:var(--accent5);font-weight:600}
+.crud-table td:nth-child(2){color:var(--accent)}
+.crud-table td:nth-child(3){color:var(--accent2)}
+.crud-table td:last-child{color:var(--text2)}
+.crud-table tr:last-child td{border-bottom:none}
+.crud-table tr:hover td{background:var(--bg3)}
+
+/* DIVIDER */
+hr{border:none;border-top:1px solid var(--border);margin:32px 0}
+
+/* CALLOUT */
+.callout{
+  border-left:3px solid var(--accent);background:rgba(88,166,255,.06);
+  border-radius:0 var(--radius) var(--radius) 0;padding:14px 18px;margin:20px 0;
+}
+.callout p{font-size:14px;margin:0}
+.callout.warn{border-color:var(--accent3);background:rgba(240,136,62,.06)}
+.callout.success{border-color:var(--accent2);background:rgba(63,185,80,.06)}
+
+/* FOOTER */
+.footer{
+  text-align:center;padding:32px 0 0;
+  border-top:1px solid var(--border);
+  color:var(--text3);font-size:13px;
+}
+</style>
+</head>
+<body>
+<div class="layout-wrapper">
+<aside class="sidebar">
+  <div class="sidebar-header">
+    <h3>İçindekiler</h3>
+    <button id="theme-toggle" class="theme-btn" aria-label="Tema Değiştir">☀️</button>
+  </div>
+  <ul>
+    <li><a href="#bolum1"><span class="n1">1.</span> Veri Tabanı Nedir?</a></li>
+    <li><a href="#bolum2"><span class="n2">2.</span> Veri Tabanı Türleri</a></li>
+    <li><a href="#bolum3"><span class="n3">3.</span> Komutlar ve Sözlük</a></li>
+    <li><a href="#bolum4"><span class="n4">4.</span> Pratik Kullanım Komutları</a></li>
+  </ul>
+</aside>
+<div class="container">
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-badge">Kapsamlı Teknik Rehber</div>
+  <h1>Veri Tabanları:<br/>Derinlemesine Kılavuz</h1>
+  <p>İlişkisel, NoSQL, Key-Value ve Graph veri tabanlarını; komutları, kısaltmaları ve pratik kullanımı ile öğren.</p>
+</div>
+
+<!-- SECTION 1 -->
+<div class="section" id="bolum1">
+  <div class="section-header">
+    <div class="section-num num-1">1</div>
+    <h2>Veri Tabanı Nedir?</h2>
+  </div>
+
+  <p><strong>Veri tabanı</strong>, düzenli biçimde depolanan ve kolayca erişilebilen, yönetilebilen yapılandırılmış veri koleksiyonudur. Ham verinin aksine, veri tabanındaki bilgiler bir schema (şema) ya da model çerçevesinde organize edilir; bu sayede sorgulama, filtreleme ve güncelleme işlemleri sistematik şekilde yapılabilir.</p>
+
+  <div class="callout">
+    <p><strong>Temel ayrım:</strong> Veri tabanı (database) sadece verilerin depolandığı yapıdır. DBMS ise bu yapıyı yöneten, sorgular çalıştıran ve güvenliği sağlayan yazılım katmanıdır.</p>
+  </div>
+
+  <h3>DBMS / VTYS — Veri Tabanı Yönetim Sistemi</h3>
+  <p><strong>DBMS</strong> (Database Management System — Veri Tabanı Yönetim Sistemi), kullanıcı ile fiziksel veri arasına giren ara yazılımdır. Temel görevleri şunlardır:</p>
+
+  <div class="two-col">
+    <div class="pro-con pros">
+      <h4>DBMS'in Sağladıkları</h4>
+      <ul>
+        <li><span><strong>Veri bütünlüğü:</strong> Tutarsız ya da hatalı veri girişini önler.</span></li>
+        <li><span><strong>Eşzamanlılık:</strong> Çok kullanıcılı ortamlarda aynı anda okuma/yazma işlemlerini yönetir.</span></li>
+        <li><span><strong>Güvenlik:</strong> Rol tabanlı erişim denetimi (RBAC) sağlar.</span></li>
+        <li><span><strong>Yedekleme &amp; Kurtarma:</strong> Veri kaybını minimize eden transaction log sistemleri içerir.</span></li>
+        <li><span><strong>Soyutlama:</strong> Fiziksel disk yapısını uygulamadan gizler.</span></li>
+      </ul>
+    </div>
+    <div class="pro-con cons">
+      <h4>Dikkat Edilmesi Gerekenler</h4>
+      <ul>
+        <li><span>Ek bellek ve işlemci kaynağı tüketir.</span></li>
+        <li><span>Yanlış konfigürasyon performansı ciddi ölçüde düşürebilir.</span></li>
+        <li><span>Lisanslı DBMS'ler (Oracle, MS SQL) yüksek maliyetli olabilir.</span></li>
+        <li><span>Büyük şemalar bakımı zorlaştırır.</span></li>
+      </ul>
+    </div>
+  </div>
+
+  <hr/>
+  <p>Yaygın DBMS örnekleri: <strong>PostgreSQL, MySQL, Oracle DB, MS SQL Server</strong> (ilişkisel); <strong>MongoDB, Cassandra</strong> (doküman/kolon tabanlı); <strong>Redis</strong> (anahtar-değer); <strong>Neo4j</strong> (grafik).</p>
+</div>
+
+<!-- SECTION 2 -->
+<div class="section" id="bolum2">
+  <div class="section-header">
+    <div class="section-num num-2">2</div>
+    <h2>Veri Tabanı Türleri</h2>
+  </div>
+
+  <div class="db-grid">
+    <div class="db-card sql">
+      <span class="type-badge">RDBMS</span>
+      <h3>İlişkisel</h3>
+      <p>Tablolar, satırlar, sütunlar. SQL dili. ACID garantisi.</p>
+    </div>
+    <div class="db-card nosql">
+      <span class="type-badge">Document</span>
+      <h3>Doküman</h3>
+      <p>JSON/BSON belgeler. Esnek şema. Yatay ölçeklenme.</p>
+    </div>
+    <div class="db-card kv">
+      <span class="type-badge">Key-Value</span>
+      <h3>Anahtar-Değer</h3>
+      <p>Basit hash yapısı. Ultra hızlı. Cache senaryoları.</p>
+    </div>
+    <div class="db-card graph">
+      <span class="type-badge">Graph</span>
+      <h3>Grafik</h3>
+      <p>Düğümler ve kenarlar. İlişki sorguları için ideal.</p>
+    </div>
+  </div>
+
+  <!-- RDBMS -->
+  <div class="db-detail" id="rdbms">
+    <div class="db-detail-header">
+      <div class="db-icon" style="background:rgba(88,166,255,.15);color:var(--sql)">🗄</div>
+      <div>
+        <h3 style="color:var(--sql)">İlişkisel Veri Tabanları (RDBMS)</h3>
+        <div class="sub">PostgreSQL · MySQL · Microsoft SQL Server · Oracle DB · SQLite</div>
+      </div>
+    </div>
+    <div class="db-detail-body">
+      <p>İlişkisel modelde veriler <strong>tablolarda</strong> saklanır. Her tablo satır (row/tuple) ve sütunlardan (column/attribute) oluşur. Tablolar arasındaki ilişkiler <strong>foreign key</strong> (yabancı anahtar) ile kurulur. Tüm işlemler <strong>ACID</strong> (Atomicity, Consistency, Isolation, Durability) özelliklerine tabidir.</p>
+
+      <div class="scenario">
+        <p><strong>Ne zaman tercih edilmeli?</strong> Veriler arası güçlü ilişki varsa, veri bütünlüğü kritikse (finans, muhasebe, e-ticaret siparişleri), karmaşık JOIN sorguları gerekiyorsa ve ekip SQL biliyor ise RDBMS doğru seçimdir.</p>
+        <div class="badges">
+          <span class="badge">Finans</span><span class="badge">E-ticaret</span><span class="badge">ERP/CRM</span>
+          <span class="badge">Muhasebe</span><span class="badge">Sağlık Kayıtları</span>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="pro-con pros">
+          <h4>Avantajlar</h4>
+          <ul>
+            <li><span>ACID garantisi — veri tutarlılığı yüksek</span></li>
+            <li><span>Güçlü sorgulama dili (SQL)</span></li>
+            <li><span>Olgun ekosistem ve geniş araç desteği</span></li>
+            <li><span>JOIN ile çok tablolu sorgular mümkün</span></li>
+            <li><span>Normalizasyon ile veri tekrarı önlenir</span></li>
+          </ul>
+        </div>
+        <div class="pro-con cons">
+          <h4>Dezavantajlar</h4>
+          <ul>
+            <li><span>Dikey ölçekleme (scale-up) maliyetli</span></li>
+            <li><span>Şema değişikliği migrasyonu gerektirir</span></li>
+            <li><span>Çok büyük hacimde düzensiz veri için yetersiz kalabilir</span></li>
+            <li><span>Object-Relational impedance (ORM karmaşıklığı)</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- MongoDB -->
+  <div class="db-detail" id="mongodb">
+    <div class="db-detail-header">
+      <div class="db-icon" style="background:rgba(63,185,80,.15);color:var(--nosql)">📄</div>
+      <div>
+        <h3 style="color:var(--nosql)">Doküman Tabanlı NoSQL</h3>
+        <div class="sub">MongoDB · CouchDB · Firestore · Amazon DocumentDB</div>
+      </div>
+    </div>
+    <div class="db-detail-body">
+      <p>Veriler <strong>JSON benzeri dokümanlar</strong> (MongoDB'de BSON) olarak saklanır. Her doküman, kendi şemasını barındırabilir; yani aynı koleksiyondaki iki dokümanın alanları tamamen farklı olabilir. Bu esneklik, hızlı gelişim döngüleri için büyük avantaj sağlar.</p>
+
+      <div class="scenario">
+        <p><strong>Ne zaman tercih edilmeli?</strong> Veri yapısı sık değişiyorsa, JSON API'ler ile çalışılıyorsa, yatay ölçekleme (sharding) ihtiyacı varsa veya hiyerarşik iç içe veri saklanıyorsa (ürün katalogları, kullanıcı profilleri) MongoDB idealdir.</p>
+        <div class="badges">
+          <span class="badge">İçerik Yönetimi</span><span class="badge">Ürün Kataloğu</span>
+          <span class="badge">Kullanıcı Profilleri</span><span class="badge">Loglama</span>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="pro-con pros">
+          <h4>Avantajlar</h4>
+          <ul>
+            <li><span>Schema-free — şema esnekliği yüksek</span></li>
+            <li><span>Yatay ölçekleme (sharding) desteği</span></li>
+            <li><span>JSON ile doğal entegrasyon</span></li>
+            <li><span>Zengin sorgulama operatörleri ($match, $group, vb.)</span></li>
+          </ul>
+        </div>
+        <div class="pro-con cons">
+          <h4>Dezavantajlar</h4>
+          <ul>
+            <li><span>JOIN yerine uygulama katmanında ilişki yönetimi</span></li>
+            <li><span>ACID tam desteği sınırlı (v4+ kısmi destek var)</span></li>
+            <li><span>Veri tekrarı (denormalization) disk kullanımını artırır</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Redis -->
+  <div class="db-detail" id="redis">
+    <div class="db-detail-header">
+      <div class="db-icon" style="background:rgba(240,136,62,.15);color:var(--kv)">⚡</div>
+      <div>
+        <h3 style="color:var(--kv)">Anahtar-Değer (Key-Value) NoSQL</h3>
+        <div class="sub">Redis · Memcached · DynamoDB · Riak</div>
+      </div>
+    </div>
+    <div class="db-detail-body">
+      <p>En basit veri modeli: her şey bir <strong>anahtar (key)</strong> ile eşleşen bir <strong>değerden (value)</strong> oluşur. Redis, bu modeli zengin veri yapılarıyla (String, Hash, List, Set, Sorted Set, Stream) güçlendirmiş; in-memory mimarisi sayesinde mikrosaniye mertebesinde yanıt süreleri sunar.</p>
+
+      <div class="scenario">
+        <p><strong>Ne zaman tercih edilmeli?</strong> Oturum yönetimi (session), önbellekleme (caching), gerçek zamanlı sıralamalar (leaderboard), pub/sub mesajlaşma ve rate limiting gibi hız gerektiren senaryolarda Redis birincil tercihtir.</p>
+        <div class="badges">
+          <span class="badge">Cache Layer</span><span class="badge">Session Store</span>
+          <span class="badge">Rate Limiting</span><span class="badge">Pub/Sub</span><span class="badge">Leaderboard</span>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="pro-con pros">
+          <h4>Avantajlar</h4>
+          <ul>
+            <li><span>Mikrosaniye yanıt süresi (in-memory)</span></li>
+            <li><span>Çok sayıda veri yapısı desteği</span></li>
+            <li><span>TTL (Time-To-Live) ile otomatik süre sonu</span></li>
+            <li><span>Persistence seçenekleri (RDB, AOF)</span></li>
+          </ul>
+        </div>
+        <div class="pro-con cons">
+          <h4>Dezavantajlar</h4>
+          <ul>
+            <li><span>Veri boyutu RAM ile sınırlı</span></li>
+            <li><span>Karmaşık sorgulama imkânı yok</span></li>
+            <li><span>İlişkisel veri modeli için uygun değil</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Neo4j -->
+  <div class="db-detail" id="neo4j">
+    <div class="db-detail-header">
+      <div class="db-icon" style="background:rgba(188,140,255,.15);color:var(--graph)">🕸</div>
+      <div>
+        <h3 style="color:var(--graph)">Grafik (Graph) Tabanlı NoSQL</h3>
+        <div class="sub">Neo4j · Amazon Neptune · ArangoDB · TigerGraph</div>
+      </div>
+    </div>
+    <div class="db-detail-body">
+      <p>Veriler <strong>düğüm (node)</strong> ve <strong>kenar (edge/relationship)</strong> olarak modellenir. Kenarlar da özellikler (properties) taşıyabilir. Grafik veri tabanları, özellikle <strong>derinlemesine gezinme (traversal)</strong> sorgularında ilişkisel veri tabanlarını çok geride bırakır; çünkü JOIN yerine doğrudan işaretçi (pointer) takibi kullanır.</p>
+
+      <div class="scenario">
+        <p><strong>Ne zaman tercih edilmeli?</strong> Sosyal ağlar, öneri motorları (recommendation engine), dolandırıcılık tespiti, erişim kontrol grafikleri ve bilgi grafikleri (knowledge graph) gibi <em>ilişkilerin kendisinin</em> birinci sınıf veri olduğu senaryolarda Neo4j rakipsizdir.</p>
+        <div class="badges">
+          <span class="badge">Sosyal Ağ</span><span class="badge">Öneri Motoru</span>
+          <span class="badge">Fraud Detection</span><span class="badge">Knowledge Graph</span>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="pro-con pros">
+          <h4>Avantajlar</h4>
+          <ul>
+            <li><span>Derin ilişki sorguları son derece hızlı</span></li>
+            <li><span>Cypher sorgu dili okunabilir ve güçlü</span></li>
+            <li><span>Veri modeli gerçek dünyayı doğal yansıtır</span></li>
+            <li><span>Grafik algoritmaları (PageRank, BFS) yerleşik</span></li>
+          </ul>
+        </div>
+        <div class="pro-con cons">
+          <h4>Dezavantajlar</h4>
+          <ul>
+            <li><span>Tablosal raporlama sorgularında yavaş kalır</span></li>
+            <li><span>Yatay ölçekleme RDBMS kadar olgun değil</span></li>
+            <li><span>Ekosistem, SQL dünyasına kıyasla daha küçük</span></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 3 -->
+<div class="section" id="bolum3">
+  <div class="section-header">
+    <div class="section-num num-3">3</div>
+    <h2>Komutlar ve Kısaltma Sözlüğü</h2>
+  </div>
+
+  <p>Veri tabanı dünyasında karşılaşacağın tüm temel kısaltmalar ve açılımları aşağıda listelenmiştir.</p>
+
+  <h3>Temel Terminoloji</h3>
+  <div class="glossary-grid">
+
+    <div class="gloss-item">
+      <div class="abbr">SQL</div>
+      <div class="full">Structured Query Language</div>
+      <div class="desc">Yapılandırılmış Sorgu Dili. İlişkisel veri tabanlarında veri tanımlama, düzenleme ve sorgulama için kullanılan standart dil.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">NoSQL</div>
+      <div class="full">Not Only SQL</div>
+      <div class="desc">Yalnızca SQL değil. Tablo-dışı veri modellerini (doküman, grafik, key-value, kolon) kapsayan veri tabanı kategorisi.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">DBMS</div>
+      <div class="full">Database Management System</div>
+      <div class="desc">Veri Tabanı Yönetim Sistemi. Veriyi yöneten, sorgulayan ve koruyan yazılım katmanı.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">RDBMS</div>
+      <div class="full">Relational DBMS</div>
+      <div class="desc">İlişkisel VTYS. Tablo tabanlı, SQL kullanan, ACID uyumlu veri tabanı yönetim sistemi.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">DDL</div>
+      <div class="full">Data Definition Language</div>
+      <div class="desc">Veri Tanımlama Dili. Tablo ve şema oluşturmak için kullanılan SQL komutları: CREATE, ALTER, DROP, TRUNCATE.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">DML</div>
+      <div class="full">Data Manipulation Language</div>
+      <div class="desc">Veri İşleme Dili. Tablo içindeki veriye erişmek ve değiştirmek için: SELECT, INSERT, UPDATE, DELETE.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">DCL</div>
+      <div class="full">Data Control Language</div>
+      <div class="desc">Veri Kontrol Dili. Yetkilendirme ve güvenlik komutları: GRANT, REVOKE.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">TCL</div>
+      <div class="full">Transaction Control Language</div>
+      <div class="desc">İşlem Kontrol Dili. Transaction (işlem grubu) yönetimi: COMMIT, ROLLBACK, SAVEPOINT, BEGIN.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">ACID</div>
+      <div class="full">Atomicity · Consistency · Isolation · Durability</div>
+      <div class="desc">Atomiklik · Tutarlılık · Yalıtım · Dayanıklılık. İlişkisel veri tabanlarının transaction güvenliğini tanımlayan dört temel özellik.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">BASE</div>
+      <div class="full">Basically Available · Soft-state · Eventually consistent</div>
+      <div class="desc">NoSQL sistemlerin benimsediği, ACID'e alternatif tutarlılık modeli. Nihai tutarlılığı kabul eder, yüksek kullanılabilirliği önceliklendirir.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">PK</div>
+      <div class="full">Primary Key</div>
+      <div class="desc">Birincil Anahtar. Tablodaki her satırı tekil olarak tanımlayan sütun ya da sütun grubu.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">FK</div>
+      <div class="full">Foreign Key</div>
+      <div class="desc">Yabancı Anahtar. Bir tablodaki sütunun başka bir tablonun birincil anahtarına referans verdiği ilişki mekanizması.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">ORM</div>
+      <div class="full">Object-Relational Mapping</div>
+      <div class="desc">Nesne-İlişkisel Eşleştirme. Uygulama nesnelerini (class) otomatik olarak veri tabanı tablolarına dönüştüren araç katmanı. Örn: Hibernate, SQLAlchemy, Prisma.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">ORM</div>
+      <div class="full">Örnek: Sequelize, Prisma, Hibernate</div>
+      <div class="desc">Kod tarafında SQL yazmadan veri tabanı işlemi yapmayı sağlar. Güç: üretkenlik. Zayıf: performans kontrolü azalır.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">ERD</div>
+      <div class="full">Entity Relationship Diagram</div>
+      <div class="desc">Varlık-İlişki Diyagramı. Tabloları, sütunları ve aralarındaki ilişkileri görsel olarak modelleyen diyagram türü.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">TTL</div>
+      <div class="full">Time To Live</div>
+      <div class="desc">Yaşam Süresi. Cache ve NoSQL sistemlerinde bir anahtarın ne kadar süre sonra otomatik olarak silineceğini belirten parametre (saniye cinsinden).</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">BSON</div>
+      <div class="full">Binary JSON</div>
+      <div class="desc">MongoDB'nin verileri saklamak için kullandığı, JSON'un ikili (binary) ve daha verimli kodlanmış hali.</div>
+    </div>
+
+    <div class="gloss-item">
+      <div class="abbr">REPL</div>
+      <div class="full">Read-Eval-Print Loop</div>
+      <div class="desc">Mongo Shell, Redis CLI gibi etkileşimli veri tabanı istemcileri için kullanılan interaktif komut satırı ortamı.</div>
+    </div>
+  </div>
+
+  <h3 style="margin-top:36px">CRUD Operasyonları</h3>
+  <p>Her veri tabanının temel işlem seti olan CRUD'un farklı sistemlerdeki karşılıkları:</p>
+
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--accent3)">CRUD Referans Tablosu</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <div style="overflow-x:auto">
+      <table class="crud-table" style="width:100%">
+        <thead>
+          <tr>
+            <th>CRUD</th><th>SQL (RDBMS)</th><th>MongoDB</th><th>Redis</th><th>Açıklama</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>Create</td><td>INSERT</td><td>insertOne / insertMany</td><td>SET</td><td>Yeni kayıt ekleme</td>
+          </tr>
+          <tr>
+            <td>Read</td><td>SELECT</td><td>find / findOne</td><td>GET</td><td>Veri okuma / sorgulama</td>
+          </tr>
+          <tr>
+            <td>Update</td><td>UPDATE</td><td>updateOne / updateMany</td><td>SET (üzerine yaz)</td><td>Mevcut veriyi güncelleme</td>
+          </tr>
+          <tr>
+            <td>Delete</td><td>DELETE</td><td>deleteOne / deleteMany</td><td>DEL</td><td>Veri silme</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- SECTION 4 -->
+<div class="section" id="bolum4">
+  <div class="section-header">
+    <div class="section-num num-4">4</div>
+    <h2>Pratik Kullanım Komutları</h2>
+  </div>
+
+  <!-- SQL / RDBMS -->
+  <h3 style="color:var(--sql)">🗄 SQL — PostgreSQL / MySQL</h3>
+
+  <h4>Veri Tabanı ve Tablo Oluşturma (DDL)</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--sql)">SQL · DDL</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">-- Yeni bir veri tabanı oluştur</span>
+<span class="keyword">CREATE DATABASE</span> <span class="table-name">uygulama_db</span>;
+
+<span class="comment">-- Veri tabanını seç (MySQL)</span>
+<span class="keyword">USE</span> <span class="table-name">uygulama_db</span>;
+
+<span class="comment">-- PostgreSQL için bağlanma komutu (terminal)</span>
+<span class="comment">-- \c uygulama_db</span>
+
+<span class="comment">-- Kullanıcılar tablosu oluştur</span>
+<span class="keyword">CREATE TABLE</span> <span class="table-name">kullanicilar</span> (
+    <span class="field">id</span>           <span class="type">SERIAL</span> <span class="keyword">PRIMARY KEY</span>,       <span class="comment">-- Otomatik artan birincil anahtar</span>
+    <span class="field">ad</span>           <span class="type">VARCHAR</span>(<span class="num">100</span>) <span class="keyword">NOT NULL</span>,   <span class="comment">-- Zorunlu metin alanı</span>
+    <span class="field">email</span>        <span class="type">VARCHAR</span>(<span class="num">255</span>) <span class="keyword">UNIQUE NOT NULL</span>, <span class="comment">-- Tekil ve zorunlu</span>
+    <span class="field">olusturulma</span>  <span class="type">TIMESTAMP</span> <span class="keyword">DEFAULT</span> <span class="func">NOW</span>()  <span class="comment">-- Varsayılan: şu an</span>
+);
+
+<span class="comment">-- Mevcut tabloya yeni sütun ekle (ALTER)</span>
+<span class="keyword">ALTER TABLE</span> <span class="table-name">kullanicilar</span>
+    <span class="keyword">ADD COLUMN</span> <span class="field">telefon</span> <span class="type">VARCHAR</span>(<span class="num">20</span>);
+
+<span class="comment">-- Tabloyu tamamen sil (veri + yapı)</span>
+<span class="keyword">DROP TABLE</span> <span class="keyword">IF EXISTS</span> <span class="table-name">kullanicilar</span>;</pre>
+  </div>
+
+  <h4>Veri Ekleme (DML — INSERT)</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--sql)">SQL · INSERT</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">-- Tek kayıt ekle</span>
+<span class="keyword">INSERT INTO</span> <span class="table-name">kullanicilar</span> (<span class="field">ad</span>, <span class="field">email</span>)
+<span class="keyword">VALUES</span> (<span class="string">'Ahmet Yılmaz'</span>, <span class="string">'ahmet@example.com'</span>);
+
+<span class="comment">-- Birden fazla kayıt ekle</span>
+<span class="keyword">INSERT INTO</span> <span class="table-name">kullanicilar</span> (<span class="field">ad</span>, <span class="field">email</span>) <span class="keyword">VALUES</span>
+    (<span class="string">'Fatma Şahin'</span>, <span class="string">'fatma@example.com'</span>),
+    (<span class="string">'Mehmet Çelik'</span>, <span class="string">'mehmet@example.com'</span>),
+    (<span class="string">'Zeynep Öztürk'</span>, <span class="string">'zeynep@example.com'</span>);</pre>
+  </div>
+
+  <h4>Veri Sorgulama (DML — SELECT)</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--sql)">SQL · SELECT</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">-- Tüm sütunları getir</span>
+<span class="keyword">SELECT</span> * <span class="keyword">FROM</span> <span class="table-name">kullanicilar</span>;
+
+<span class="comment">-- Belirli sütunlar ve filtreleme</span>
+<span class="keyword">SELECT</span> <span class="field">ad</span>, <span class="field">email</span>
+<span class="keyword">FROM</span>   <span class="table-name">kullanicilar</span>
+<span class="keyword">WHERE</span>  <span class="field">email</span> <span class="keyword">LIKE</span> <span class="string">'%@example.com'</span>
+<span class="keyword">ORDER BY</span> <span class="field">ad</span> <span class="keyword">ASC</span>
+<span class="keyword">LIMIT</span> <span class="num">10</span>;
+
+<span class="comment">-- Aggregate: kaç kullanıcı var?</span>
+<span class="keyword">SELECT</span> <span class="func">COUNT</span>(*) <span class="keyword">AS</span> <span class="field">toplam_kullanici</span>
+<span class="keyword">FROM</span>   <span class="table-name">kullanicilar</span>;
+
+<span class="comment">-- İki tabloyu JOIN ile birleştir</span>
+<span class="keyword">SELECT</span> <span class="table-name">k</span>.<span class="field">ad</span>, <span class="table-name">s</span>.<span class="field">baslik</span>
+<span class="keyword">FROM</span>   <span class="table-name">kullanicilar</span>  <span class="keyword">AS</span> <span class="table-name">k</span>
+<span class="keyword">JOIN</span>   <span class="table-name">siparisler</span>    <span class="keyword">AS</span> <span class="table-name">s</span>  <span class="keyword">ON</span> <span class="table-name">s</span>.<span class="field">kullanici_id</span> = <span class="table-name">k</span>.<span class="field">id</span>
+<span class="keyword">WHERE</span>  <span class="table-name">k</span>.<span class="field">id</span> = <span class="num">1</span>;</pre>
+  </div>
+
+  <h4>Güncelleme ve Silme (DML — UPDATE / DELETE)</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--sql)">SQL · UPDATE · DELETE</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">-- Belirli bir kaydı güncelle (WHERE olmadan BÜTÜN kayıtlar güncellenir!)</span>
+<span class="keyword">UPDATE</span> <span class="table-name">kullanicilar</span>
+<span class="keyword">SET</span>    <span class="field">telefon</span> = <span class="string">'+90 532 000 00 00'</span>
+<span class="keyword">WHERE</span>  <span class="field">id</span> = <span class="num">1</span>;
+
+<span class="comment">-- Belirli bir kaydı sil</span>
+<span class="keyword">DELETE FROM</span> <span class="table-name">kullanicilar</span>
+<span class="keyword">WHERE</span> <span class="field">id</span> = <span class="num">5</span>;
+
+<span class="comment">-- Transaction ile güvenli işlem</span>
+<span class="keyword">BEGIN</span>;
+    <span class="keyword">UPDATE</span> <span class="table-name">hesaplar</span> <span class="keyword">SET</span> <span class="field">bakiye</span> = <span class="field">bakiye</span> - <span class="num">100</span> <span class="keyword">WHERE</span> <span class="field">id</span> = <span class="num">1</span>;
+    <span class="keyword">UPDATE</span> <span class="table-name">hesaplar</span> <span class="keyword">SET</span> <span class="field">bakiye</span> = <span class="field">bakiye</span> + <span class="num">100</span> <span class="keyword">WHERE</span> <span class="field">id</span> = <span class="num">2</span>;
+<span class="keyword">COMMIT</span>; <span class="comment">-- Hata varsa: ROLLBACK;</span></pre>
+  </div>
+
+  <hr/>
+
+  <!-- MongoDB -->
+  <h3 style="color:var(--nosql); margin-top:36px">📄 MongoDB</h3>
+
+  <h4>Veri Tabanı ve Koleksiyon Oluşturma</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--nosql)">MongoDB Shell</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">// Veri tabanına geç (yoksa ilk belge eklenince oluşur)</span>
+<span class="keyword">use</span> <span class="table-name">uygulama_db</span>
+
+<span class="comment">// Koleksiyon oluştur (explicit)</span>
+<span class="func">db.createCollection</span>(<span class="string">"kullanicilar"</span>)
+
+<span class="comment">// Tek doküman ekle — schema-free, her alan isteğe bağlı</span>
+<span class="func">db.kullanicilar.insertOne</span>({
+    <span class="field">ad</span>:    <span class="string">"Ahmet Yılmaz"</span>,
+    <span class="field">email</span>: <span class="string">"ahmet@example.com"</span>,
+    <span class="field">roller</span>: [<span class="string">"admin"</span>, <span class="string">"editor"</span>],   <span class="comment">// dizi</span>
+    <span class="field">adres</span>: {                           <span class="comment">// iç içe belge</span>
+        <span class="field">sehir</span>: <span class="string">"İstanbul"</span>,
+        <span class="field">posta</span>: <span class="string">"34000"</span>
+    },
+    <span class="field">olusturulma</span>: <span class="keyword">new</span> <span class="func">Date</span>()
+})
+
+<span class="comment">// Birden fazla doküman ekle</span>
+<span class="func">db.kullanicilar.insertMany</span>([
+    { <span class="field">ad</span>: <span class="string">"Fatma Şahin"</span>, <span class="field">email</span>: <span class="string">"fatma@example.com"</span> },
+    { <span class="field">ad</span>: <span class="string">"Mehmet Çelik"</span>, <span class="field">email</span>: <span class="string">"mehmet@example.com"</span> }
+])</pre>
+  </div>
+
+  <h4>Sorgulama (find)</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--nosql)">MongoDB · Queries</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">// Tüm belgeleri getir</span>
+<span class="func">db.kullanicilar.find</span>({})
+
+<span class="comment">// Filtreli sorgu — şehri İstanbul olanlar</span>
+<span class="func">db.kullanicilar.find</span>({ <span class="string">"adres.sehir"</span>: <span class="string">"İstanbul"</span> })
+
+<span class="comment">// Sadece ad ve email alanlarını getir (projection)</span>
+<span class="func">db.kullanicilar.find</span>(
+    { <span class="field">roller</span>: <span class="string">"admin"</span> },      <span class="comment">// filtre</span>
+    { <span class="field">ad</span>: <span class="num">1</span>, <span class="field">email</span>: <span class="num">1</span>, <span class="field">_id</span>: <span class="num">0</span> }  <span class="comment">// projeksiyon</span>
+)
+
+<span class="comment">// Sıralama, limit ve atla</span>
+<span class="func">db.kullanicilar.find</span>({})
+    .<span class="func">sort</span>({ <span class="field">ad</span>: <span class="num">1</span> })   <span class="comment">// 1: artan, -1: azalan</span>
+    .<span class="func">skip</span>(<span class="num">10</span>)
+    .<span class="func">limit</span>(<span class="num">5</span>)
+
+<span class="comment">// Aggregation pipeline örneği — şehre göre grupla</span>
+<span class="func">db.kullanicilar.aggregate</span>([
+    { <span class="op">$group</span>: { <span class="field">_id</span>: <span class="string">"$adres.sehir"</span>, <span class="field">sayi</span>: { <span class="op">$sum</span>: <span class="num">1</span> } } },
+    { <span class="op">$sort</span>: { <span class="field">sayi</span>: -<span class="num">1</span> } }
+])</pre>
+  </div>
+
+  <h4>Güncelleme ve Silme</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--nosql)">MongoDB · Update · Delete</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">// Tek belge güncelle — $set sadece belirtilen alanı değiştirir</span>
+<span class="func">db.kullanicilar.updateOne</span>(
+    { <span class="field">email</span>: <span class="string">"ahmet@example.com"</span> },
+    { <span class="op">$set</span>: { <span class="string">"adres.sehir"</span>: <span class="string">"Ankara"</span> } }
+)
+
+<span class="comment">// Tüm eşleşen belgeleri güncelle</span>
+<span class="func">db.kullanicilar.updateMany</span>(
+    { <span class="string">"adres.sehir"</span>: <span class="string">"İstanbul"</span> },
+    { <span class="op">$set</span>: { <span class="field">bolge</span>: <span class="string">"Marmara"</span> } }
+)
+
+<span class="comment">// Tek belge sil</span>
+<span class="func">db.kullanicilar.deleteOne</span>({ <span class="field">email</span>: <span class="string">"silinecek@example.com"</span> })
+
+<span class="comment">// Tüm eşleşen belgeleri sil</span>
+<span class="func">db.kullanicilar.deleteMany</span>({ <span class="field">aktif</span>: <span class="keyword">false</span> })</pre>
+  </div>
+
+  <hr/>
+
+  <!-- Redis -->
+  <h3 style="color:var(--kv); margin-top:36px">⚡ Redis</h3>
+
+  <h4>Temel String Komutları</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--kv)">Redis CLI</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment"># String: SET / GET</span>
+<span class="keyword">SET</span>  kullanici:1:ad  <span class="string">"Ahmet Yılmaz"</span>
+<span class="keyword">GET</span>  kullanici:1:ad
+<span class="comment"># → "Ahmet Yılmaz"</span>
+
+<span class="comment"># TTL ile süre sonu belirle (60 saniye)</span>
+<span class="keyword">SET</span>   oturum:abc123  <span class="string">"kullanici_id_42"</span>  <span class="keyword">EX</span>  <span class="num">3600</span>
+<span class="keyword">TTL</span>   oturum:abc123        <span class="comment"># Kalan saniye</span>
+<span class="keyword">PERSIST</span> oturum:abc123     <span class="comment"># TTL'yi kaldır</span>
+<span class="keyword">DEL</span>   oturum:abc123        <span class="comment"># Anahtarı sil</span>
+
+<span class="comment"># Sayaç artırma / azaltma</span>
+<span class="keyword">SET</span>  sayfa:anasayfa:goruntulemeler  <span class="num">0</span>
+<span class="keyword">INCR</span> sayfa:anasayfa:goruntulemeler   <span class="comment"># → 1</span>
+<span class="keyword">INCRBY</span> sayfa:anasayfa:goruntulemeler <span class="num">10</span>  <span class="comment"># → 11</span>
+<span class="keyword">DECR</span> sayfa:anasayfa:goruntulemeler   <span class="comment"># → 10</span></pre>
+  </div>
+
+  <h4>Hash, List ve Sorted Set</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--kv)">Redis · Veri Yapıları</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment"># HASH — nesne gibi çalışır</span>
+<span class="keyword">HSET</span>   kullanici:1  <span class="field">ad</span> <span class="string">"Ahmet"</span>  <span class="field">email</span> <span class="string">"ahmet@example.com"</span>  <span class="field">yas</span> <span class="num">28</span>
+<span class="keyword">HGET</span>   kullanici:1  <span class="field">ad</span>
+<span class="keyword">HGETALL</span> kullanici:1          <span class="comment"># tüm alanlar</span>
+<span class="keyword">HDEL</span>   kullanici:1  <span class="field">yas</span>     <span class="comment"># alan sil</span>
+
+<span class="comment"># LIST — sıralı liste (kuyruk / stack)</span>
+<span class="keyword">LPUSH</span>  gorevler  <span class="string">"email-gonder"</span> <span class="string">"rapor-olustur"</span>  <span class="comment"># başa ekle</span>
+<span class="keyword">RPUSH</span>  gorevler  <span class="string">"veri-temizle"</span>                   <span class="comment"># sona ekle</span>
+<span class="keyword">LPOP</span>   gorevler                  <span class="comment"># soldan çıkar</span>
+<span class="keyword">LRANGE</span> gorevler  <span class="num">0</span>  <span class="num">-1</span>          <span class="comment"># tüm listeyi getir</span>
+
+<span class="comment"># SORTED SET — skor ile sıralı küme (leaderboard)</span>
+<span class="keyword">ZADD</span>   liderlik  <span class="num">4250</span>  <span class="string">"ahmet"</span>
+<span class="keyword">ZADD</span>   liderlik  <span class="num">7800</span>  <span class="string">"fatma"</span>
+<span class="keyword">ZADD</span>   liderlik  <span class="num">5500</span>  <span class="string">"mehmet"</span>
+<span class="keyword">ZREVRANGE</span> liderlik  <span class="num">0</span>  <span class="num">2</span>  <span class="keyword">WITHSCORES</span>  <span class="comment"># En yüksek 3</span>
+<span class="comment"># → fatma 7800, mehmet 5500, ahmet 4250</span></pre>
+  </div>
+
+  <hr/>
+
+  <!-- Neo4j -->
+  <h3 style="color:var(--graph); margin-top:36px">🕸 Neo4j — Cypher Sorgu Dili</h3>
+
+  <div class="callout warn">
+    <p><strong>Cypher (CQL):</strong> Neo4j'nin kendi sorgu dili. İngilizce açılımı <em>Cypher Query Language</em>'dir. Grafik yapılarını ASCII sanatıyla ifade eder: <code style="color:var(--accent5)">(node)-[:EDGE]-&gt;(node)</code></p>
+  </div>
+
+  <h4>Düğüm ve İlişki Oluşturma</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--graph)">Cypher · Neo4j</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">// Düğüm oluştur — CREATE</span>
+<span class="keyword">CREATE</span> (<span class="table-name">a</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span>, <span class="field">yas</span>: <span class="num">28</span>, <span class="field">sehir</span>: <span class="string">'İstanbul'</span> })
+<span class="keyword">CREATE</span> (<span class="table-name">f</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Fatma Şahin'</span>, <span class="field">yas</span>: <span class="num">32</span>, <span class="field">sehir</span>: <span class="string">'Ankara'</span> })
+
+<span class="comment">// İlişki oluştur — Ahmet, Fatma'yı TANIYORdur</span>
+<span class="keyword">MATCH</span>  (<span class="table-name">a</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span> }),
+       (<span class="table-name">f</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Fatma Şahin'</span> })
+<span class="keyword">CREATE</span> (<span class="table-name">a</span>)-[:<span class="op">TANIYOR</span> { <span class="field">yil</span>: <span class="num">2018</span> }]->(<span class="table-name">f</span>)
+
+<span class="comment">// Varsa getir, yoksa oluştur — MERGE</span>
+<span class="keyword">MERGE</span> (<span class="table-name">k</span>:<span class="type">Kisi</span> { <span class="field">email</span>: <span class="string">'yeni@example.com'</span> })
+<span class="keyword">ON CREATE SET</span> <span class="table-name">k</span>.<span class="field">olusturulma</span> = <span class="func">datetime</span>()
+<span class="keyword">ON MATCH SET</span>  <span class="table-name">k</span>.<span class="field">guncellendi</span> = <span class="func">datetime</span>()</pre>
+  </div>
+
+  <h4>Grafik Sorgulama (MATCH)</h4>
+  <div class="code-block">
+    <div class="code-header">
+      <span class="lang" style="color:var(--graph)">Cypher · Queries</span>
+      <div class="dots"><div class="dot dot-r"></div><div class="dot dot-y"></div><div class="dot dot-g"></div></div>
+    </div>
+    <pre><span class="comment">// Tüm Kisi düğümlerini getir</span>
+<span class="keyword">MATCH</span> (<span class="table-name">k</span>:<span class="type">Kisi</span>) <span class="keyword">RETURN</span> <span class="table-name">k</span>
+
+<span class="comment">// Ahmet'in tanıdıklarını bul</span>
+<span class="keyword">MATCH</span> (<span class="table-name">a</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span> })-[:<span class="op">TANIYOR</span>]->(<span class="table-name">t</span>)
+<span class="keyword">RETURN</span> <span class="table-name">t</span>.<span class="field">ad</span>, <span class="table-name">t</span>.<span class="field">sehir</span>
+
+<span class="comment">// Derinlik-2: arkadaşın arkadaşı (2 adım)</span>
+<span class="keyword">MATCH</span> (<span class="table-name">a</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span> })-[:<span class="op">TANIYOR</span>*<span class="num">2</span>]->(<span class="table-name">uzak</span>)
+<span class="keyword">RETURN DISTINCT</span> <span class="table-name">uzak</span>.<span class="field">ad</span>
+
+<span class="comment">// Kısa yolu bul — Dijkstra benzeri</span>
+<span class="keyword">MATCH</span> <span class="func">shortestPath</span>(
+    (<span class="table-name">a</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span> })
+    -[:<span class="op">TANIYOR</span>*]-
+    (<span class="table-name">f</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Fatma Şahin'</span> })
+)
+<span class="keyword">RETURN</span> <span class="func">path</span>
+
+<span class="comment">// Güncelle — SET ile</span>
+<span class="keyword">MATCH</span> (<span class="table-name">k</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span> })
+<span class="keyword">SET</span> <span class="table-name">k</span>.<span class="field">sehir</span> = <span class="string">'İzmir'</span>
+<span class="keyword">RETURN</span> <span class="table-name">k</span>
+
+<span class="comment">// Düğüm ve tüm ilişkilerini sil</span>
+<span class="keyword">MATCH</span> (<span class="table-name">k</span>:<span class="type">Kisi</span> { <span class="field">ad</span>: <span class="string">'Ahmet Yılmaz'</span> })
+<span class="keyword">DETACH DELETE</span> <span class="table-name">k</span>   <span class="comment">// DETACH: önce ilişkileri kopar</span></pre>
+  </div>
+
+  <div class="callout success">
+    <p><strong>İpucu:</strong> Neo4j'de <code style="color:var(--accent2)">DETACH DELETE</code> kullanmak zorunludur; aksi hâlde düğümün ilişkileri varken silme işlemi hata verir. Bu, kazara silmeye karşı bilinçli bir tasarım kararıdır.</p>
+  </div>
+
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <p>Veri Tabanları Kapsamlı Rehberi &nbsp;·&nbsp; SQL · MongoDB · Redis · Neo4j</p>
+  <p style="margin-top:8px;font-size:12px">RDBMS · NoSQL · Key-Value · Graph · DDL · DML · ACID · CRUD</p>
+</div>
+
+</div>
+</div>
+<script>
+  const toggleBtn = document.getElementById('theme-toggle');
+  const currentTheme = localStorage.getItem('theme') || 'dark';
+  if (currentTheme === 'light') {
+    document.documentElement.setAttribute('data-theme', 'light');
+    toggleBtn.textContent = '🌙';
+  }
+  toggleBtn.addEventListener('click', () => {
+    let theme = document.documentElement.getAttribute('data-theme');
+    if (theme === 'light') {
+      document.documentElement.removeAttribute('data-theme');
+      localStorage.setItem('theme', 'dark');
+      toggleBtn.textContent = '☀️';
+    } else {
+      document.documentElement.setAttribute('data-theme', 'light');
+      localStorage.setItem('theme', 'light');
+      toggleBtn.textContent = '🌙';
+    }
+  });
+</script>
+</body>
+</html>

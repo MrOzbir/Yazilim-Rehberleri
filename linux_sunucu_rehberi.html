@@ -1,0 +1,1183 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linux Sunucu Kurulumu, Güvenliği & Ağ Yönetimi | Master Rehber</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Prism.js CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <!-- AOS CSS -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.css" rel="stylesheet">
+
+    <!-- Tippy.js CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/tippy.js@6/animations/scale.css"/>
+
+    <style>
+        :root {
+            --bg: #0B0F19;
+            --bg2: #111625;
+            --bg3: #181E33;
+            --border: #1E293B;
+            --accent: #06B6D4;
+            --cyan: #22D3EE;
+            --warn: #F59E0B;
+            --danger: #F43F5E;
+            --success: #10B981;
+            --text-main: #E2E8F0;
+            --text-muted: #94A3B8;
+            --dot-red: #FF5F56;
+            --dot-yellow: #FFBD2E;
+            --dot-green: #27C93F;
+            --sidebar-width: 280px;
+            --heading-color: #FFFFFF;
+        }
+
+        body.light-mode {
+            --bg: #F8FAFC;
+            --bg2: #FFFFFF;
+            --bg3: #F1F5F9;
+            --border: #E2E8F0;
+            --accent: #06B6D4;
+            --cyan: #0891B2;
+            --warn: #D97706;
+            --danger: #E11D48;
+            --success: #059669;
+            --text-main: #334155;
+            --text-muted: #64748B;
+            --heading-color: #0F172A;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, sans-serif;
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.7;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, h5 {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            color: var(--heading-color);
+            margin-bottom: 1rem;
+        }
+
+        a {
+            color: var(--cyan);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        
+        a:hover {
+            color: #fff;
+        }
+
+        /* Layout */
+        .layout {
+            display: block;
+        }
+
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: rgba(17, 22, 37, 0.8);
+            backdrop-filter: blur(12px);
+            border-right: 1px solid var(--border);
+            padding: 2.5rem 1.5rem;
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        body.light-mode .sidebar {
+            background-color: rgba(255, 255, 255, 0.85);
+        }
+
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 4px; }
+
+        .sidebar-brand {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--cyan);
+            margin-bottom: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            letter-spacing: -0.5px;
+        }
+
+        .sidebar-brand svg {
+            width: 28px;
+            height: 28px;
+            filter: drop-shadow(0 0 8px rgba(34, 211, 238, 0.4));
+        }
+
+        .nav-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .nav-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.85rem 1rem;
+            color: var(--text-muted);
+            border-radius: 0.75rem;
+            font-weight: 500;
+            font-size: 0.95rem;
+            border: 1px solid transparent;
+        }
+
+        .nav-link:hover {
+            background-color: var(--bg3);
+            color: var(--cyan);
+            border-color: var(--border);
+        }
+
+        .nav-link.active {
+            background: linear-gradient(90deg, rgba(34, 211, 238, 0.1), transparent);
+            color: var(--cyan);
+            border-left: 3px solid var(--cyan);
+            border-radius: 0 0.75rem 0.75rem 0;
+        }
+
+        .main-wrapper {
+            margin-left: var(--sidebar-width);
+            margin-right: var(--sidebar-width);
+        }
+
+        .main-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 5rem 3rem;
+            width: 100%;
+        }
+
+        /* Hero */
+        .hero {
+            margin-bottom: 5rem;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: -100px;
+            left: -100px;
+            width: 300px;
+            height: 300px;
+            background: var(--accent);
+            filter: blur(150px);
+            opacity: 0.15;
+            z-index: -1;
+            border-radius: 50%;
+        }
+
+        .hero-title {
+            font-size: 3.5rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--heading-color) 0%, var(--text-muted) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: -1px;
+        }
+
+        .hero-desc {
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            max-width: 800px;
+        }
+
+        /* Sections */
+        .section {
+            margin-bottom: 7rem;
+            scroll-margin-top: 5rem;
+        }
+
+        .section-header {
+            margin-bottom: 3rem;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 1.5rem;
+        }
+
+        .section-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.35rem 1rem;
+            background-color: rgba(6, 182, 212, 0.1);
+            color: var(--cyan);
+            border: 1px solid rgba(6, 182, 212, 0.2);
+            border-radius: 2rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 1.5rem;
+            letter-spacing: 0.5px;
+        }
+
+        .section-title {
+            font-size: 2.25rem;
+            font-weight: 800;
+        }
+
+        /* Cards */
+        .card {
+            background-color: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: 1.25rem;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            position: relative;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.2);
+            border-color: rgba(34, 211, 238, 0.3);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 0;
+        }
+        
+        .card-subtitle {
+            font-size: 1.15rem;
+            font-weight: 600;
+            color: var(--cyan);
+            margin-top: 2rem;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        
+        .card-subtitle::before {
+            content: '⚡';
+            font-size: 1rem;
+        }
+
+        .level-badge {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.5rem;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .level-temel { background-color: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+        .level-orta { background-color: rgba(245, 158, 11, 0.1); color: var(--warn); border: 1px solid rgba(245, 158, 11, 0.2); }
+        .level-ileri { background-color: rgba(244, 63, 94, 0.1); color: var(--danger); border: 1px solid rgba(244, 63, 94, 0.2); }
+        .level-master { background-color: rgba(34, 211, 238, 0.1); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.2); }
+
+        /* Typography */
+        .text-block { margin-bottom: 1.5rem; color: var(--text-main); }
+        .text-block strong { color: var(--heading-color); font-weight: 600; }
+        
+        .alert-box {
+            background-color: rgba(245, 158, 11, 0.1);
+            border-left: 4px solid var(--warn);
+            padding: 1.25rem;
+            border-radius: 0.5rem;
+            margin: 1.5rem 0;
+            font-size: 0.95rem;
+        }
+
+        .feature-list { list-style: none; margin-bottom: 1.5rem; }
+        .feature-list li { position: relative; padding-left: 1.75rem; margin-bottom: 0.75rem; color: var(--text-muted); }
+        .feature-list li::before { content: '▹'; position: absolute; left: 0; top: -2px; color: var(--cyan); font-size: 1.2rem; font-weight: bold; }
+        .feature-list li strong { color: var(--text-main); }
+
+        /* Terminal Window */
+        .terminal {
+            background-color: #0D1117;
+            border: 1px solid #1E293B;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            margin: 2rem 0;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+        }
+
+        .terminal-header {
+            background-color: #161B22;
+            padding: 0.75rem 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            border-bottom: 1px solid #30363D;
+        }
+
+        .terminal-dots { display: flex; gap: 0.5rem; }
+        .dot { width: 12px; height: 12px; border-radius: 50%; }
+        .dot.red { background-color: var(--dot-red); }
+        .dot.yellow { background-color: var(--dot-yellow); }
+        .dot.green { background-color: var(--dot-green); }
+
+        .terminal-title {
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        .btn-copy {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            padding: 0.35rem 0.75rem;
+            border-radius: 0.35rem;
+            font-size: 0.75rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .btn-copy:hover { color: var(--cyan); border-color: var(--cyan); background: rgba(34, 211, 238, 0.1); }
+
+        .terminal-body { padding: 1.5rem; overflow-x: auto; }
+        .terminal-body pre { margin: 0 !important; padding: 0 !important; background: transparent !important; font-family: 'JetBrains Mono', monospace !important; font-size: 0.9rem !important; line-height: 1.6 !important; text-shadow: none !important; }
+        .terminal-body code { font-family: 'JetBrains Mono', monospace !important; text-shadow: none !important; }
+
+        .hint { border-bottom: 1px dashed var(--cyan); cursor: help; color: var(--cyan); font-weight: 500; }
+
+        /* Theme Toggle & Search */
+        .theme-toggle {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-muted);
+            border-radius: 0.75rem;
+            padding: 0.75rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            transition: all 0.2s;
+            margin-top: auto;
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.95rem;
+            width: 100%;
+        }
+        .theme-toggle:hover {
+            color: var(--cyan);
+            border-color: var(--cyan);
+            background: rgba(34, 211, 238, 0.05);
+        }
+        .theme-toggle svg { width: 18px; height: 18px; }
+        .theme-toggle .icon-moon { display: none; }
+        .theme-toggle .icon-sun { display: block; }
+        body.light-mode .theme-toggle .icon-moon { display: block; }
+        body.light-mode .theme-toggle .icon-sun { display: none; }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 2rem;
+        }
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            color: var(--text-muted);
+        }
+        .search-box input {
+            width: 100%;
+            background-color: var(--bg);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            padding: 0.85rem 1rem 0.85rem 2.5rem;
+            border-radius: 0.75rem;
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-box input:focus {
+            border-color: var(--cyan);
+            box-shadow: 0 0 0 3px rgba(34, 211, 238, 0.1);
+        }
+
+        mark {
+            background-color: rgba(34, 211, 238, 0.3);
+            color: inherit;
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+        body.light-mode mark {
+            background-color: rgba(8, 145, 178, 0.3);
+        }
+
+        @media (max-width: 1200px) { .main-wrapper { margin-right: 0; } }
+        @media (max-width: 992px) { :root { --sidebar-width: 260px; } .hero-title { font-size: 2.8rem; } }
+        @media (max-width: 768px) {
+            .main-wrapper { margin-left: 0; margin-right: 0; }
+            .sidebar { width: 100%; height: auto; position: static; border-right: none; border-bottom: 1px solid var(--border); padding: 1.5rem; }
+            .main-content { padding: 2.5rem 1.5rem; }
+            .terminal-title { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="layout">
+    <!-- Sidebar Navigation -->
+    <aside class="sidebar">
+        <div class="sidebar-brand">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect>
+                <rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect>
+                <line x1="6" y1="6" x2="6.01" y2="6"></line>
+                <line x1="6" y1="18" x2="6.01" y2="18"></line>
+            </svg>
+            DevOps Master
+        </div>
+
+        <div class="search-box">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="search-icon"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            <input type="text" id="searchInput" placeholder="Rehberde ara...">
+        </div>
+
+        <nav>
+            <ul class="nav-list">
+                <li><a href="#kurulum" class="nav-link active">01. Temel Linux & SSH</a></li>
+                <li><a href="#ag-guvenlik" class="nav-link">02. Ağ & Gelişmiş Güvenlik</a></li>
+                <li><a href="#web-sunucu" class="nav-link">03. Web Sunucu & Proxy</a></li>
+                <li><a href="#docker" class="nav-link">04. Konteyner & Docker</a></li>
+                <li><a href="#izleme" class="nav-link">05. İzleme, Log & Systemd</a></li>
+            </ul>
+        </nav>
+
+        <button class="theme-toggle" id="themeToggle" aria-label="Tema Değiştir">
+            <svg class="icon-sun" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"></circle><line x1="12" y1="1" x2="12" y2="3"></line><line x1="12" y1="21" x2="12" y2="23"></line><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line><line x1="1" y1="12" x2="3" y2="12"></line><line x1="21" y1="12" x2="23" y2="12"></line><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line></svg>
+            <svg class="icon-moon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+            <span class="theme-text">Tema Değiştir</span>
+        </button>
+    </aside>
+
+    <!-- Main Content -->
+    <div class="main-wrapper">
+    <main class="main-content">
+        
+        <div class="hero" data-aos="fade-down">
+            <h1 class="hero-title">Linux Sunucu Kurulumu, Güvenliği & Ağ Yönetimi: Detaylı Başvuru Rehberi</h1>
+            <p class="hero-desc">Basit kurulumların ötesine geçerek; kernel seviyesi yetkiler, defansif ağ mimarileri, ters proxy stratejileri ve modern konteyner orkestrasyonu gibi uzman DevOps pratiklerini barındıran tamamen kapsamlandırılmış master rehber.</p>
+        </div>
+
+        <!-- SECTION 01 -->
+        <section id="kurulum" class="section">
+            <div class="section-header" data-aos="fade-right">
+                <div class="section-badge">Bölüm 01</div>
+                <h2 class="section-title">Temel Linux Mimarisi, Kullanıcılar ve İleri Seviye SSH Hardening</h2>
+            </div>
+
+            <div class="card" data-aos="fade-up">
+                <div class="card-header">
+                    <h3 class="card-title">1.1 FHS ve Gelişmiş Dosya İzinleri</h3>
+                    <span class="level-badge level-orta">Orta Seviye</span>
+                </div>
+                <p class="text-block">Standart Okuma/Yazma/Çalıştırma (rwx) yetkilerinin yanı sıra, sistem güvenliğini sağlamak için SUID, SGID ve Sticky Bit gibi özel izin yapılarını anlamak elzemdir.</p>
+                
+                <ul class="feature-list">
+                    <li><strong>SUID (Set User ID):</strong> Bir dosyanın (örn. <code>/usr/bin/passwd</code>), dosyayı çalıştıran kullanıcının yetkileriyle değil, dosya sahibinin (root) yetkileriyle çalışmasını sağlar.</li>
+                    <li><strong>SGID (Set Group ID):</strong> Dizinlere uygulandığında, o dizin içinde oluşturulan dosyalar o dizinin grubunu miras alır. (Ortak çalışma alanları için).</li>
+                    <li><strong>Sticky Bit:</strong> Sadece dosyanın sahibinin veya root'un o dosyayı silebilmesini sağlar (örn. <code>/tmp</code> dizini).</li>
+                </ul>
+
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">bash</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-bash"># Klasik chmod (Sahip: 7, Grup: 5, Diğerleri: 5)
+root@server:~# chmod 755 /var/www/html
+
+# SUID Ayarlamak (Sembolik: u+s, Nümerik: 4000)
+root@server:~# chmod u+s /opt/scripts/special_script.sh
+
+# Ortak paylaşımlı dizin için SGID Ayarlamak (Sembolik: g+s, Nümerik: 2000)
+root@server:~# chmod g+s /var/shared_folder
+
+# Sticky Bit Ayarlamak (Sembolik: +t, Nümerik: 1000)
+root@server:~# chmod +t /var/public_uploads</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header">
+                    <h3 class="card-title">1.2 Sudoers Manipülasyonu (visudo)</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block">Her kullanıcıyı <code>sudo</code> grubuna eklemek büyük bir güvenlik açığıdır. Belirli kullanıcılara sadece belirli komutları root olarak çalıştırma yetkisi vermek gerekir. Bu işlem sadece <code>visudo</code> komutu ile yapılmalıdır; dosyayı <code>nano /etc/sudoers</code> ile doğrudan düzenlemek syntax hatasında sistem erişimini kaybetmenize yol açabilir.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">/etc/sudoers (visudo üzerinden)</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-bash"># Geliştirici sadece Nginx servisini yeniden başlatabilsin (şifresiz)
+developer ALL=(root) NOPASSWD: /bin/systemctl restart nginx
+
+# DevOps grubu tüm komutları şifresiz çalıştırabilsin
+%devops ALL=(ALL:ALL) NOPASSWD: ALL
+
+# Belirli bir komut dosyasını (script) çalıştırma izni
+monitor_user ALL=(root) /opt/scripts/health_check.sh</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-header">
+                    <h3 class="card-title">1.3 SSH Hardening Deep Dive</h3>
+                    <span class="level-badge level-master">Master Seviye</span>
+                </div>
+                <p class="text-block">Sadece Port değiştirmek ve Password Authentication kapatmak yeterli değildir. SSH servisini daha da daraltmak gerekir.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">/etc/ssh/sshd_config</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-bash"># Temel Güvenlik
+Port 2222
+PermitRootLogin no
+PasswordAuthentication no
+PubkeyAuthentication yes
+
+# İleri Seviye Daraltma (Hardening)
+AllowUsers devops admin          # Sadece bu kullanıcılar SSH yapabilir (Kritik!)
+MaxAuthTries 3                   # 3 yanlış denemede bağlantıyı kes
+ClientAliveInterval 300          # 5 dakika işlem yapılmazsa oturumu düşür
+ClientAliveCountMax 2            # Cevap vermeyen istemciyi 2. denemede at
+PermitEmptyPasswords no          # Boş şifrelere kesinlikle izin verme
+X11Forwarding no                 # GUI uygulamalarının iletilmesini engelle
+AllowTcpForwarding no            # SSH Tünellemeyi engelle (Gerekmiyorsa)
+
+# Ayarları test et (syntax hatası var mı?) ve servisi yeniden başlat
+root@server:~# sshd -t
+root@server:~# systemctl restart sshd</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 02 -->
+        <section id="ag-guvenlik" class="section">
+            <div class="section-header" data-aos="fade-right">
+                <div class="section-badge">Bölüm 02</div>
+                <h2 class="section-title">Ağ Yönetimi, DNS ve Gelişmiş Güvenlik Duvarı</h2>
+            </div>
+
+            <div class="card" data-aos="fade-up">
+                <div class="card-header">
+                    <h3 class="card-title">2.1 Netplan ile Statik IP ve DNS</h3>
+                    <span class="level-badge level-orta">Orta Seviye</span>
+                </div>
+                <p class="text-block">Ubuntu ve modern Linux dağıtımlarında ağ yönetimi <code>/etc/network/interfaces</code> yerine <span class="hint" data-tippy-content="Ağ konfigürasyonlarını YAML formatında yazıp backend'e (NetworkManager veya systemd-networkd) ileten modern araç.">Netplan</span> üzerinden yapılmaktadır.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">/etc/netplan/01-netcfg.yaml</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-yaml">network:
+  version: 2
+  renderer: networkd
+  ethernets:
+    eth0:
+      dhcp4: no
+      addresses:
+        - 192.168.1.100/24
+      routes:
+        - to: default
+          via: 192.168.1.1
+      nameservers:
+        addresses:
+          - 1.1.1.1
+          - 8.8.8.8
+        search: [mydomain.local]</code></pre>
+                    </div>
+                </div>
+                <div class="text-block" style="margin-top: 1rem;">
+                    <strong>Uygulamak için:</strong> <code>sudo netplan try</code> (Hata yaparsanız 120 saniye içinde eski ayara döner), memnunsanız <code>sudo netplan apply</code>.
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header">
+                    <h3 class="card-title">2.2 UFW Rate Limiting ve İptables Mantığı</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block">UFW, aslında arka planda Linux çekirdeğinin <code>iptables / netfilter</code> yapısını kullanan bir arayüzdür. Doğrudan UFW üzerinden "Hız Sınırlandırma (Rate Limiting)" uygulayarak kaba kuvvet saldırılarını fail2ban olmadan da yavaşlatabilirsiniz.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">bash</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-bash"># SSH Portu için Rate Limiting uygula 
+# (Aynı IP'den 30 saniye içinde 6'dan fazla bağlantı gelirse banlar)
+root@server:~# ufw limit 2222/tcp
+
+# Belirli bir IP bloğuna (Subnet) tam erişim
+root@server:~# ufw allow from 10.0.0.0/8
+
+# Giden trafiği engelle ve sadece belirli portlara izin ver (Sunucu hacklense bile dışarı veri kaçıramaz)
+root@server:~# ufw default deny outgoing
+root@server:~# ufw allow out 80/tcp
+root@server:~# ufw allow out 443/tcp
+root@server:~# ufw allow out 53/udp  # DNS Sorguları için şart!</code></pre>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-header">
+                    <h3 class="card-title">2.3 Fail2Ban İleri Konfigürasyon ve Log Okuma</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block">Fail2ban'in en güçlü yanı sadece SSH'ı değil, Nginx/Apache loglarını da okuyarak web tabanlı taramaları (botları) engelleyebilmesidir.</p>
+
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">/etc/fail2ban/jail.local</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-yaml">[DEFAULT]
+bantime = 1h          # Varsayılan ban süresi
+findtime = 10m        # Denemelerin sayıldığı zaman aralığı
+maxretry = 5          # Maksimum deneme
+
+[sshd]
+enabled = true
+port = 2222
+maxretry = 3          # SSH için özel olarak düşürdük
+
+# Nginx 404 (Not Found) tarayan botları engelle
+[nginx-botsearch]
+enabled = true
+port     = http,https
+logpath  = %(nginx_error_log)s
+maxretry = 2          # 2 hatalı url taramasında banla!</code></pre>
+                    </div>
+                </div>
+                
+                <div class="text-block" style="margin-top: 1rem;">
+                    <strong>Banlanmış IP'leri Görmek:</strong> <code>fail2ban-client status sshd</code><br>
+                    <strong>Bir IP'nin banını kaldırmak (Unban):</strong> <code>fail2ban-client set sshd unbanip 1.2.3.4</code>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 03 -->
+        <section id="web-sunucu" class="section">
+            <div class="section-header" data-aos="fade-right">
+                <div class="section-badge">Bölüm 03</div>
+                <h2 class="section-title">Modern Web Sunucusu ve Proxy Mimarisi (Nginx)</h2>
+            </div>
+
+            <div class="card" data-aos="fade-up">
+                <div class="card-header">
+                    <h3 class="card-title">3.1 Yük Dengeleme (Load Balancing) ve Upstream Mimarisi</h3>
+                    <span class="level-badge level-master">Master Seviye</span>
+                </div>
+                <p class="text-block">Arka planda çalışan birden fazla Node.js veya Python sürecine (process) trafiği paylaştırmak için <code>upstream</code> bloğu kullanılır. Bu sayede High-Availability (Yüksek Erişilebilirlik) sağlanır.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">/etc/nginx/nginx.conf veya sites-available/api</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-nginx"># Sunucu havuzunu tanımla
+upstream backend_api {
+    # Varsayılan algoritma Round-Robin'dir (Sırayla dağıtır)
+    # least_conn; eklenirse en az bağlantısı olana yönlendirir
+    # ip_hash; eklenirse aynı IP hep aynı sunucuya düşer (Session koruma)
+    
+    server 127.0.0.1:3000 weight=3; # Bu sunucuya 3 kat daha fazla trafik ver
+    server 127.0.0.1:3001;
+    server 127.0.0.1:3002 backup;   # Diğerleri çökerse devreye gir
+}
+
+server {
+    listen 80;
+    server_name api.domain.com;
+
+    location / {
+        proxy_pass http://backend_api; # Havuza yönlendir
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header">
+                    <h3 class="card-title">3.2 Güvenlik Başlıkları (Security Headers) ve Mikro-Önbellekleme</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block">Nginx üzerinden XSS, Clickjacking gibi saldırıları engellemek için HTTP response header'larına müdahale edilmelidir. Ayrıca anlık trafik patlamalarında backend'i korumak için <code>microcaching</code> uygulanabilir.</p>
+
+                <div class="alert-box">
+                    <strong>Bilgi:</strong> <code>add_header Strict-Transport-Security</code> (HSTS) tarayıcıya sitenin "sadece ve her zaman HTTPS üzerinden çalışması gerektiğini" söyler.
+                </div>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">Nginx Security & Cache Config</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-nginx"># Cache Yolu Tanımlama (http bloğu içine)
+proxy_cache_path /var/cache/nginx levels=1:2 keys_zone=my_cache:10m max_size=1g inactive=60m use_temp_path=off;
+
+server {
+    listen 443 ssl http2;
+    server_name api.domain.com;
+    
+    # SSL Sertifikaları...
+
+    # Security Headers
+    add_header X-Frame-Options "SAMEORIGIN" always; # Clickjacking Koruması
+    add_header X-XSS-Protection "1; mode=block" always;
+    add_header X-Content-Type-Options "nosniff" always;
+    add_header Strict-Transport-Security "max-age=31536000; includeSubDomains" always;
+
+    location /api/ {
+        proxy_pass http://backend_api;
+        
+        # Microcaching Aktifleştirme
+        proxy_cache my_cache;
+        proxy_cache_valid 200 1m; # 200 Başarılı yanıtları 1 dakika cache'le
+        proxy_cache_use_stale error timeout http_500 http_502 http_503 http_504; # Backend çökerse cache'deki eski veriyi göster
+        
+        # Güvenlik başlıklarını proxy altından da geçir
+        add_header X-Cache-Status $upstream_cache_status;
+    }
+}</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 04 -->
+        <section id="docker" class="section">
+            <div class="section-header" data-aos="fade-right">
+                <div class="section-badge">Bölüm 04</div>
+                <h2 class="section-title">Konteyner Mimarisi, Optimizasyon ve Güvenlik</h2>
+            </div>
+
+            <div class="card" data-aos="fade-up">
+                <div class="card-header">
+                    <h3 class="card-title">4.1 İleri Seviye Dockerfile ve Güvenlik Pratikleri</h3>
+                    <span class="level-badge level-master">Master Seviye</span>
+                </div>
+                <p class="text-block">Docker imajlarınızı oluştururken, <span class="hint" data-tippy-content="Olası bir RCE (Remote Code Execution) açığında saldırganın host sisteme root olarak sıçramasını zorlaştıran yöntem.">root olmayan (non-root)</span> kullanıcılar tanımlamak ve yalnızca derlenmiş binary'leri/kodları kopyalamak çok kritik bir DevSecOps standardıdır.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">Golang / Multi-stage / Distroless Dockerfile</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-docker"># AŞAMA 1: Derleme
+FROM golang:1.20-alpine AS builder
+WORKDIR /app
+# Sistem kütüphanelerine bağımlı olmadan saf statik derleme
+ENV CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+COPY go.mod go.sum ./
+RUN go mod download
+COPY . .
+RUN go build -ldflags="-w -s" -o server main.go
+
+# AŞAMA 2: Production (Distroless imaj kullanımı)
+# İçerisinde shell (sh/bash) bile barındırmayan ultra-güvenli Google imajı
+FROM gcr.io/distroless/static-debian11
+# İmajın içine giriyoruz, root kullanıcısı değil nonroot kullanıcısı aktif
+USER nonroot:nonroot
+COPY --from=builder --chown=nonroot:nonroot /app/server /server
+# Sadece çalıştırılabilir dosyayı çağır
+ENTRYPOINT ["/server"]</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header">
+                    <h3 class="card-title">4.2 Docker Compose Ağları, Hacimler ve Log Rotasyonu</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block">Varsayılan bridge ağı yerine servisler arası iletişimi izole etmek için özel ağlar tanımlanmalıdır. Ayrıca konteynerlerin sonsuza kadar log üreterek diski doldurmasını önlemek için Docker seviyesinde log-rotasyonu şarttır.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">Gelişmiş docker-compose.yml</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-yaml">version: '3.8'
+
+services:
+  web:
+    image: nginx:alpine
+    ports:
+      - "80:80"
+    networks:
+      - frontend      # Sadece frontend ağına dahil
+    depends_on:
+      - api
+    logging:          # Logların diski doldurmasını engelle
+      driver: "json-file"
+      options:
+        max-size: "10m"
+        max-file: "3"
+
+  api:
+    build: ./api
+    networks:
+      - frontend      # Nginx ile konuşabilmesi için
+      - backend       # Veritabanı ile konuşabilmesi için
+    restart: on-failure:5  # Çökerse maksimum 5 kez dene
+    read_only: true        # Konteyner dosya sistemini Read-Only yap! (Hacklense bile dosya yazamaz)
+    tmpfs:
+      - /tmp           # Read-Only olsa da /tmp klasörünü geçici RAM disk olarak ver
+
+  db:
+    image: postgres:15-alpine
+    networks:
+      - backend       # Sadece backend ağına dahil (Nginx ulaşamaz)
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    environment:
+      POSTGRES_DB: app_db
+      POSTGRES_USER: ${DB_USER}
+      POSTGRES_PASSWORD_FILE: /run/secrets/db_password # Düz metin env yerine Docker Secrets kullanımı
+
+secrets:
+  db_password:
+    file: ./secrets/db_pass.txt
+
+networks:
+  frontend:
+    driver: bridge
+  backend:
+    driver: bridge
+    internal: true    # Bu ağ dış dünyaya (internete) tamamen kapalıdır!
+
+volumes:
+  db_data:</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 05 -->
+        <section id="izleme" class="section">
+            <div class="section-header" data-aos="fade-right">
+                <div class="section-badge">Bölüm 05</div>
+                <h2 class="section-title">Log Analizi, Systemd ve Modern Sistem İzleme</h2>
+            </div>
+
+            <div class="card" data-aos="fade-up">
+                <div class="card-header">
+                    <h3 class="card-title">5.1 Cron'a Modern Alternatif: Systemd Timers</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block">Geleneksel <code>cron</code> loglaması zayıftır ve işlemi takip etmek zordur. Modern Linux sistemlerinde zamanlanmış görevler için <strong>Systemd Timer</strong>'lar kullanılır. Hem saniye bazlı hassasiyet sağlar hem de logları doğrudan <code>journalctl</code> içine atar.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">1. /etc/systemd/system/backup.service</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-ini">[Unit]
+Description=Database Backup Script
+
+[Service]
+Type=oneshot
+ExecStart=/opt/scripts/backup.sh</code></pre>
+                    </div>
+                </div>
+
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">2. /etc/systemd/system/backup.timer</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-ini">[Unit]
+Description=Run backup every day at midnight
+
+[Timer]
+# Her gece 00:00'da çalıştır
+OnCalendar=*-*-* 00:00:00
+# Sistem o saatte kapalıysa, açıldığında görevi telafi et
+Persistent=true
+
+[Install]
+WantedBy=timers.target</code></pre>
+                    </div>
+                </div>
+                <div class="text-block" style="margin-top: 1rem;">
+                    <strong>Aktifleştirmek için:</strong> <code>systemctl enable --now backup.timer</code><br>
+                    <strong>Tüm Timer'ları listele:</strong> <code>systemctl list-timers</code>
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="100">
+                <div class="card-header">
+                    <h3 class="card-title">5.2 Journalctl ve Log Veri Madenciliği (Awk/Grep)</h3>
+                    <span class="level-badge level-master">Master Seviye</span>
+                </div>
+                <p class="text-block">Büyük sunucularda metin tabanlı devasa log dosyaları arasında kaybolmamak için <code>journalctl</code> filtrelerini ve <code>awk</code> metin işlemcisini verimli kullanmak gerekir.</p>
+                
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">bash</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-bash"># SSH servisinde dünden bugüne olan "Failed" (Başarısız) kelimesi geçen logları getir
+root@server:~# journalctl -u sshd --since "yesterday" | grep "Failed"
+
+# Geçen boot (yeniden başlatma) sırasındaki çekirdek (kernel) hatalarını bul
+root@server:~# journalctl -k -b -1 -p err
+
+# Nginx loglarında en çok istek yapan (IP tabanlı) Top 10 IP adresini listele (awk ve sort kombosu)
+root@server:~# awk '{print $1}' /var/log/nginx/access.log | sort | uniq -c | sort -nr | head -n 10
+
+# Nginx loglarından sadece 404 dönen isteklerin URL'lerini çek
+root@server:~# awk '($9 ~ /404/)' /var/log/nginx/access.log | awk '{print $7}'</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card" data-aos="fade-up" data-aos-delay="200">
+                <div class="card-header">
+                    <h3 class="card-title">5.3 Tarihsel Metrikler (sysstat/sar) ve Prometheus</h3>
+                    <span class="level-badge level-ileri">İleri Seviye</span>
+                </div>
+                <p class="text-block"><code>htop</code> sadece anlık durumu gösterir. "Dün gece saat 03:00'te sunucu neden yavaşladı?" sorusunun cevabı için <code>sysstat</code> (sar) paketi veya Prometheus & Grafana stack'i kurulmalıdır.</p>
+                
+                <ul class="feature-list">
+                    <li><strong>sar aracı:</strong> <code>apt install sysstat</code> ile kurulur. Arka planda 10 dakikada bir snapshot alır.</li>
+                    <li><strong>Prometheus & Grafana:</strong> Modern bulut sistemlerinde sunuculara <em>Node Exporter</em> kurularak CPU, RAM, Disk I/O metrikleri merkezi bir Prometheus sunucusuna çekilir ve Grafana panellerinde görselleştirilir.</li>
+                </ul>
+
+                <div class="terminal">
+                    <div class="terminal-header">
+                        <div class="terminal-dots"><span class="dot red"></span><span class="dot yellow"></span><span class="dot green"></span></div>
+                        <div class="terminal-title">bash</div>
+                        <button class="btn-copy" onclick="copyCode(this)">Kopyala</button>
+                    </div>
+                    <div class="terminal-body">
+<pre><code class="language-bash"># Bugünün CPU geçmişini saatlik olarak göster
+root@server:~# sar -u
+
+# Ayın 15'indeki RAM kullanım geçmişini göster
+root@server:~# sar -r -f /var/log/sysstat/sa15
+
+# Disk I/O (Okuma/Yazma) istatistiklerini izle
+root@server:~# iostat -x 2 5  # 2 saniyede bir 5 defa raporla</code></pre>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+    </div>
+</div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-nginx.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-docker.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-yaml.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-ini.min.js"></script>
+
+<script src="https://unpkg.com/@popperjs/core@2"></script>
+<script src="https://unpkg.com/tippy.js@6"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/aos/2.3.4/aos.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"></script>
+
+<script>
+    // Theme Toggle
+    const themeToggle = document.getElementById('themeToggle');
+    if (localStorage.getItem('theme') === 'light') {
+        document.body.classList.add('light-mode');
+    }
+    themeToggle.addEventListener('click', () => {
+        document.body.classList.toggle('light-mode');
+        localStorage.setItem('theme', document.body.classList.contains('light-mode') ? 'light' : 'dark');
+    });
+
+    // Search & Filter
+    const searchInput = document.getElementById('searchInput');
+    const contentArea = document.querySelector('.main-content');
+    const markInstance = new Mark(contentArea);
+
+    searchInput.addEventListener('input', function(e) {
+        const term = e.target.value.trim();
+        markInstance.unmark({
+            done: function() {
+                if (term.length > 1) {
+                    markInstance.mark(term, {
+                        accuracy: "partially",
+                        diacritics: true,
+                        exclude: [".language-bash", ".language-nginx", ".language-yaml", ".language-docker", ".language-ini"]
+                    });
+                    
+                    document.querySelectorAll('.card').forEach(card => {
+                        if(card.textContent.toLowerCase().includes(term.toLowerCase())) {
+                            card.style.display = 'block';
+                        } else {
+                            card.style.display = 'none';
+                        }
+                    });
+                    
+                    document.querySelectorAll('.section').forEach(section => {
+                        const cards = section.querySelectorAll('.card');
+                        let hasVisible = false;
+                        cards.forEach(c => { if(c.style.display !== 'none') hasVisible = true; });
+                        section.style.display = hasVisible ? 'block' : 'none';
+                    });
+                } else {
+                    document.querySelectorAll('.card, .section').forEach(el => el.style.display = 'block');
+                }
+            }
+        });
+    });
+
+    // Initialize AOS Animations
+    AOS.init({
+        duration: 800,
+        once: true,
+        offset: 50,
+        easing: 'ease-out-cubic'
+    });
+
+    // Initialize Tooltips
+    tippy('[data-tippy-content]', {
+        animation: 'scale',
+        theme: 'translucent',
+        placement: 'top',
+        arrow: true
+    });
+
+    // Copy Code Functionality
+    function copyCode(btn) {
+        const terminal = btn.closest('.terminal');
+        const codeElement = terminal.querySelector('code');
+        const code = codeElement.innerText;
+        
+        navigator.clipboard.writeText(code).then(() => {
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right:2px"><polyline points="20 6 9 17 4 12"></polyline></svg> Kopyalandı`;
+            btn.style.color = 'var(--dot-green)';
+            btn.style.borderColor = 'var(--dot-green)';
+            btn.style.background = 'rgba(39, 201, 63, 0.1)';
+            
+            setTimeout(() => {
+                btn.innerHTML = originalHTML;
+                btn.style.color = '';
+                btn.style.borderColor = '';
+                btn.style.background = '';
+            }, 2500);
+        });
+    }
+
+    // Smooth Scrolling with active state update
+    const sections = document.querySelectorAll("section");
+    const navLinks = document.querySelectorAll(".nav-link");
+
+    window.addEventListener("scroll", () => {
+        let current = "";
+        sections.forEach((section) => {
+            const sectionTop = section.offsetTop;
+            if (scrollY >= sectionTop - 150) {
+                current = section.getAttribute("id");
+            }
+        });
+
+        navLinks.forEach((link) => {
+            link.classList.remove("active");
+            if (link.getAttribute("href").includes(current)) {
+                link.classList.add("active");
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

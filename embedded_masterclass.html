@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Embedded Systems & IoT Geliştirici Başvuru Rehberi (Ansiklopedik)</title>
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;700&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- AOS CSS -->
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    
+    <!-- Prism.js Theme -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/themes/prism-tomorrow.min.css" rel="stylesheet" />
+    
+    <style>
+        :root {
+            --bg: #0A0A0C; --bg2: #101014; --bg3: #16161C;
+            --border: #262632;
+            --accent: #10B981; --cyan: #00E5FF; --red: #FF3366; --purple: #9D4EDD; --yellow: #F59E0B;
+            --text-main: #E2E8F0; --text-muted: #94A3B8;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; line-height: 1.7; overflow-x: hidden; width: 100vw; }
+        h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', sans-serif; margin-top: 2rem; margin-bottom: 1rem; }
+        p { margin-bottom: 1rem; color: var(--text-muted); }
+
+        /* Top Header */
+        .top-header {
+            position: sticky; top: 0; z-index: 100; background: rgba(10, 10, 12, 0.9); backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; height: 65px;
+        }
+        .header-brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.2rem; color: var(--accent); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
+        .header-brand::before { content: ''; display: inline-block; width: 10px; height: 10px; background: var(--accent); box-shadow: 0 0 12px var(--accent); border-radius: 2px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
+
+        /* Search Bar */
+        .search-container { position: relative; margin: 0 2rem; flex-grow: 1; max-width: 450px; }
+        #searchInput { width: 100%; padding: 0.5rem 1rem 0.5rem 2.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; transition: all 0.3s; }
+        #searchInput:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 229, 255, 0.15); background: var(--bg3); }
+        .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
+        mark.highlight { background-color: var(--cyan); color: var(--bg); padding: 0 3px; border-radius: 3px; font-weight: 600; }
+
+        /* Layout */
+        .layout { display: flex; align-items: stretch; width: 100%; }
+
+        /* Sidebar */
+        .sidebar { width: 340px; background: var(--bg2); border-right: 1px solid var(--border); padding: 2rem 1rem; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; flex-shrink: 0; }
+        .sidebar::-webkit-scrollbar { width: 6px; }
+        .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+        
+        .toc-item { display: flex; align-items: center; gap: 12px; padding: 0.75rem 1rem; color: var(--text-muted); text-decoration: none; border-radius: 6px; transition: all 0.2s ease; font-size: 0.85rem; font-weight: 500; margin-bottom: 4px; cursor: pointer; border: 1px solid transparent; }
+        .toc-item:hover { background: var(--bg3); color: var(--text-main); }
+        .toc-item.active { background: rgba(0, 229, 255, 0.05); border-color: rgba(0, 229, 255, 0.2); color: var(--cyan); }
+        .toc-item .status-icon { width: 18px; height: 18px; border: 1px solid var(--border); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 9px; transition: all 0.3s; flex-shrink: 0; }
+        .toc-item.done .status-icon { background: rgba(16, 185, 129, 0.15); border-color: var(--accent); color: var(--accent); }
+        .toc-item.done .status-icon::after { content: '✓'; font-weight: bold; }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 3rem 5rem 15rem 5rem; max-width: 1300px; min-width: 0; }
+        section { margin-bottom: 7rem; scroll-margin-top: 100px; }
+        .section-header { margin-bottom: 2.5rem; padding-bottom: 1.5rem; border-bottom: 1px solid var(--border); }
+        .section-header h2 { font-size: 2.2rem; color: var(--text-main); display: flex; align-items: center; flex-wrap: wrap; gap: 15px; margin: 0; }
+        
+        .badge { background: rgba(0, 229, 255, 0.1); color: var(--cyan); padding: 0.3rem 0.8rem; border-radius: 4px; font-size: 0.85rem; font-weight: 600; font-family: 'JetBrains Mono', monospace; border: 1px solid rgba(0, 229, 255, 0.2); }
+        .badge.advanced { background: rgba(255, 51, 102, 0.1); color: var(--red); border-color: rgba(255, 51, 102, 0.2); }
+        .badge.core { background: rgba(16, 185, 129, 0.1); color: var(--accent); border-color: rgba(16, 185, 129, 0.2); }
+        .badge.hardware { background: rgba(157, 78, 221, 0.1); color: var(--purple); border-color: rgba(157, 78, 221, 0.2); }
+        .badge.component { background: rgba(245, 158, 11, 0.1); color: var(--yellow); border-color: rgba(245, 158, 11, 0.2); }
+
+        /* Cyber Card */
+        .cyber-card { background: linear-gradient(145deg, var(--bg2) 0%, var(--bg) 100%); border: 1px solid var(--border); border-radius: 8px; padding: 2rem; position: relative; overflow: hidden; margin-top: 2rem; margin-bottom: 2rem; }
+        .cyber-card::before { content: ''; position: absolute; top: 0; left: 0; width: 3px; height: 100%; background: var(--cyan); box-shadow: 0 0 15px var(--cyan); }
+        .cyber-card h3 { margin-top: 0; color: var(--cyan); }
+        .cyber-card.alert { border-color: rgba(255, 51, 102, 0.3); }
+        .cyber-card.alert::before { background: var(--red); box-shadow: 0 0 15px var(--red); }
+        .cyber-card.alert h3 { color: var(--red); }
+
+        /* Tables */
+        .table-wrap { width: 100%; overflow-x: auto; margin: 2.5rem 0; background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+        th, td { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); }
+        th { background: var(--bg3); font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; color: var(--text-main); font-size: 0.95rem; text-transform: uppercase; }
+        td { font-family: 'Inter', sans-serif; font-size: 0.95rem; color: var(--text-muted); }
+        td code { font-family: 'JetBrains Mono', monospace; background: rgba(255,255,255,0.05); padding: 0.2rem 0.4rem; border-radius: 4px; color: var(--cyan); font-size: 0.85em; }
+        tr:last-child td { border-bottom: none; }
+
+        /* IDE Code Block Styling */
+        .ide-window { background: var(--bg2); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin: 2rem 0; position: relative; }
+        .ide-header { display: flex; align-items: center; padding: 0.75rem 1rem; background: var(--bg3); border-bottom: 1px solid var(--border); }
+        .ide-dots { display: flex; gap: 6px; margin-right: 15px; }
+        .ide-dot { width: 12px; height: 12px; border-radius: 50%; }
+        .ide-dot.r { background: var(--red); } .ide-dot.y { background: #F59E0B; } .ide-dot.g { background: var(--accent); }
+        .ide-title { color: var(--text-muted); font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; }
+        .ide-window pre[class*="language-"] { margin: 0 !important; border: none; border-radius: 0; background: transparent !important; padding: 1.5rem !important; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; line-height: 1.5; }
+
+        .btn-mark-read { background: rgba(16, 185, 129, 0.05); border: 1px solid var(--accent); color: var(--accent); padding: 0.75rem 1.5rem; border-radius: 6px; font-family: 'JetBrains Mono', monospace; font-weight: 600; cursor: pointer; transition: all 0.3s; margin-top: 1rem; display: inline-flex; align-items: center; gap: 10px; }
+        .btn-mark-read:hover { background: rgba(16, 185, 129, 0.2); }
+        .btn-mark-read.completed { background: var(--accent); color: var(--bg); }
+
+        .math-formula { background: var(--bg3); padding: 1.25rem 2rem; border-radius: 8px; border-left: 4px solid var(--cyan); font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; display: inline-block; margin: 1.5rem 0; color: #fff; }
+
+        ul.hardware-list { list-style-type: none; margin-left: 0; }
+        ul.hardware-list li { position: relative; padding-left: 1.5rem; margin-bottom: 0.75rem; color: var(--text-muted); }
+        ul.hardware-list li::before { content: '>'; position: absolute; left: 0; color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-weight: bold; }
+        ul.hardware-list li strong { color: var(--text-main); }
+
+        @media (max-width: 900px) {
+            .layout { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; position: static; padding: 1rem; }
+            .main-content { padding: 2rem 1.5rem 5rem 1.5rem; }
+            .search-container { max-width: 200px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="top-header">
+        <div class="header-brand">EMBEDDED_MASTERCLASS</div>
+        <div class="search-container">
+            <span class="search-icon">🔍</span>
+            <input type="text" id="searchInput" placeholder="Rehberde kelime ara (Örn: MOSFET, PWM)..." autocomplete="off">
+        </div>
+        <div style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-muted);">
+            SYS_STATUS: <span style="color: var(--accent);">ONLINE</span>
+        </div>
+    </header>
+
+    <div class="layout">
+        <!-- Sidebar Navigation -->
+        <nav class="sidebar">
+            <h4 style="color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; padding-left: 1rem;">Ansiklopedik İndeks</h4>
+            
+            <a href="#sec-01" class="toc-item active" data-target="sec-01"><div class="status-icon"></div><span>01. MCU ve Donanım Mimarisi</span></a>
+            <a href="#sec-02" class="toc-item" data-target="sec-02"><div class="status-icon"></div><span>02. Pasif Devre Elemanları</span></a>
+            <a href="#sec-03" class="toc-item" data-target="sec-03"><div class="status-icon"></div><span>03. Yarı İletkenler & Transistörler</span></a>
+            <a href="#sec-04" class="toc-item" data-target="sec-04"><div class="status-icon"></div><span>04. Lojik Kapılar & Entegreler</span></a>
+            <a href="#sec-05" class="toc-item" data-target="sec-05"><div class="status-icon"></div><span>05. Ekranlar & Görüntü Birimleri</span></a>
+            <a href="#sec-06" class="toc-item" data-target="sec-06"><div class="status-icon"></div><span>06. Prototipleme & PCB Tasarımı</span></a>
+            <a href="#sec-07" class="toc-item" data-target="sec-07"><div class="status-icon"></div><span>07. Temel Giriş/Çıkış ve GPIO</span></a>
+            <a href="#sec-08" class="toc-item" data-target="sec-08"><div class="status-icon"></div><span>08. Seri İletişim Protokolleri</span></a>
+            <a href="#sec-09" class="toc-item" data-target="sec-09"><div class="status-icon"></div><span>09. Kesmeler & Timer/PWM</span></a>
+            <a href="#sec-10" class="toc-item" data-target="sec-10"><div class="status-icon"></div><span>10. Aktüatörler & Sürücüler</span></a>
+            <a href="#sec-11" class="toc-item" data-target="sec-11"><div class="status-icon"></div><span>11. Kapsamlı Sensör Kılavuzu</span></a>
+            <a href="#sec-12" class="toc-item" data-target="sec-12"><div class="status-icon"></div><span>12. Güç Yönetimi & RTOS</span></a>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            
+            <!-- SECTION 01 -->
+            <section id="sec-01" data-aos="fade-up">
+                <div class="section-header"><h2>01. Mikrodenetleyiciler ve Donanım Mimarisi <span class="badge hardware">ARCHITECTURE</span></h2></div>
+                <div class="cyber-card">
+                    <h3>Mikroişlemci (MPU) vs Mikrodenetleyici (MCU)</h3>
+                    <ul class="hardware-list">
+                        <li><strong>Mikroişlemci (MPU):</strong> Sadece işlem çekirdeğini (ALU, Cache) barındırır. RAM, ROM ve çevresel birimlerin harici bağlanması gerekir (Intel Core, Broadcom). Yüksek frekans, Linux/Windows çalıştırır.</li>
+                        <li><strong>Mikrodenetleyici (MCU):</strong> CPU, Flash Bellek, SRAM ve donanım birimlerini (Timer, ADC) tek çipte (SoC) toplar. STM32, ESP32, AVR örnekleridir. RTOS veya Bare-metal çalışır, düşük güç tüketir.</li>
+                    </ul>
+                </div>
+                <h3 data-aos="fade-up">İç Mimari (Buses) ve Osilatörler</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>AHB (Advanced High-performance Bus):</strong> CPU, RAM, Flash ve DMA gibi en hızlı bileşenlerin iletişim hattıdır.</li>
+                    <li><strong>APB (Advanced Peripheral Bus):</strong> UART, I2C, ADC gibi yavaş çevresel birimler için köprüdür. Güç tasarrufu için düşük frekansta çalıştırılır (APB1, APB2).</li>
+                    <li><strong>Saat Sinyali & PLL:</strong> MCU kalbidir. Dahili (HSI) rc devresidir, ucuzdur ama sıcaklıkla sapar. Harici (HSE) kuvars kristalidir, çok hassastır. PLL (Phase-Locked Loop) ile bu saat frekansı donanımsal olarak katlanarak (örn: 8MHz kristal -> 168MHz) CPU'ya verilir.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-01')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 02 -->
+            <section id="sec-02" data-aos="fade-up">
+                <div class="section-header"><h2>02. Pasif Devre Elemanları <span class="badge component">COMPONENTS</span></h2></div>
+                <p>Elektronik devrelerin yapı taşlarıdır. Güç üretmezler, sadece enerjiyi tüketir, depolar veya sınırlandırırlar.</p>
+                <h3 data-aos="fade-up">Dirençler (Resistor)</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>Ohm Kanunu ($V = I \times R$):</strong> Akımı sınırlamak ve voltajı bölmek (Voltage Divider) için kullanılır. Üzerinden geçen akım ısıya dönüşür ($P = I^2 \times R$).</li>
+                    <li><strong>Pull-up / Pull-down:</strong> Bir MCU pininin (input) boşta kalıp anten gibi parazit toplamasını (Floating State) engeller. Pini sürekli VCC'ye veya GND'ye zayıf bir şekilde (10kΩ ile) çeker. Dışarıdan net bir sinyal gelene kadar default değeri korur.</li>
+                    <li><strong>SMD Kodları:</strong> Üzerinde '103' yazan direnç $10 \times 10^3 = 10,000\Omega = 10k\Omega$'dur. '472' = 4.7kΩ'dur.</li>
+                </ul>
+                <h3 data-aos="fade-up">Kondansatörler (Capacitor)</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>Kullanım Alanları:</strong> Enerjiyi elektrik alanında depolar. DC akımı engeller, AC akımı (sinyal/gürültü) geçirir.</li>
+                    <li><strong>Seramik (Mercimek):</strong> Kutupsuzdur. Çok hızlı tepki verir. Genellikle 100nF (0.1µF) değerinde çipleri gürültüden korumak (Decoupling/Bypass) için MCU besleme bacaklarına en yakın noktaya bağlanır.</li>
+                    <li><strong>Elektrolitik ve Tantal:</strong> Kutupludur (+ ve - bacağı vardır). Yüksek kapasitelidir (Örn: 1000µF). Voltaj çökmelerine karşı devrede enerji deposu (Filtreleme) olarak görev yapar. Tantal olanlar SMD formda çok stabildir ancak ters bağlamada alev alır.</li>
+                    <li><strong>RC Filtre:</strong> Bir direnç ve bir kondansatör seri bağlanarak Low-Pass Filter (Düşük geçiren filtre) oluşturulur. Formül: $f_c = \frac{1}{2\pi R C}$. Bu frekansın üstündeki gürültüler yutulur. Sensör analog okumaları için elzemdir.</li>
+                </ul>
+                <h3 data-aos="fade-up">Bobinler / İndüktörler (Inductor)</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li>Enerjiyi manyetik alan olarak depolar. Akımın ani değişimine karşı direnç gösterir (Lenz Yasası).</li>
+                    <li>Özellikle Switching (Anahtarlamalı) Güç Kaynaklarında (Buck/Boost Converter) DC voltajı düşürmek/yükseltmek için PWM sinyali ile sürülür.</li>
+                    <li>Bir röle veya motor bobini enerjisi kesildiğinde, manyetik alan çökerken ters yönde binlerce voltluk "Flyback" voltajı üretir ve MCU'yu yakar. Bunu engellemek için ters bağlı <strong>Flyback Diyotu</strong> kullanılır.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-02')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 03 -->
+            <section id="sec-03" data-aos="fade-up">
+                <div class="section-header"><h2>03. Yarı İletkenler & Transistörler <span class="badge component">SEMICONDUCTORS</span></h2></div>
+                <h3 data-aos="fade-up">Diyot Ailesi</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>Standart Diyot (1N4007):</strong> Akımı tek yönde geçirir. Silisyum diyotlarda yaklaşık 0.7V "Voltaj Düşümü" (Voltage Drop) yaşanır. Ters kutup koruması için pillerin girişine konur.</li>
+                    <li><strong>Schottky Diyot:</strong> Voltaj düşümü çok azdır (0.2V - 0.3V) ve çok hızlı anahtarlama yapar. SMPS devrelerinde bobin ile birlikte kullanılır.</li>
+                    <li><strong>Zener Diyot:</strong> Ters yönde bağlandığında "Zener Kırılma Voltajı" (Örn: 3.3V, 5.1V) değerini sabit tutar. Basit voltaj regülasyonu ve pin koruması için (Aşırı voltaj kırpma) mükemmeldir.</li>
+                    <li><strong>LED (Light Emitting Diode):</strong> Işık yayan diyottur. Seri direnç olmadan asla bağlanmamalıdır. (Kırmızı LED ~2V, Mavi LED ~3.2V düşüm yapar).</li>
+                </ul>
+                <h3 data-aos="fade-up">Transistörler (BJT ve MOSFET)</h3>
+                <div class="cyber-card">
+                    <p>Mikrodenetleyiciler 5V ve 20mA verebilir. Bir motor, şerit LED veya güçlü bir cihaz sürmek için Elektronik Anahtarlar (Transistörler) zorunludur.</p>
+                </div>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>BJT (Bipolar Junction Transistor):</strong> Akım kontrollüdür. NPN ve PNP olarak ikiye ayrılır. Base bacağına verilen çok küçük bir akım, Collector ile Emitter arasından geçen çok büyük bir akımı kontrol eder ($I_C = \beta \cdot I_B$). Günümüzde mikrodenetleyici çıkışlarında daha az tercih edilir çünkü sürekli Base akımı çekerek güç harcar.</li>
+                    <li><strong>MOSFET (Metal-Oxide-Semiconductor Field-Effect):</strong> Voltaj kontrollüdür. MCU için en iyi sürücüdür çünkü Gate bacağı yalıtkandır, akım çekmez! Sadece Gate bacağına uygulanan voltaj ile Drain-Source arası açılır.</li>
+                    <li><strong>N-Channel MOSFET:</strong> Yükün GND (eksi) hattını anahtarlar. Çoğunlukla bu tercih edilir (Örn: IRLZ44N, IRF520).</li>
+                    <li><strong>P-Channel MOSFET:</strong> Yükün VCC (artı) hattını anahtarlar.</li>
+                    <li><em>Kritik Nokta:</em> MOSFET alırken <strong>Logic Level (Mantık Seviyesi)</strong> olmasına dikkat edilmelidir. Gate Threshold (Eşik) voltajı 5V altında olmalıdır, yoksa MCU'nun 3.3V pini MOSFET'i tam açamaz, MOSFET direnç gösterip yanar ($R_{DS(on)}$ değeri düşürülemez).</li>
+                </ul>
+                <h3 data-aos="fade-up">Optokuplör (Galvanik İzolasyon)</h3>
+                <p data-aos="fade-up">İçinde bir LED ve bir fototransistör (ışık sensörü) barındıran kapalı bir entegredir (Örn: PC817). MCU tarafı LED'i yakar, karşı taraftaki transistör ışığı görünce iletime geçer. İki taraf arasında elektriksel hiçbir bağ yoktur (Galvanik İzolasyon). Motor sürücülerde veya endüstriyel 24V sistemlerde MCU'yu binlerce voltluk ani piklerden korumak için kullanılır.</p>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-03')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 04 -->
+            <section id="sec-04" data-aos="fade-up">
+                <div class="section-header"><h2>04. Lojik Kapılar & Dijital Entegreler <span class="badge hardware">LOGIC</span></h2></div>
+                <h3 data-aos="fade-up">Lojik (Mantık) Kapıları</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>AND (VE):</strong> Tüm girişler 1 (High) ise çıkış 1 olur. (Güvenlik zincirleri).</li>
+                    <li><strong>OR (VEYA):</strong> Herhangi bir giriş 1 ise çıkış 1 olur.</li>
+                    <li><strong>NOT (DEĞİL):</strong> Girişi tersine çevirir. 1 ise 0, 0 ise 1. (Inverter).</li>
+                    <li><strong>XOR (ÖZEL VEYA):</strong> Girişler farklıysa 1, aynıysa 0 verir. Veri şifreleme ve parity(hata kontrol) sistemlerinin temelidir.</li>
+                </ul>
+                <h3 data-aos="fade-up">Pin Çoğaltıcılar (Shift Registers & Multiplexers)</h3>
+                <p data-aos="fade-up">Mikrodenetleyicinin pinleri yetmediğinde harici dijital entegreler imdada yetişir:</p>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>Shift Register (74HC595):</strong> 3 adet MCU pini (Data, Clock, Latch) kullanarak 8 adet dijital çıkış elde etmenizi sağlar. Veri seri olarak (bit bit) içeri itilir (Shift), Latch pini tetiklenince tüm veriler 8 paralel pine aktarılır. Çoklu LED veya röle sürmek için entegreler peş peşe eklenebilir.</li>
+                    <li><strong>Analog Multiplexer (CD74HC4067):</strong> Tersi bir mantıkla, 16 farklı sensörü (analog) tek bir ADC pinine bağlamak için kullanılır. 4 adet adres pini ile hangi sensörün okunacağı anlık olarak seçilir.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-04')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 05 -->
+            <section id="sec-05" data-aos="fade-up">
+                <div class="section-header"><h2>05. Ekranlar & Görüntü Birimleri <span class="badge component">DISPLAYS</span></h2></div>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>7-Segment Display:</strong> 7 LED çubuğun '8' rakamı formatında dizilimidir. Çoklu hanelerde <em>Multiplexing (Zaman Çoğullama)</em> kullanılır: 1. hane yanar, bekler söner, 2. hane yanar... Bu işlem saniyede 100 kez yapılırsa insan gözü hepsini sabit yanıyor görür. Pin tasarrufu sağlar. MAX7219 entegresi bunu donanımsal yapar.</li>
+                    <li><strong>Karakter LCD (16x2 / 20x4):</strong> Arka aydınlatmalı, her bir harfi 5x8 piksel olan donanımsal çipli (HD44780) ekranlardır. Paralel veri yolu karmaşasını çözmek için arka tarafına lehimlenen <strong>PCF8574 I2C modülü</strong> ile sadece 4 kabloyla kullanılır.</li>
+                    <li><strong>OLED (Organik LED - SSD1306):</strong> Her pikselin kendi ışığını ürettiği arka aydınlatmasız sistemlerdir. Gerçek siyah (piksel sönük) verir. I2C veya SPI ile çalışır. Bellek haritası (Framebuffer) mantığıyla MCU RAM'inde ekranın bir kopyası çizilir, sonra tek seferde ekrana aktarılır.</li>
+                    <li><strong>TFT LCD:</strong> Renkli grafik ekranlardır (RGB565). I2C yavaş kalacağı için SPI (veya paralel 8/16-bit veri yolu) ile sürülür. MCU'nun çok fazla zamanını almaması için grafik verileri DMA (Direct Memory Access) donanımı ile arka planda aktarılır.</li>
+                    <li><strong>e-Paper (E-Ink):</strong> Elektronik mürekkep. Sadece ekran güncellenirken enerji harcar, görüntü oluştuktan sonra gücü kesseniz bile aylar boyunca ekranda kalır. Düşük yenileme hızı vardır, fiyat etiketleri ve IoT cihazları için mükemmeldir.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-05')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 06 -->
+            <section id="sec-06" data-aos="fade-up">
+                <div class="section-header"><h2>06. Prototipleme & PCB Tasarımı <span class="badge hardware">HARDWARE</span></h2></div>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>Breadboard:</strong> Lehim gerektirmeyen tak-çıkar tahtalardır. Ortadaki 5 delik yan yana kısa devredir. Yüksek frekanslı devrelerde (Örn: 20MHz kristal) veya yüksek akımlı motor devrelerinde breadboard'un parazit kapasitansı ve direnci yüzünden sistem hatalı çalışabilir. Sadece basit testler içindir.</li>
+                    <li><strong>PCB (Printed Circuit Board):</strong> Baskılı devre kartı. Bakır yollar (Trace) tasarım programlarıyla (Altium, KiCad, EasyEDA) çizilerek fabrikaya Gerber dosyası formatında yollanır.</li>
+                    <li><strong>Trace Width (Yol Kalınlığı):</strong> İçinden geçecek akıma göre bakır yolun kalınlığı hesaplanmalıdır. Yoksa yol yanar.</li>
+                    <li><strong>Via:</strong> Çok katmanlı PCB'lerde (Örn: üst yüzeyden alt yüzeye) bakır yolları birbirine bağlayan delik içi kaplamalardır.</li>
+                    <li><strong>Ground Plane (GND Dökümü):</strong> PCB'nin boş kalan tüm yüzeyinin tamamen bakır bırakılıp GND'ye (Toprak) bağlanmasıdır. Elektromanyetik gürültüyü emen mükemmel bir kalkandır, sinyal bütünlüğünü (Signal Integrity) korur.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-06')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 07 -->
+            <section id="sec-07" data-aos="fade-up">
+                <div class="section-header"><h2>07. Temel Giriş/Çıkış ve GPIO Yönetimi <span class="badge core">CORE</span></h2></div>
+                <p>GPIO pinleri (Floating, Pull-up, Push-pull, Open-drain) MCU'nun donanım arayüzüdür.</p>
+                <div class="ide-window" data-aos="fade-up">
+                    <div class="ide-header"><div class="ide-dots"><div class="ide-dot r"></div><div class="ide-dot y"></div><div class="ide-dot g"></div></div><div class="ide-title">gpio_register_control.c</div></div>
+<pre><code class="language-c">// STM32 Bare-Metal GPIO (Pull-up buton ile LED yakma)
+RCC->AHB1ENR |= (1 << 0) | (1 << 2); // Clock Aktif (Port A ve C)
+
+GPIOA->MODER &= ~(3 << (5 * 2)); // PA5 temizle
+GPIOA->MODER |=  (1 << (5 * 2)); // PA5 Output (01)
+
+GPIOC->PUPDR &= ~(3 << (13 * 2)); // PC13 temizle
+GPIOC->PUPDR |=  (1 << (13 * 2)); // PC13 Pull-up (01)
+
+while(1) {
+    if (!(GPIOC->IDR & (1 << 13))) { // Buton GND'ye çekildi mi?
+        GPIOA->BSRR = (1 << 5);      // LED'i YAK
+    } else {
+        GPIOA->BSRR = (1 << (5 + 16)); // LED'i SÖNDÜR
+    }
+}</code></pre>
+                </div>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-07')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 08 -->
+            <section id="sec-08" data-aos="fade-up">
+                <div class="section-header"><h2>08. Seri İletişim Protokolleri <span class="badge">COMMS</span></h2></div>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr><th>Protokol</th><th>Kablo Sayısı</th><th>Senkronizasyon</th><th>Mesafe & Hız</th><th>Açıklama</th></tr>
+                        </thead>
+                        <tbody>
+                            <tr><td><strong>UART</strong></td><td>TX, RX, GND</td><td>Asenkron (Baud)</td><td>Kısa / 115200bps</td><td>En basit seri haberleşme. 1:1 Cihaz.</td></tr>
+                            <tr><td><strong>SPI</strong></td><td>MOSI, MISO, SCK, CS</td><td>Senkron (Clock)</td><td>PCB İçi / 20+ Mbps</td><td>Çok hızlı. Ekranlar ve Flash bellekler. Multi-slave.</td></tr>
+                            <tr><td><strong>I2C</strong></td><td>SDA, SCL (Pull-up)</td><td>Senkron (Clock)</td><td>PCB İçi / 400 kbps</td><td>Adreslenebilir. Sadece 2 pin ile 127 cihaz. Sensörler içindir.</td></tr>
+                            <tr><td><strong>RS485</strong></td><td>A, B (Diferansiyel)</td><td>Asenkron</td><td>1200 Metre</td><td>Endüstriyel Modbus ağı. UART'ın donanımsal güçlendirilmiş, gürültüye dirençli halidir.</td></tr>
+                            <tr><td><strong>CAN Bus</strong></td><td>CAN_H, CAN_L</td><td>Asenkron</td><td>40m / 1 Mbps</td><td>Otomotiv standardı. Donanımsal hata tespiti ve önceliklendirme yapar. Aşırı güvenilirdir.</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-08')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 09 -->
+            <section id="sec-09" data-aos="fade-up">
+                <div class="section-header"><h2>09. Kesmeler (Interrupt) & Timer/PWM <span class="badge advanced">ADVANCED</span></h2></div>
+                <div class="cyber-card alert">
+                    <h3>Polling vs Interrupt</h3>
+                    <p><strong>Polling (Sorgulama):</strong> While döngüsünde sürekli "Butona basıldı mı?" sorusunu sorarak CPU'yu kitler.</p>
+                    <p><strong>Interrupt (Kesme):</strong> Bir donanım olayı (Pin değişimi, UART verisi) olduğunda işlemcinin anında mevcut işini bırakıp ISR (Interrupt Service Routine) fonksiyonunu çalıştırmasıdır. NVIC (Nested Vectored Interrupt Controller) ile öncelikler belirlenir.</p>
+                </div>
+                <h3 data-aos="fade-up">Donanımsal Zamanlayıcılar (Timers) ve PWM</h3>
+                <p data-aos="fade-up">Timer'lar CPU'dan bağımsız sayan saatlerdir. Belirli bir süre dolduğunda kesme üretirler. Ayrıca <strong>PWM (Pulse Width Modulation)</strong> modülü ile periyodu sabit kare dalganın, High/Low kalma süresi (Duty Cycle) değiştirilerek sahte analog voltaj üretilir. Motor hızı, LED parlaklığı PWM ile ayarlanır.</p>
+                <div class="math-formula" data-aos="zoom-in">
+                    $ DutyCycle(\%) = \left( \frac{Sinyalin Açık (High) Süresi}{Toplam Periyot} \right) \times 100 $
+                </div>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-09')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 10 -->
+            <section id="sec-10" data-aos="fade-up">
+                <div class="section-header"><h2>10. Aktüatörler & Sürücüler <span class="badge hardware">HARDWARE</span></h2></div>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>DC Motorlar:</strong> Güç verildiğinde döner. Yön değiştirmek için H-Bridge (H-Köprüsü) devresi (Örn: L298N, TB6612FNG) kullanılır. Hızları PWM ile kontrol edilir.</li>
+                    <li><strong>Stepper (Adım) Motor:</strong> İçindeki bobinlere sırayla akım verilerek (A4988, TMC2209 sürücüleri ile) adım adım döndürülür (Örn: Her adım 1.8 derece). Konum kontrolünde 3D yazıcıların kalbidir.</li>
+                    <li><strong>Servo Motor:</strong> Kapalı çevrimdir. İçinde DC motor, dişli ve potansiyometre bulunur. 50Hz (20ms) frekanslı PWM sinyali ile sürülür. 1.5ms pulse motoru 90 dereceye merkezler.</li>
+                    <li><strong>BLDC (Fırçasız DC):</strong> Dronelarda kullanılır. Üç fazlıdır. ESC (Electronic Speed Controller) devresi olmadan döndürülemez. Mekanik sürtünme olmadığı için çok uzun ömürlü ve hızlıdır.</li>
+                    <li><strong>Röle:</strong> Elektromanyetik şalterdir. 5V ile 220V şebekeyi mekanik olarak izoleli şekilde anahtarlar. Tepki süresi yavaştır (Milisaniye).</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-10')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 11 -->
+            <section id="sec-11" data-aos="fade-up">
+                <div class="section-header"><h2>11. Kapsamlı Sensör Kılavuzu <span class="badge hardware">HARDWARE</span></h2></div>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>IMU (İvmeölçer & Jiroskop - MPU6050):</strong> İvmeölçer yerçekimine göre statik açıyı hesaplar ama gürültülüdür. Jiroskop açısal hızı kusursuz ölçer ama zamanla kayma (drift) yapar. Kusursuz 3D yönelim için bu ikisi yazılımsal olarak <em>Kalman Filter</em> veya <em>Complementary Filter</em> ile birleştirilir (Sensör Füzyonu).</li>
+                    <li><strong>Mesafe:</strong> <em>HC-SR04 (Ultrasonik)</em> sesin yankı süresiyle çalışır, yansıtıcı olmayan yüzeylerde sapıtır. <em>VL53L0X (ToF)</em> ışık (lazer) uçuş süresiyle çalışır, inanılmaz hassastır.</li>
+                    <li><strong>Sıcaklık:</strong> <em>DS18B20</em> dijital 1-Wire protokolü kullanır; 64-bit ID'si vardır, onlarcası paralel tek kabloya bağlanabilir. <em>Termokupl (MAX6675)</em> endüstriyel kazanlar (1000°C) için kullanılır.</li>
+                    <li><strong>Kuvvet/Ağırlık:</strong> <em>Load Cell</em> direncini mikrovolt bazında değiştirir. Gürültüsüz okumak için donanımsal köprü devresi barındıran HX711 24-bit harici ADC'si kullanılır.</li>
+                    <li><strong>Enkoderler:</strong> Motor miline takılır. Dönüş yönü ve hızını A ve B fazlarından (Quadrature) gelen palsler aracılığıyla bildirir. İşlemci yükü olmaması için MCU Timer donanımının 'Encoder Mode' kanalına bağlanır.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-11')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+            <!-- SECTION 12 -->
+            <section id="sec-12" data-aos="fade-up">
+                <div class="section-header"><h2>12. Güç Yönetimi & RTOS <span class="badge advanced">SYSTEM ARCH</span></h2></div>
+                <div class="cyber-card">
+                    <h3>Watchdog Timer (WDT)</h3>
+                    <p>Sistem kilitlenmelerine karşı nihai çözümdür. Donanımsal bir geri sayım sayacıdır. Yazılım sonsuz döngüdeyken (while(1)) belirli aralıklarla bu sayacı sıfırlamalıdır (Kick the dog). Eğer kod donar veya çökerse sayaç sıfıra ulaşır ve MCU'ya donanımsal Reset atar.</p>
+                </div>
+                <h3 data-aos="fade-up">FreeRTOS ile Çoklu Görev (Multitasking)</h3>
+                <ul class="hardware-list" data-aos="fade-up">
+                    <li><strong>Task (Görev):</strong> Gömülü sistemin her bir fonksiyonu (Sensör okuma, Wi-Fi aktarımı) ayrı görevlere bölünür ve Scheduler (Planlayıcı) bunlara önceliklerine göre işlemci zamanı verir. Super-Loop bloklanmalarını çözer.</li>
+                    <li><strong>Queue (Kuyruk):</strong> Görevler arası güvenli veri paketleri taşır. (Örn: ADC Task veriyi okur kuyruğa atar, LCD Task kuyruktan alıp ekrana çizer).</li>
+                    <li><strong>Mutex / Semaphore:</strong> Kritik kaynakların (Örn: I2C donanımı veya aynı anda yazılan bir değişken) birden fazla task tarafından aynı anda kullanılmasını (Race Condition) engelleyen kilit (Lock) mekanizmalarıdır.</li>
+                </ul>
+                <button class="btn-mark-read" onclick="markSectionComplete('sec-12')"><span class="btn-text">MARK SECTION COMPLETE</span></button>
+            </section>
+
+        </main>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/prism.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-c.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/mark.js/8.11.1/mark.min.js"></script>
+    
+    <script>
+        AOS.init({ duration: 800, once: true, offset: 100 });
+
+        const sections = document.querySelectorAll('section');
+        const navItems = document.querySelectorAll('.toc-item');
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    navItems.forEach(item => {
+                        item.classList.remove('active');
+                        if (item.getAttribute('data-target') === entry.target.id) {
+                            item.classList.add('active');
+                        }
+                    });
+                }
+            });
+        }, { root: null, rootMargin: '-10% 0px -70% 0px', threshold: 0 });
+
+        sections.forEach(sec => observer.observe(sec));
+
+        navItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                e.preventDefault();
+                const targetId = item.getAttribute('data-target');
+                const targetSection = document.getElementById(targetId);
+                const headerOffset = 80;
+                const elementPosition = targetSection.getBoundingClientRect().top;
+                const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+            });
+        });
+
+        function markSectionComplete(sectionId) {
+            const tocItem = document.querySelector(`.toc-item[data-target="${sectionId}"]`);
+            if (tocItem) tocItem.classList.add('done');
+            
+            const section = document.getElementById(sectionId);
+            const btn = section.querySelector('.btn-mark-read');
+            if (btn) {
+                btn.classList.add('completed');
+                btn.querySelector('.btn-text').innerText = '✓ SECTION COMPLETED';
+                btn.disabled = true;
+            }
+        }
+
+        const markInstance = new Mark(document.querySelector(".main-content"));
+        const searchInput = document.getElementById('searchInput');
+        let searchTimeout;
+
+        searchInput.addEventListener('input', function() {
+            clearTimeout(searchTimeout);
+            const searchTerm = this.value;
+            searchTimeout = setTimeout(() => {
+                markInstance.unmark({
+                    done: function() {
+                        if(searchTerm.length >= 2) {
+                            markInstance.mark(searchTerm, {
+                                className: 'highlight',
+                                separateWordSearch: false,
+                                done: function(count) {
+                                    if (count > 0) {
+                                        const firstMatch = document.querySelector('mark.highlight');
+                                        if (firstMatch) {
+                                            const headerOffset = 150; 
+                                            const elementPosition = firstMatch.getBoundingClientRect().top;
+                                            const offsetPosition = elementPosition + window.pageYOffset - headerOffset;
+                                            window.scrollTo({ top: offsetPosition, behavior: 'smooth' });
+                                        }
+                                    }
+                                }
+                            });
+                        }
+                    }
+                });
+            }, 300);
+        });
+    </script>
+</body>
+</html>

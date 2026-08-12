@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CSS3 Kapsamlı Başvuru Rehberi</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* 1. MODERN CANLI (CIVIL CIVIL) PALET & TIPOGRAFI */
+        :root {
+            /* Koyu Tema (Varsayılan) */
+            --bg: #100f14;
+            --bg2: #191820;
+            --bg3: #22202c;
+            --bg4: #2b2838;
+            --border: #3d3654;
+            --border2: #4f466b;
+            
+            /* Canlı Vurgu Renkleri */
+            --accent: #00E5FF;
+            --accent-hover: #00B8D4;
+            --accent2: #FF8A00;
+            --cyan: #00F5D4;
+            --cyan-hover: #00d6b9;
+            --purple: #9D4EDD;
+            
+            /* Metin Renkleri */
+            --text-main: #f0f0f5;
+            --text-muted: #a8a5b8;
+            --text-light: #FFFFFF;
+            
+            /* Durum Renkleri */
+            --info: #00BBF9;
+            --tip: #00F5D4;
+            --warn: #FEE440;
+            
+            /* Tipografi */
+            --font-heading: 'Plus Jakarta Sans', sans-serif;
+            --font-body: 'Inter', sans-serif;
+            --font-code: 'JetBrains Mono', monospace;
+            
+            /* Ortak Boyutlar */
+            --radius-sm: 6px;
+            --radius-md: 10px;
+            --radius-lg: 16px;
+            --sidebar-w: 280px;
+            --bottom-bar-h: 46px;
+        }
+
+        body.light-mode {
+            --bg: #FFFFFF;
+            --bg2: #F4F5F8;
+            --bg3: #EAECEF;
+            --bg4: #E0E3E7;
+            --border: #DDE1E6;
+            --border2: #C1C7D0;
+            
+            --text-main: #171A21;
+            --text-muted: #5E6C84;
+            --text-light: #111827;
+        }
+
+        /* Temel Reset */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            font-family: var(--font-body);
+            background-color: var(--bg);
+            color: var(--text-main);
+            line-height: 1.6;
+            display: flex;
+            transition: background-color 0.3s ease, color 0.3s ease;
+            overflow-x: hidden;
+            scroll-behavior: smooth;
+        }
+
+        h1, h2, h3, h4, h5, h6 {
+            font-family: var(--font-heading);
+            color: var(--text-light);
+            margin-bottom: 1rem;
+        }
+
+        /* 4. DINAMIK YAN MENÜ (Sidebar) */
+        .sidebar {
+            width: var(--sidebar-w);
+            height: 100vh;
+            position: sticky;
+            top: 0;
+            background: var(--bg2);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            flex-shrink: 0;
+            z-index: 100;
+            transition: background 0.3s, border 0.3s;
+        }
+        .sidebar-header {
+            padding: 2rem 1.5rem 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .sidebar-header h2 {
+            font-size: 1.25rem;
+            font-weight: 800;
+            color: var(--accent);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin: 0;
+        }
+        .sidebar-header h2::before {
+            content: '</>';
+            color: var(--cyan);
+        }
+        .toc {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 1rem 0.5rem;
+        }
+        .toc::-webkit-scrollbar { width: 6px; }
+        .toc::-webkit-scrollbar-track { background: transparent; }
+        .toc::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 4px; }
+
+        .toc-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0.75rem 1rem;
+            margin-bottom: 0.25rem;
+            color: var(--text-muted);
+            text-decoration: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.25s ease;
+            border-left: 3px solid transparent;
+        }
+        .toc-item:hover {
+            background: var(--bg3);
+            color: var(--text-main);
+        }
+        .toc-item.active {
+            background: rgba(38, 77, 228, 0.1);
+            color: var(--accent);
+            border-left-color: var(--accent);
+            font-weight: 600;
+        }
+        .toc-item.toc-entering {
+            animation: slideLeft 0.3s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+        }
+        .toc-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: transparent;
+            transition: background 0.3s;
+        }
+        .toc-item.active .toc-dot {
+            background: var(--accent);
+            animation: dotPulse 1.5s infinite;
+        }
+
+        /* 2. STICKY HEADER & TOP BAR */
+        .main-content {
+            flex-grow: 1;
+            min-width: 0;
+            padding-bottom: calc(var(--bottom-bar-h) + 2rem);
+        }
+        .top-header {
+            position: sticky;
+            top: 0;
+            background: rgba(15, 15, 15, 0.85); /* Dark fallback */
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: 50;
+            padding: 1rem 3rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            transition: background 0.3s, border 0.3s;
+        }
+        body.light-mode .top-header {
+            background: rgba(250, 250, 250, 0.85);
+        }
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        .search-box input {
+            width: 100%;
+            padding: 0.6rem 1rem 0.6rem 2.5rem;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            border-radius: var(--radius-md);
+            font-family: var(--font-body);
+            font-size: 0.9rem;
+            outline: none;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .search-box input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(38, 77, 228, 0.15);
+        }
+        .search-box svg {
+            position: absolute;
+            left: 0.8rem;
+            top: 50%;
+            transform: translateY(-50%);
+            fill: var(--text-muted);
+            width: 16px;
+            height: 16px;
+        }
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+        .reading-stats {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .theme-btn {
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 1.1rem;
+        }
+        .theme-btn:hover {
+            background: var(--border);
+            transform: scale(1.05);
+        }
+
+        /* Hero Alanı */
+        .hero {
+            padding: 4.5rem 3rem 3.5rem;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(-45deg, rgba(255, 46, 147, 0.1), rgba(255, 138, 0, 0.1), rgba(0, 245, 212, 0.1), rgba(157, 78, 221, 0.1));
+            background-size: 400% 400%;
+            animation: gradientBG 15s ease infinite;
+        }
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        .hero h1 {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1rem;
+            background: linear-gradient(135deg, var(--accent), var(--accent2), var(--cyan), var(--purple));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-size: 300%;
+            animation: textGradient 6s linear infinite;
+        }
+        @keyframes textGradient {
+            0% { background-position: 0% center; }
+            100% { background-position: 300% center; }
+        }
+        .hero p {
+            font-size: 1.15rem;
+            color: var(--text-muted);
+            max-width: 750px;
+            line-height: 1.6;
+        }
+
+        /* 3. VISUALIZER CARD MIMARISI & ICERIK */
+        .section {
+            padding: 3rem 3rem;
+            border-bottom: 1px dashed var(--border);
+        }
+        .section > h2 {
+            font-size: 1.8rem;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .section > p {
+            margin-bottom: 2rem;
+            font-size: 1.05rem;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .card {
+            background: var(--bg2);
+            border: 1px solid var(--border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        .card-header {
+            background: rgba(38, 77, 228, 0.05);
+            border-bottom: 1px solid var(--border);
+            padding: 1rem 1.25rem;
+            font-family: var(--font-heading);
+            font-weight: 600;
+            color: var(--accent);
+            font-size: 1.1rem;
+        }
+        .card-content {
+            padding: 1.25rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        /* Bilgi Kutuları */
+        .info-box {
+            padding: 1rem;
+            border-radius: var(--radius-sm);
+            border-left: 4px solid;
+            background: var(--bg3);
+            font-size: 0.95rem;
+        }
+        .info-title {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+            font-family: var(--font-heading);
+        }
+        .info-box.note { border-color: var(--info); }
+        .info-box.note .info-title { color: var(--info); }
+        .info-box.tip { border-color: var(--tip); }
+        .info-box.tip .info-title { color: var(--tip); }
+        .info-box.warn { border-color: var(--warn); }
+        .info-box.warn .info-title { color: var(--warn); }
+
+        /* Kod Blokları */
+        .code-block {
+            position: relative;
+            background: var(--bg4);
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            overflow: hidden;
+            margin-top: auto;
+        }
+        .code-block pre {
+            padding: 1rem;
+            overflow-x: auto;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: #d4d4d4;
+            background: #1e1e1e; /* VSCode tarzı sabit koyu */
+        }
+        body.light-mode .code-block pre {
+            background: #282c34;
+            color: #abb2bf;
+        }
+        .copy-btn {
+            position: absolute;
+            top: 0.4rem;
+            right: 0.4rem;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: #fff;
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-body);
+        }
+        .copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
+        .copy-btn.copied { background: var(--tip); border-color: var(--tip); }
+
+        /* 5. GELİŞMİŞ JS MOTORLARI - CSS */
+        mark.search-hl {
+            background: rgba(255, 190, 11, 0.4);
+            color: inherit;
+            border-bottom: 2px solid var(--warn);
+            border-radius: 2px;
+            padding: 0 2px;
+        }
+
+        .tooltip {
+            position: relative;
+            border-bottom: 1px dashed var(--cyan);
+            cursor: help;
+            color: var(--cyan);
+            font-weight: 500;
+            transition: color 0.2s;
+        }
+        .tooltip:hover {
+            color: var(--cyan-hover);
+        }
+        .tooltip::after {
+            content: attr(data-tip);
+            position: absolute;
+            bottom: 130%;
+            left: 50%;
+            transform: translateX(-50%) translateY(5px);
+            background: var(--bg4);
+            color: var(--text-light);
+            padding: 0.5rem 0.75rem;
+            border-radius: var(--radius-sm);
+            border: 1px solid var(--border);
+            font-size: 0.8rem;
+            font-family: var(--font-body);
+            font-weight: 400;
+            white-space: nowrap;
+            z-index: 100;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.2s ease;
+            pointer-events: none;
+        }
+        .tooltip:hover::after {
+            opacity: 1;
+            visibility: visible;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        #scrollTop {
+            position: fixed;
+            bottom: calc(var(--bottom-bar-h) + 1.5rem);
+            right: 2rem;
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 90;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        #scrollTop.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        #scrollTop:hover {
+            background: var(--border);
+        }
+        .progress-ring {
+            position: absolute;
+            top: -1px; left: -1px;
+            transform: rotate(-90deg);
+        }
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.1s;
+        }
+
+        /* 2. SECTIONS PROGRESS BAR (Bottom) */
+        #progressBar {
+            position: fixed;
+            bottom: 0;
+            left: var(--sidebar-w);
+            right: 0;
+            height: var(--bottom-bar-h);
+            background: var(--bg2);
+            border-top: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            padding: 0 2rem;
+            font-family: var(--font-code);
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            z-index: 100;
+            transition: left 0.3s;
+        }
+        .prog-info {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            width: 100%;
+        }
+        .prog-sec-num { color: var(--accent); font-weight: 600; }
+        .prog-sec-name { color: var(--text-main); flex-grow: 1; }
+        .prog-sec-pct { font-weight: 600; min-width: 45px; text-align: right; }
+        
+        .prog-fill-wrapper {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: transparent;
+        }
+        .prog-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.1s linear;
+            position: relative;
+        }
+        .prog-fill.moving::after {
+            content: '';
+            position: absolute;
+            top: -2px;
+            right: 0;
+            width: 30px;
+            height: 7px;
+            background: var(--cyan);
+            filter: blur(4px);
+            border-radius: 50%;
+        }
+
+        /* Keyframes */
+        @keyframes slideLeft {
+            from { transform: translateX(15px); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes dotPulse {
+            0% { box-shadow: 0 0 0 0 rgba(38, 77, 228, 0.5); }
+            70% { box-shadow: 0 0 0 6px rgba(38, 77, 228, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(38, 77, 228, 0); }
+        }
+
+        /* Medya Sorguları */
+        @media (max-width: 992px) {
+            .sidebar { transform: translateX(-100%); position: fixed; }
+            .main-content { padding-left: 0; }
+            #progressBar { left: 0; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 4. YAN MENÜ -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <h2>CSS3 Reference</h2>
+        </div>
+        <nav class="toc">
+            <a href="#s01" class="toc-item">01 CSS Seçiciler ve Özgüllük <span class="toc-dot"></span></a>
+            <a href="#s02" class="toc-item">02 Kutu Modeli ve BFC <span class="toc-dot"></span></a>
+            <a href="#s03" class="toc-item">03 Ekran Düzenleri <span class="toc-dot"></span></a>
+            <a href="#s04" class="toc-item">04 Flexbox & Grid <span class="toc-dot"></span></a>
+            <a href="#s05" class="toc-item">05 Renkler & Arka Planlar <span class="toc-dot"></span></a>
+            <a href="#s06" class="toc-item">06 Tipografi & Metin Özellikleri <span class="toc-dot"></span></a>
+            <a href="#s07" class="toc-item">07 Dönüşümler & Geçişler <span class="toc-dot"></span></a>
+            <a href="#s08" class="toc-item">08 CSS Animasyonları <span class="toc-dot"></span></a>
+            <a href="#s09" class="toc-item">09 Responsive Tasarım <span class="toc-dot"></span></a>
+            <a href="#s10" class="toc-item">10 Değişkenler & Fonksiyonlar <span class="toc-dot"></span></a>
+            <a href="#s11" class="toc-item">11 Pseudo-classes & Elements <span class="toc-dot"></span></a>
+            <a href="#s12" class="toc-item">12 Tarayıcı Performansı <span class="toc-dot"></span></a>
+        </nav>
+    </aside>
+
+    <main class="main-content">
+        <!-- HEADER -->
+        <header class="top-header">
+            <div class="search-box">
+                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                <input type="text" id="searchInput" placeholder="İçerikte ara... (Cmd+K)">
+            </div>
+            <div class="header-actions">
+                <button id="themeToggle" class="theme-btn" title="Tema Değiştir">☀️</button>
+            </div>
+        </header>
+
+        <!-- HERO -->
+        <section class="hero">
+            <h1>CSS3 Kapsamlı Başvuru Rehberi</h1>
+            <p>Modern web tasarımının kalbi olan CSS3 için derinlemesine teknik detaylar, best-practiceler, mimari yapılar ve ileri düzey konseptler referansı.</p>
+        </section>
+
+        <!-- 6. CSS İÇERİK İSKELETİ -->
+        
+        <section class="section" id="s01" data-title="CSS Seçiciler & Öncelik Sıralaması">
+            <h2>01. CSS Seçiciler & Öncelik Sıralaması (Specificity)</h2>
+            <p>CSS seçiciler, DOM üzerindeki spesifik elementleri hedeflememizi sağlayan kurallar bütünüdür. <strong>Specificity</strong> ise, aynı elementi hedefleyen birden fazla kural olduğunda hangi kuralın ezici olacağını belirleyen puanlama sistemidir.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Temel ve Nitelik Seçiciler</div>
+                    <div class="card-content">
+                        <p>Elementleri etiketine, sınıfına, kimliğine veya sahip olduğu niteliklere (attributes) göre seçebilirsiniz.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">/* Evrensel Seçici */
+* { margin: 0; padding: 0; }
+
+/* Class ve ID Seçici */
+.btn { color: white; }
+#main-header { font-size: 2rem; }
+
+/* Nitelik (Attribute) Seçicileri */
+input[type="text"] { border: 1px solid #ccc; }
+a[href^="https"] { color: green; } /* https ile başlayanlar */
+a[href$=".pdf"] { color: red; }    /* .pdf ile bitenler */</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Kombinatörler (Combinators)</div>
+                    <div class="card-content">
+                        <p>Elementler arasındaki hiyerarşik (ebeveyn-çocuk, kardeş) ilişkileri tanımlar.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">/* Torun (Descendant) Seçici: Boşluk */
+.card p { color: gray; } /* .card içindeki tüm p'ler */
+
+/* Çocuk (Child) Seçici: > */
+ul > li { list-style: none; } /* Sadece doğrudan alt öğe olan li'ler */
+
+/* Bitişik Kardeş (Adjacent Sibling): + */
+h2 + p { margin-top: 0; } /* h2'den hemen sonra gelen ilk p */
+
+/* Genel Kardeş (General Sibling): ~ */
+h2 ~ p { font-size: 1.1rem; } /* h2 ile aynı seviyedeki tüm p'ler */</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Specificity (Öncelik Puanlaması)</div>
+                    <div class="card-content">
+                        <p>Tarayıcılar çakışan kuralları çözerken <code>(Inline, ID, Class, Element)</code> şeklindeki 4 haneli puanlamaya bakar.</p>
+                        <div class="info-box note">
+                            <div class="info-title">Puanlama Tablosu</div>
+                            <div>
+                                <ul>
+                                    <li><strong>Inline Stiller:</strong> (1,0,0,0) - 1000 Puan</li>
+                                    <li><strong>ID Seçiciler (#):</strong> (0,1,0,0) - 100 Puan</li>
+                                    <li><strong>Class, Nitelik ve Pseudo-class:</strong> (0,0,1,0) - 10 Puan</li>
+                                    <li><strong>Element ve Pseudo-element:</strong> (0,0,0,1) - 1 Puan</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div class="info-box warn">
+                            <div class="info-title">!important Tehlikesi</div>
+                            <div><code>!important</code> bu puanlamayı tamamen yok sayarak en yüksek önceliği alır. Sadece utility (yardımcı) sınıflarda veya 3. parti kütüphaneleri ezerken dikkatli kullanılmalıdır, aksi takdirde CSS mimarinizi kırılganlaştırır.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Kalıtım (Inheritance)</div>
+                    <div class="card-content">
+                        <p>Bazı CSS özellikleri (örneğin font-family, color) ebeveynden çocuk elementlere otomatik geçer. Kalıtımı yönetmek için özel değerler kullanılır.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.child {
+  /* Ebeveyndeki değeri zorla miras alır */
+  color: inherit; 
+  
+  /* Tarayıcının varsayılan ilk değerine döner */
+  border: initial; 
+  
+  /* Kalıtsal bir özellikse 'inherit', değilse 'initial' gibi davranır */
+  margin: unset; 
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s02" data-title="Kutu Modeli (Box Model) & Sınırlar">
+            <h2>02. Kutu Modeli (Box Model) & Sınırlar</h2>
+            <p>CSS'te HTML'deki her element görünmez bir dikdörtgen kutu olarak ele alınır. Bu kutunun anatomisini anlamak, doğru boyutlandırma ve boşluklandırma yapabilmenin tek yoludur.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Kutu Anatomisi</div>
+                    <div class="card-content">
+                        <p>Bir element dıştan içe doğru 4 katmandan oluşur:</p>
+                        <ul>
+                            <li><strong>Margin:</strong> Elementin çevresindeki görünmez dış boşluk.</li>
+                            <li><strong>Border:</strong> Padding ve Content etrafındaki görünür sınır.</li>
+                            <li><strong>Padding:</strong> İçerik ile border arasındaki iç boşluk.</li>
+                            <li><strong>Content:</strong> Metnin veya resmin bulunduğu asıl (width/height) alan.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">box-sizing Stratejisi</div>
+                    <div class="card-content">
+                        <p>Varsayılan <code>content-box</code> modelinde padding ve border, elementin genişliğine (width) <strong>eklenir</strong> ve elementi büyütür. Endüstri standardı olan <code>border-box</code> ise bunları genişliğin içine dahil eder.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">/* Evrensel Border-Box Reset (Modern Standart) */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+.box {
+  width: 200px;
+  padding: 20px;
+  border: 5px solid black;
+  /* border-box ile bu kutu tam 200px kalır. 
+     İçerik alanı 150px'e (200-40-10) daralır. */
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Margin Collapse (Çökme) Sendromu</div>
+                    <div class="card-content">
+                        <p>Blok seviyesindeki ardışık iki elementin <strong>dikey</strong> margin (top/bottom) değerleri karşılaştığında, toplamları alınmaz; sadece büyük olan margin değeri uygulanır (çöker).</p>
+                        <div class="info-box tip">
+                            <div class="info-title">Çözüm Yolları</div>
+                            <div>
+                                Margin çökmesini engellemek için elementlerin bir BFC (Block Formatting Context) içinde olması veya aralarında padding/border/inline içerik bulunması gerekir. Günümüzde <code>display: flex</code> veya <code>display: grid</code> kullanarak margin çökmesi sendromundan tamamen kurtulabilirsiniz.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Outline vs Border</div>
+                    <div class="card-content">
+                        <p><code>outline</code> (dış hat), <code>border</code>'a benzese de kutu modelinin boyutlarına dahil edilmez (yer kaplamaz) ve elementin dışından çizilir.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.input-field {
+  border: 1px solid #ccc;
+}
+
+.input-field:focus {
+  /* Genellikle erişilebilirlik (a11y) için kullanılır, 
+     sayfa düzenini bozmadan odak (focus) halkası çizer. */
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s03" data-title="Ekran Düzenleri (Display & Positioning)">
+            <h2>03. Ekran Düzenleri (Display & Positioning)</h2>
+            <p>Elementlerin sayfa akışında nasıl davranacağını ve nereye konumlandırılacağını belirleyen temel yerleşim teknikleri.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Display Değerleri</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.element {
+  /* Tüm satırı kaplar, margin/padding her yönde çalışır. (Örn: div, p, h1) */
+  display: block; 
+  
+  /* Sadece içeriği kadar yer kaplar. margin-top/bottom ÇALIŞMAZ. (Örn: span, a) */
+  display: inline; 
+  
+  /* Yan yana dizilir ama block gibi boyut (width/height/margin) verilebilir. */
+  display: inline-block; 
+  
+  /* Elementi DOM'dan görsel olarak siler, yer kaplamaz. */
+  display: none; 
+}
+
+.hidden-element {
+  /* Elementi gizler AMA kapladığı boşluk sayfada kalır. */
+  visibility: hidden; 
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Positioning (Konumlandırma) Kuralları</div>
+                    <div class="card-content">
+                        <p>Sayfa akışını (document flow) manipüle etmek için <code>position</code> kullanılır.</p>
+                        <ul>
+                            <li><strong>static:</strong> Varsayılan değer. Normal akışta kalır. <code>top/left/z-index</code> etki etmez.</li>
+                            <li><strong>relative:</strong> Normal akıştaki yerine göre kaydırılır. Akışta bıraktığı boşluk korunur.</li>
+                            <li><strong>absolute:</strong> Akıştan tamamen çıkarılır (havaya kalkar). <code>static</code> <u>olmayan</u> en yakın ebeveynine göre hizalanır.</li>
+                            <li><strong>fixed:</strong> Akıştan çıkarılır ve doğrudan viewport'a (tarayıcı penceresine) sabitlenir. Scroll edilse de kıpırdamaz.</li>
+                            <li><strong>sticky:</strong> Relative ve Fixed karışımıdır. Element, belirlenen bir scroll noktasına gelene kadar relative, sonrasında viewport içinde kalacak şekilde fixed davranır.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Absolute & Relative İlişkisi</div>
+                    <div class="card-content">
+                        <p>Absolute elementi belirli bir kutunun içinde tutmanın en yaygın senaryosu.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.parent-container {
+  /* Absolute çocuğun referans alacağı koordinat düzlemini başlatır */
+  position: relative; 
+}
+
+.child-badge {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  /* parent-container'ın sağ üst köşesine yapışır */
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Z-Index & Stacking Context</div>
+                    <div class="card-content">
+                        <p>Z-ekseninde (derinlik) hangi elementin üstte görüneceğini belirler.</p>
+                        <div class="info-box note">
+                            <div class="info-title">Stacking Context (Yığınlama Bağlamı)</div>
+                            <div>
+                                Z-index değeri sadece <code>position</code> değeri <code>static</code> <strong>olmayan</strong> elementlerde veya Flex/Grid çocuklarında çalışır. Yeni bir yığınlama bağlamı oluşan elementlerde (örn: opacity &lt; 1, transform, filter), içerdeki elementin z-index'i ne kadar büyük olursa olsun dışarıdaki elementin z-index sınırını geçemez.
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s04" data-title="Modern Düzenler: Flexbox & Grid">
+            <h2>04. Modern Düzenler: Flexbox & Grid</h2>
+            <p>Günümüz web tasarımında düzenleri inşa etmenin en güçlü ve endüstri standardı iki mekanizması Flexbox ve CSS Grid'dir.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Flexbox (Esnek Kutu Modeli)</div>
+                    <div class="card-content">
+                        <p>1-Boyutlu (Tek satır veya tek sütun) yerleşimlerde mükemmeldir. İçeriklerin hizalanması, boşlukların dağıtılması ve esnek büyüme/küçülme davranışları sağlar.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.flex-container {
+  display: flex;
+  flex-direction: row; /* row (yan yana) | column (alt alta) */
+  justify-content: space-between; /* Ana eksende hizalama */
+  align-items: center; /* Çapraz eksende hizalama */
+  flex-wrap: wrap; /* Sığmayanlar alta insin */
+  gap: 1.5rem; /* Öğeler arası boşluk */
+}
+
+.flex-item {
+  /* flex: [grow] [shrink] [basis] */
+  /* Büyüme izni var, küçülme izni var, ideal boyutu 200px */
+  flex: 1 1 200px; 
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">CSS Grid (Izgara Sistemi)</div>
+                    <div class="card-content">
+                        <p>2-Boyutlu (Aynı anda hem satır hem sütun) yerleşimleri kusursuz yönetir. Karmaşık sayfa iskeletleri ve makro layout'lar için idealdir.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.grid-container {
+  display: grid;
+  /* 3 sütunlu yapı: ilk ikisi 1 parça (fr), sonuncusu en az 250px en çok 1 parça */
+  grid-template-columns: repeat(2, 1fr) minmax(250px, 1fr);
+  grid-template-rows: auto 1fr; 
+  gap: 20px;
+}
+
+.grid-item {
+  /* Bu öğe 1. sütundan başlayıp 3. sütuna kadar (toplam 2 sütun) genişler */
+  grid-column: 1 / 3; 
+  grid-row: 1;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Grid Area Kullanımı</div>
+                    <div class="card-content">
+                        <p>CSS Grid ile çok net ve okunabilir sayfa yapıları tasarlayabilirsiniz.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.layout {
+  display: grid;
+  grid-template-areas:
+    "header header"
+    "sidebar main"
+    "footer footer";
+}
+
+.header { grid-area: header; }
+.sidebar { grid-area: sidebar; }
+.main { grid-area: main; }</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Hangisini Tercih Etmeli?</div>
+                    <div class="card-content">
+                        <div class="info-box tip">
+                            <div class="info-title">1D vs 2D Kuralı</div>
+                            <div>
+                                <ul>
+                                    <li><strong>Flexbox:</strong> İçerik (content-first) odaklıdır. Bir navbar içindeki linkleri hizalamak, buton içindeki ikonu ve metni ortalamak veya yan yana esnek kartlar dizmek için kullanın.</li>
+                                    <li><strong>CSS Grid:</strong> Düzen (layout-first) odaklıdır. Sayfanın genel iskeletini (header, sidebar, content) oluşturmak veya tam olarak iki boyutlu, hizalı ızgara tabanlı galeriler yapmak için kullanın.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 05. Renkler, Arka Planlar & Gradyanlar -->
+        <section class="section" id="s05" data-title="Renkler, Arka Planlar & Gradyanlar">
+            <h2>05. Renkler, Arka Planlar & Gradyanlar</h2>
+            <p>CSS'te renk uzayları ve arka plan yönetiminin temelleri ile estetik gradyan tasarımları.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Renk Formatları</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.element {
+  color: #ff5733;            /* HEX: Alfa desteği 8 hanelidir (#ff573380) */
+  color: rgb(255, 87, 51);   /* RGB: Sabit renk kodları */
+  color: rgba(0, 0, 0, 0.5); /* RGBA: Alfa (saydamlık) destekli */
+  color: hsl(120, 100%, 50%);  /* HSL: Ton, Doygunluk, Parlaklık (Responsive renkler için ideal) */
+  color: hsla(120, 50%, 50%, 0.8); /* HSLA: HSL + Saydamlık */
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Arka Plan Görselleri</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.hero-bg {
+  background-image: url('/img/hero.jpg');
+  background-size: cover; /* Resmi, orantısını koruyarak alanı kaplayacak şekilde ölçekler */
+  /* Diğer boyutlar: contain (tamamını sığdır), auto */
+  background-position: center; /* Resmi merkeze hizalar */
+  background-repeat: no-repeat; /* Döşemeyi engeller */
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Gradyanlar (Gradients)</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.gradient-box {
+  /* Doğrusal Gradyan: 135 derece açıyla soldan sağa */
+  background: linear-gradient(135deg, var(--accent), var(--cyan));
+  
+  /* Radyal Gradyan: Merkezden dışa doğru yayılan dairesel renk */
+  background: radial-gradient(circle, #fff, #333);
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 06. Tipografi & Metin Özellikleri -->
+        <section class="section" id="s06" data-title="Tipografi & Metin Özellikleri">
+            <h2>06. Tipografi & Metin Özellikleri</h2>
+            <p>Okunabilirlik (Readability) ve genel estetiği sağlayan tipografi ve text stillendirmesi.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Yazı Tipi ve Boyutlar</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.text {
+  font-family: 'Inter', sans-serif;
+  
+  /* px: Sabit pikseller. em: Ebeveyne göre. rem: Kök (html) elementine göre oranlanır. */
+  font-size: 1.2rem; 
+  
+  font-weight: 600; /* 100-900 arası değer alır (400=normal, 700=bold) */
+  line-height: 1.5; /* Satır yüksekliği (1.5 katı) */
+  letter-spacing: -0.02em; /* Harfler arası boşluk daraltması */
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Metin Düzeni ve Gölgeler</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.heading {
+  text-align: center; /* left, right, justify, center */
+  
+  /* text-shadow: yatay-x dikey-y bulanıklık-blur renk */
+  text-shadow: 2px 4px 6px rgba(0, 0, 0, 0.3);
+  
+  text-transform: uppercase; /* uppercase, lowercase, capitalize */
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 07. Dönüşümler & Geçişler -->
+        <section class="section" id="s07" data-title="Dönüşümler & Geçişler (Transforms & Transitions)">
+            <h2>07. Dönüşümler & Geçişler (Transforms & Transitions)</h2>
+            <p>GPU üzerinde donanımsal hızlandırma ile performanslı mikro-etkileşimler yaratma kuralları.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">2D ve 3D Transforms</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.box {
+  /* X ekseninde 50px sağa, Y ekseninde 20px aşağı taşı */
+  transform: translate(50px, 20px); 
+  
+  /* 45 derece döndür */
+  transform: rotate(45deg); 
+  
+  /* Yüzde 20 büyüt */
+  transform: scale(1.2); 
+  
+  /* X ekseninde yamult */
+  transform: skewX(10deg); 
+  
+  /* 3D Transform: Derinlik (Z) ekseninde döndür ve taşı */
+  transform: perspective(500px) rotateY(30deg) translateZ(50px);
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Geçişler (Transitions)</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.btn {
+  background: blue;
+  
+  /* transition: [özellik] [süre] [zamanlama-fonk] [gecikme] */
+  transition: background 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.btn:hover { background: darkblue; }</code></pre>
+                        </div>
+                        <div class="info-box note">
+                            <div class="info-title">Performans Bilgisi</div>
+                            <div>Tarayıcıyı yormamak için geçişlerde (Repaint veya Reflow tetikleyen) width, height, top, left yerine <strong>transform</strong> ve <strong>opacity</strong> kullanmalısınız.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 08. CSS Animasyonları -->
+        <section class="section" id="s08" data-title="CSS Animasyonları (Keyframes)">
+            <h2>08. CSS Animasyonları (Keyframes)</h2>
+            <p>Elementlerin başlangıçtan bitişe karmaşık zaman tünelleri (timeline) oluşturarak hareketlendirilmesi.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">@keyframes Tanımlama</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">@keyframes slideIn {
+  0% {
+    transform: translateX(-100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Animasyonu Uygulama & Optimizasyon</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.animated-box {
+  /* name | duration | timing-function | delay | iteration-count | direction | fill-mode */
+  animation: slideIn 0.5s ease-out 0s 1 normal forwards;
+  
+  /* GPU Acceleration'ı zorla tetiklemek için optimizasyon (Eski Yöntem) */
+  /* transform: translateZ(0); */
+  
+  /* Modern Optimizasyon: Tarayıcıya önceden haber verir */
+  will-change: transform, opacity;
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 09. Responsive Tasarım & Media Queries -->
+        <section class="section" id="s09" data-title="Responsive Tasarım & Media Queries">
+            <h2>09. Responsive Tasarım & Media Queries</h2>
+            <p>Gelişmiş ekran boyutlarına dinamik olarak uyum sağlama sanatıdır.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Mobil-Öncelikli (Mobile-First) Mimari</div>
+                    <div class="card-content">
+                        <p>Kodun varsayılan hali mobildir, ekran büyüdükçe (<code>min-width</code>) yeni özellikler eklenir. Bu, mobil cihazları gereksiz masaüstü CSS'lerini okumaktan kurtarır.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">/* Tüm cihazlar (Mobil varsayılan) */
+.layout { display: flex; flex-direction: column; }
+
+/* Tablet ve Üzeri Breakpoint */
+@media (min-width: 768px) {
+  .layout { flex-direction: row; }
+}
+
+/* Sadece Küçük Ekranlara Özel (Tavsiye Edilmez) */
+@media (max-width: 500px) { ... }</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 10. CSS Değişkenleri & Fonksiyonlar -->
+        <section class="section" id="s10" data-title="Değişkenler & Fonksiyonlar">
+            <h2>10. CSS Değişkenleri (Custom Properties) & Fonksiyonlar</h2>
+            <p>CSS içinde matematiksel hesaplamalar ve dinamik değer atamaları.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Değişkenler (Custom Properties)</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">:root {
+  --primary-color: #3498db;
+  --spacing: 16px;
+}
+.box {
+  color: var(--primary-color);
+  padding: var(--spacing);
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Matematik ve Dinamik Fonksiyonlar</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.container {
+  /* calc: Birimler arası matematik hesabı */
+  width: calc(100% - 40px);
+  
+  /* clamp: min-değer, ideal-değer, max-değer (Tipografide çok kullanılır) */
+  font-size: clamp(1rem, 2vw + 0.5rem, 2.5rem);
+  
+  /* min/max: İki değerden küçüğünü veya büyüğünü seçer */
+  max-width: min(900px, 100%);
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 11. Pseudo-classes & Pseudo-elements -->
+        <section class="section" id="s11" data-title="Pseudo-classes & Pseudo-elements">
+            <h2>11. Pseudo-classes & Pseudo-elements</h2>
+            <p>Elementlerin belirli durumlarını veya DOM'da fiziksel olarak olmayan sahte öğelerini hedefleme.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Durum (State) Seçicileri</div>
+                    <div class="card-content">
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">.btn:hover { background: darkblue; }   /* Fare üzerine geldiğinde */
+.input:focus { border-color: blue; }   /* Klavye veya fare ile odaklandığında */
+.btn:active { transform: scale(0.9); } /* Tıklandığı an */
+
+/* nth-child: Belirli sıradaki kardeş öğeleri seçer (Örn: Çift sıralar) */
+li:nth-child(even) { background: #eee; }
+
+/* :not(): Belirtilen seçici hariç hepsini hedefler */
+.card:not(.active) { opacity: 0.5; }</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">Sanal Elementler (::before & ::after)</div>
+                    <div class="card-content">
+                        <div class="info-box tip">
+                            <div class="info-title">Content Zorunluluğu</div>
+                            <div><code>::before</code> ve <code>::after</code> kullanırken ekranda belirmeleri için mutlaka boş da olsa <code>content: "";</code> özelliğini tanımlamanız gerekir. Bu elementler genelde estetik arka plan dekorları (çiçek, ok, gölge vb.) için kullanılır.</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 12. Tarayıcı Performansı & Modern Mimari -->
+        <section class="section" id="s12" data-title="Tarayıcı Performansı & Modern CSS Mimari">
+            <h2>12. Tarayıcı Performansı & Modern CSS Mimarileri</h2>
+            <p>Render bloklamalarını kaldırma ve CSS kodunu ölçeklenebilir bir mimariyle yazma teorileri.</p>
+            
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header">Repaint ve Reflow (Tarayıcı Yükü)</div>
+                    <div class="card-content">
+                        <ul>
+                            <li><strong>Reflow:</strong> Elementin boyutu, margin'i, genişliği (width/height) değiştiğinde tarayıcının tüm sayfadaki elementlerin konumunu yeniden hesaplaması. (Çok Maliyetli)</li>
+                            <li><strong>Repaint:</strong> Elementin rengi, gölgesi gibi görsel (fiziksel boyutunu etkilemeyen) kısımları değiştiğinde ekrana yeniden çizilmesi. (Nispeten daha az maliyetli)</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">BEM (Block, Element, Modifier)</div>
+                    <div class="card-content">
+                        <p>Spagetti koda ve specificity savaşlarına son vermek için kullanılan isimlendirme konvansiyonu.</p>
+                        <div class="code-block">
+                            <button class="copy-btn">Kopyala</button>
+                            <pre><code class="language-css">/* Block (Kapsayıcı Bileşen) */
+.card { ... }
+
+/* Element (Bileşenin iç parçası) (Çift alt çizgi) */
+.card__title { ... }
+.card__image { ... }
+
+/* Modifier (Bileşenin varyasyonu) (Çift tire) */
+.card--featured { border: 2px solid gold; }</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- 2. ALT İLERLEME ÇUBUĞU -->
+    <div id="progressBar">
+        <div class="prog-info">
+            <span class="prog-sec-num" id="pgNum">01</span>
+            <span class="prog-sec-name" id="pgName">CSS Seçiciler ve Özgüllük</span>
+            <span class="prog-sec-pct" id="pgPct">%0</span>
+        </div>
+        <div class="prog-fill-wrapper">
+            <div class="prog-fill" id="pgFill"></div>
+        </div>
+    </div>
+
+    <!-- YUKARI ÇIK BUTONU -->
+    <button id="scrollTop" aria-label="Yukarı Çık">
+        <svg class="progress-ring" width="46" height="46">
+            <circle class="progress-ring__circle" stroke="var(--accent)" stroke-width="3" fill="transparent" r="21" cx="23" cy="23" />
+        </svg>
+        <span style="position:absolute; font-weight:bold;">↑</span>
+    </button>
+
+    <!-- JAVASCRIPT MOTORLARI -->
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            // 1. TEMA DEĞİŞTİRİCİ
+            const themeBtn = document.getElementById('themeToggle');
+            themeBtn.addEventListener('click', () => {
+                document.body.classList.toggle('light-mode');
+                themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️';
+            });
+
+            // 3. KOPYALA BUTONLARI
+            document.querySelectorAll('.copy-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    const code = btn.nextElementSibling.innerText;
+                    navigator.clipboard.writeText(code);
+                    btn.innerText = 'Kopyalandı!';
+                    btn.classList.add('copied');
+                    setTimeout(() => {
+                        btn.innerText = 'Kopyala';
+                        btn.classList.remove('copied');
+                    }, 2000);
+                });
+            });
+
+            // 4. OTOMATİK SÖZLÜK & TOOLTIP SİSTEMİ
+            const glossary = {
+                'Specificity': 'CSS seçici önceliğini belirleyen ağırlık kuralı.',
+                'BFC': 'Block Formatting Context, blok seviyesindeki ögelerin kendi içlerindeki düzenini sağlayan bağlam.',
+                'Flexbox': 'Tek boyutlu (satır veya sütun) esnek düzen modeli.',
+                'Reflow': 'Tarayıcının elementlerin boyut ve konumlarını yeniden hesaplaması işlemi.',
+                'Repaint': 'Elementlerin görsel özelliklerinin ekrana yeniden çizilmesi işlemi.',
+                'GPU Acceleration': 'Tarayıcının bazı CSS işlemlerini işlemciden alıp grafik işlemcisine (GPU) devretmesi.'
+            };
+
+            const applyGlossary = () => {
+                const walker = document.createTreeWalker(document.querySelector('.main-content'), NodeFilter.SHOW_TEXT, null, false);
+                const nodes = [];
+                const termsRegex = new RegExp(`\\b(${Object.keys(glossary).join('|')})\\b`, 'gi');
+                
+                let node;
+                while(node = walker.nextNode()) {
+                    const parentTag = node.parentNode.tagName;
+                    if (['SCRIPT','STYLE','CODE','PRE','MARK','SPAN','BUTTON','H1','H2','H3'].includes(parentTag)) continue;
+                    if (node.parentNode.classList.contains('tooltip')) continue;
+                    if (termsRegex.test(node.nodeValue)) {
+                        nodes.push(node);
+                    }
+                }
+                
+                nodes.forEach(n => {
+                    const temp = document.createElement('div');
+                    temp.innerHTML = n.nodeValue.replace(termsRegex, (match) => {
+                        const key = Object.keys(glossary).find(k => k.toLowerCase() === match.toLowerCase());
+                        if(!key) return match;
+                        return `<span class="tooltip" data-tip="${glossary[key]}">${match}</span>`;
+                    });
+                    const parent = n.parentNode;
+                    while(temp.firstChild) {
+                        parent.insertBefore(temp.firstChild, n);
+                    }
+                    parent.removeChild(n);
+                });
+            };
+            applyGlossary();
+
+            // 5. ARAMA MOTORU & HIGHLIGHT
+            const searchInput = document.getElementById('searchInput');
+            const tocItems = document.querySelectorAll('.toc-item');
+            
+            // Kısayol: Cmd+K / Ctrl+K
+            document.addEventListener('keydown', (e) => {
+                if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+                    e.preventDefault();
+                    searchInput.focus();
+                }
+            });
+
+            searchInput.addEventListener('input', (e) => {
+                const term = e.target.value.toLowerCase().trim();
+                
+                // TOC Filtreleme
+                tocItems.forEach(item => {
+                    const text = item.innerText.toLowerCase();
+                    item.style.display = text.includes(term) || term === '' ? 'flex' : 'none';
+                });
+
+                // Önceki vurguları temizle
+                document.querySelectorAll('mark.search-hl').forEach(hl => {
+                    const parent = hl.parentNode;
+                    parent.replaceChild(document.createTextNode(hl.innerText), hl);
+                    parent.normalize();
+                });
+
+                if (term.length < 2) return;
+
+                // İçerikte yeni vurguları yap
+                const walker = document.createTreeWalker(document.querySelector('.main-content'), NodeFilter.SHOW_TEXT, null, false);
+                const searchNodes = [];
+                let n;
+                while(n = walker.nextNode()) {
+                    const pTag = n.parentNode.tagName;
+                    if (['SCRIPT','STYLE'].includes(pTag)) continue;
+                    if (n.nodeValue.toLowerCase().includes(term)) {
+                        searchNodes.push(n);
+                    }
+                }
+
+                searchNodes.forEach(sn => {
+                    const temp = document.createElement('div');
+                    const regex = new RegExp(`(${term})`, 'gi');
+                    temp.innerHTML = sn.nodeValue.replace(regex, '<mark class="search-hl">$1</mark>');
+                    const parent = sn.parentNode;
+                    while(temp.firstChild) {
+                        parent.insertBefore(temp.firstChild, sn);
+                    }
+                    parent.removeChild(sn);
+                });
+            });
+
+            // 6. SCROLLSPY, İLERLEME ÇUBUĞU VE YUKARI ÇIK BUTONU
+            const sections = document.querySelectorAll('.section');
+            const pgNum = document.getElementById('pgNum');
+            const pgName = document.getElementById('pgName');
+            const pgPct = document.getElementById('pgPct');
+            const pgFill = document.getElementById('pgFill');
+            const scrollTopBtn = document.getElementById('scrollTop');
+            
+            // Scroll Ring SVG Ayarları
+            const circle = document.querySelector('.progress-ring__circle');
+            const radius = circle.r.baseVal.value;
+            const circumference = radius * 2 * Math.PI;
+            circle.style.strokeDasharray = `${circumference} ${circumference}`;
+            circle.style.strokeDashoffset = circumference;
+
+            let moveTimeout;
+
+            const handleScroll = () => {
+                const scrollY = window.scrollY;
+                const winH = window.innerHeight;
+                const docH = document.documentElement.scrollHeight;
+                
+                // SVG İlerleme Halkası (Genel)
+                const scrollPercent = (scrollY / (docH - winH)) * 100 || 0;
+                circle.style.strokeDashoffset = circumference - (scrollPercent / 100) * circumference;
+                
+                if (scrollY > 300) scrollTopBtn.classList.add('visible');
+                else scrollTopBtn.classList.remove('visible');
+
+                // Bölüm İçi İlerleme ve ScrollSpy
+                let currentSec = null;
+                sections.forEach(sec => {
+                    const rect = sec.getBoundingClientRect();
+                    // Ekranın ortasına denk gelen bölüm
+                    if (rect.top <= winH / 2 && rect.bottom >= winH / 2) {
+                        currentSec = sec;
+                    }
+                });
+
+                if (currentSec) {
+                    const id = currentSec.id;
+                    const secNum = id.replace('s', '');
+                    const secTitle = currentSec.getAttribute('data-title');
+                    
+                    // TOC Aktif Sınıfı Yönetimi
+                    tocItems.forEach(item => {
+                        if (item.getAttribute('href') === '#' + id) {
+                            if(!item.classList.contains('active')){
+                                item.classList.add('active', 'toc-entering');
+                                setTimeout(() => item.classList.remove('toc-entering'), 300);
+                            }
+                        } else {
+                            item.classList.remove('active');
+                        }
+                    });
+
+                    // Alt İlerleme Çubuğu Güncellemesi
+                    const rect = currentSec.getBoundingClientRect();
+                    const secH = currentSec.offsetHeight;
+                    // Bölüm içindeki dikey kaydırma miktarını hesapla
+                    const scrolledInside = (winH / 2) - rect.top;
+                    let innerProgress = Math.max(0, Math.min(100, (scrolledInside / secH) * 100));
+
+                    // Sayfa sonuna gelindiyse (kullanıcı en alta indiyse) zorla %100 yap
+                    if (Math.ceil(scrollY + winH) >= docH) {
+                        innerProgress = 100;
+                    }
+
+                    pgNum.innerText = secNum;
+                    pgName.innerText = secTitle;
+                    pgPct.innerText = `%${Math.floor(innerProgress)}`;
+                    pgFill.style.width = `${innerProgress}%`;
+                    
+                    // Dinamik Parlama Efekti
+                    pgFill.classList.add('moving');
+                    clearTimeout(moveTimeout);
+                    moveTimeout = setTimeout(() => pgFill.classList.remove('moving'), 150);
+                }
+            };
+
+            window.addEventListener('scroll', handleScroll, { passive: true });
+            handleScroll(); // İlk yükleme tetiklemesi
+
+            // Yukarı Çık Aksiyonu
+            scrollTopBtn.addEventListener('click', () => {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            });
+        });
+    </script>
+</body>
+</html>
