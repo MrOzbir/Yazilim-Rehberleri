@@ -1,15 +1,18 @@
 <!DOCTYPE html>
 <html lang="tr">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>SQL & NoSQL Veritabanı Mimarisi Başvuru Rehberi</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
     <style>
         /* 1. DB PURPLE PALETİ & TIPOGRAFİ */
         :root {
@@ -49,27 +52,71 @@
             --text-dim: #475569;
         }
 
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; }
-        
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        /* ERGONOMİK & DUYARLI TİPOGRAFİ (Root Font Size) 
+           Kullanıcının cihaza olan uzaklığına göre temel puntoyu ayarlıyoruz. 
+           Sayfadaki tüm elemanlar 'rem' kullandığı için, sadece burayı değiştirerek 
+           tüm sayfadaki yazıları, boşlukları ve kutuları orantılı olarak küçültmüş oluyoruz. */
+
+        /* 1. Masaüstü/Büyük Monitör (> 1440px): Ekrana en uzak mesafe */
+        html {
+            scroll-behavior: smooth;
+            font-size: 14.5px;
+            /* 16'dan 14.5'e çektik, ekrana çok daha fazla şey sığacak */
+        }
+
+        /* 2. Laptop (1025px - 1440px): Ekrana orta uzaklık */
+        @media (max-width: 1440px) {
+            html {
+                font-size: 13.5px;
+            }
+        }
+
+        /* 3. Tablet (769px - 1024px): Elde tutulan, daha yakın mesafe */
+        @media (max-width: 1024px) {
+            html {
+                font-size: 12.5px;
+            }
+        }
+
+        /* 4. Telefon (<= 768px): Göze en yakın mesafe. 
+           Çok küçültmek okunabilirliği bozacağı için 11.5px veya 12px idealdir. */
+        @media (max-width: 768px) {
+            html {
+                font-size: 11.5px;
+            }
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text);
             font-family: var(--font-body);
             line-height: 1.6;
             transition: background-color 0.3s, color 0.3s;
-            display: flex;
+            overflow-x: hidden;
+            width: 100%;
         }
 
-        h1, h2, h3, h4 { 
-            font-family: var(--font-heading); 
-            color: var(--text); 
+        h1,
+        h2,
+        h3,
+        h4 {
+            font-family: var(--font-heading);
+            color: var(--text);
         }
-        p { margin-bottom: 1rem; }
+
+        p {
+            margin-bottom: 1rem;
+        }
 
         /* DİNAMİK YAN MENÜ (Sidebar) */
         .sidebar {
-            width: 320px;
+            width: 260px;
             height: 100vh;
             position: fixed;
             left: 0;
@@ -83,23 +130,30 @@
             gap: 0.5rem;
             z-index: 100;
         }
-        
+
         /* Özel Scrollbar */
-        .sidebar::-webkit-scrollbar { width: 6px; }
-        .sidebar::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+        .sidebar::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .sidebar::-webkit-scrollbar-thumb {
+            background: var(--border2);
+            border-radius: 3px;
+        }
 
         .sidebar-top {
             display: flex;
             justify-content: space-between;
             align-items: center;
         }
+
         .sidebar-top h2 {
             font-size: 1.1rem;
             background: linear-gradient(90deg, var(--accent), var(--cyan));
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
         }
-        
+
         /* Theme Toggle Butonu */
         .theme-toggle {
             background: var(--bg3);
@@ -114,10 +168,17 @@
             justify-content: center;
             transition: all 0.2s;
         }
-        .theme-toggle:hover { border-color: var(--accent); transform: scale(1.05); }
+
+        .theme-toggle:hover {
+            border-color: var(--accent);
+            transform: scale(1.05);
+        }
 
         /* Arama Motoru */
-        .search-container { position: relative; }
+        .search-container {
+            position: relative;
+        }
+
         .search-input {
             width: 100%;
             background: var(--bg3);
@@ -129,9 +190,10 @@
             outline: none;
             transition: border-color 0.2s, box-shadow 0.2s;
         }
-        .search-input:focus { 
-            border-color: var(--accent); 
-            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2); 
+
+        .search-input:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.2);
         }
 
         /* Okuma Süresi */
@@ -155,6 +217,7 @@
             list-style: none;
             padding-bottom: 0;
         }
+
         .toc-item {
             text-decoration: none;
             color: var(--text-dim);
@@ -168,6 +231,7 @@
             cursor: pointer;
             border: 1px solid transparent;
         }
+
         .toc-item .num {
             font-family: var(--font-code);
             font-size: 0.85rem;
@@ -175,7 +239,12 @@
             opacity: 0.7;
             margin-right: 0.75rem;
         }
-        .toc-item .text { flex: 1; font-weight: 500; }
+
+        .toc-item .text {
+            flex: 1;
+            font-weight: 500;
+        }
+
         .toc-dot {
             width: 8px;
             height: 8px;
@@ -190,42 +259,72 @@
             background-color: var(--bg3);
             color: var(--text);
         }
-        
+
         /* Aktif ScrollSpy Durumu */
         .toc-item.active {
             background-color: var(--bg3);
             border-color: var(--border);
             color: var(--accent);
         }
+
         .toc-item.active .toc-dot {
             background-color: var(--accent);
             box-shadow: 0 0 8px var(--accent);
             animation: dotPulse 1.5s infinite;
         }
-        .toc-item.active .num { opacity: 1; }
-        
+
+        .toc-item.active .num {
+            opacity: 1;
+        }
+
         /* TOC Entering Sola Kayma Efekti */
         .toc-item.toc-entering {
             animation: slideLeft 0.3s ease forwards;
         }
 
         @keyframes dotPulse {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7); }
-            70% { transform: scale(1.2); box-shadow: 0 0 0 6px rgba(124, 58, 237, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(124, 58, 237, 0); }
+            0% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(124, 58, 237, 0.7);
+            }
+
+            70% {
+                transform: scale(1.2);
+                box-shadow: 0 0 0 6px rgba(124, 58, 237, 0);
+            }
+
+            100% {
+                transform: scale(0.95);
+                box-shadow: 0 0 0 0 rgba(124, 58, 237, 0);
+            }
         }
+
         @keyframes slideLeft {
-            0% { transform: translateX(10px); opacity: 0; }
-            100% { transform: translateX(0); opacity: 1; }
+            0% {
+                transform: translateX(10px);
+                opacity: 0;
+            }
+
+            100% {
+                transform: translateX(0);
+                opacity: 1;
+            }
         }
 
         /* ANA İÇERİK */
         .main-content {
-            margin-left: 320px;
-            flex: 1;
-            padding: 4rem 8%;
+            margin-left: 260px;
+            padding: 4rem 5%;
             padding-bottom: 150px;
-            max-width: 1200px;
+            width: calc(100% - 260px);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .main-content>* {
+            width: 100%;
+            max-width: 1100px;
         }
 
         .section {
@@ -233,6 +332,7 @@
             scroll-margin-top: 2rem;
             position: relative;
         }
+
         .section-title {
             font-size: 2.5rem;
             margin-bottom: 2rem;
@@ -243,6 +343,7 @@
             border-bottom: 1px solid var(--border);
             padding-bottom: 1rem;
         }
+
         .section-title .num {
             font-family: var(--font-code);
             color: var(--accent);
@@ -259,8 +360,11 @@
             margin-bottom: 1.5rem;
             transition: border-color 0.3s;
         }
-        .card:hover { border-color: var(--border2); }
-        
+
+        .card:hover {
+            border-color: var(--border2);
+        }
+
         h3.sub {
             font-size: 1.3rem;
             margin-top: 2rem;
@@ -277,6 +381,7 @@
             border: 1px solid var(--border);
             overflow: hidden;
         }
+
         .code-header {
             display: flex;
             justify-content: space-between;
@@ -289,6 +394,7 @@
             font-size: 0.85rem;
             color: var(--text-dim);
         }
+
         .copy-btn {
             background: transparent;
             border: 1px solid var(--border2);
@@ -300,11 +406,13 @@
             transition: all 0.2s;
             font-family: var(--font-body);
         }
+
         .copy-btn:hover {
             color: var(--text);
             border-color: var(--accent);
             background: rgba(124, 58, 237, 0.1);
         }
+
         pre {
             padding: 1.5rem;
             overflow-x: auto;
@@ -318,7 +426,7 @@
         .bottom-progress-container {
             position: fixed;
             bottom: 0;
-            left: 320px;
+            left: 260px;
             right: 0;
             height: 70px;
             background-color: rgba(18, 16, 22, 0.85);
@@ -330,6 +438,7 @@
             padding: 0 3rem;
             z-index: 90;
         }
+
         body.light-mode .bottom-progress-container {
             background-color: rgba(241, 245, 249, 0.85);
         }
@@ -342,6 +451,7 @@
             font-family: var(--font-heading);
             font-weight: 600;
         }
+
         .progress-info .num {
             color: var(--accent);
             font-family: var(--font-code);
@@ -351,6 +461,7 @@
             border-radius: 6px;
             border: 1px solid var(--border);
         }
+
         .progress-info .title {
             color: var(--text);
             white-space: nowrap;
@@ -358,6 +469,7 @@
             text-overflow: ellipsis;
             font-size: 0.95rem;
         }
+
         .progress-info .pct {
             color: var(--cyan);
             font-family: var(--font-code);
@@ -374,6 +486,7 @@
             position: relative;
             overflow: hidden;
         }
+
         .progress-fill {
             height: 100%;
             background: linear-gradient(90deg, var(--accent2), var(--accent), var(--cyan));
@@ -382,17 +495,27 @@
             transition: width 0.1s ease;
             position: relative;
         }
+
         /* İlerleme çubuğu parlama ve hareket animasyonu */
         .progress-fill::after {
             content: '';
             position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
             animation: moveGlow 2s infinite linear;
         }
+
         @keyframes moveGlow {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
+            0% {
+                transform: translateX(-100%);
+            }
+
+            100% {
+                transform: translateX(100%);
+            }
         }
 
         /* 4. SCROLL TOP BUTONU (Progress Ring) */
@@ -415,19 +538,25 @@
             z-index: 95;
             color: var(--text);
         }
+
         .scroll-top.visible {
             opacity: 1;
             visibility: visible;
         }
+
         .scroll-top:hover {
             color: var(--accent);
             transform: translateY(-3px);
             box-shadow: 0 4px 12px rgba(124, 58, 237, 0.2);
         }
+
         /* CSS Conic Gradient Ring */
         .scroll-ring {
             position: absolute;
-            top: -2px; left: -2px; right: -2px; bottom: -2px;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
             border-radius: 50%;
             background: conic-gradient(var(--accent) var(--scroll-pct, 0%), transparent 0);
             z-index: -1;
@@ -444,6 +573,7 @@
             display: inline-block;
             font-weight: 500;
         }
+
         .glossary-tooltip {
             position: absolute;
             bottom: 130%;
@@ -456,7 +586,7 @@
             border-radius: 4px;
             font-size: 0.85rem;
             width: 280px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5);
             opacity: 0;
             visibility: hidden;
             transition: all 0.2s;
@@ -466,22 +596,26 @@
             text-align: center;
             line-height: 1.4;
         }
+
         .glossary-tooltip::after {
             content: '';
             position: absolute;
-            top: 100%; left: 50%;
+            top: 100%;
+            left: 50%;
             margin-left: -6px;
             border-width: 6px;
             border-style: solid;
             border-color: var(--border2) transparent transparent transparent;
         }
+
         .glossary-term:hover .glossary-tooltip {
             opacity: 1;
             visibility: visible;
             transform: translateX(-50%) translateY(0);
         }
+
         body.light-mode .glossary-tooltip {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
         }
 
         /* Arama Motoru Highlighting */
@@ -492,31 +626,157 @@
             padding: 0 2px;
             border-bottom: 2px solid var(--accent);
         }
-    
+
         /* KESKİN KOD RENKLERİ */
-        .token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--text-dim); font-style: italic; }
-        .token.punctuation { color: var(--border2); }
-        .token.namespace { opacity: .7; }
-        .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #f43f5e; }
-        .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #10b981; }
-        .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: var(--cyan); }
-        .token.atrule, .token.attr-value, .token.keyword { color: var(--accent); font-weight: bold; }
-        .token.function, .token.class-name { color: #eab308; }
-        .token.regex, .token.important, .token.variable { color: #f59e0b; }
-        
+        .token.comment,
+        .token.prolog,
+        .token.doctype,
+        .token.cdata {
+            color: var(--text-dim);
+            font-style: italic;
+        }
+
+        .token.punctuation {
+            color: var(--border2);
+        }
+
+        .token.namespace {
+            opacity: .7;
+        }
+
+        .token.property,
+        .token.tag,
+        .token.boolean,
+        .token.number,
+        .token.constant,
+        .token.symbol,
+        .token.deleted {
+            color: #f43f5e;
+        }
+
+        .token.selector,
+        .token.attr-name,
+        .token.string,
+        .token.char,
+        .token.builtin,
+        .token.inserted {
+            color: #10b981;
+        }
+
+        .token.operator,
+        .token.entity,
+        .token.url,
+        .language-css .token.string,
+        .style .token.string {
+            color: var(--cyan);
+        }
+
+        .token.atrule,
+        .token.attr-value,
+        .token.keyword {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .token.function,
+        .token.class-name {
+            color: #eab308;
+        }
+
+        .token.regex,
+        .token.important,
+        .token.variable {
+            color: #f59e0b;
+        }
+
         .card {
             opacity: 0;
             transform: translateY(20px);
             transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
         }
+
         .card.in-view {
             opacity: 1;
             transform: translateY(0);
         }
 
+        /* 5. MOBİL UYUM (Responsive Design) */
+        .mobile-menu-btn {
+            display: none;
+            position: fixed;
+            top: 1rem;
+            left: 1rem;
+            z-index: 1001;
+            background-color: var(--bg2);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.5rem 0.75rem;
+            border-radius: 8px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s;
+        }
+
+        .mobile-menu-btn:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        @media (max-width: 1024px) {
+            .mobile-menu-btn {
+                display: block;
+            }
+
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.3s ease-in-out;
+                box-shadow: 4px 0 15px rgba(0, 0, 0, 0.5);
+            }
+
+            .sidebar.open {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 4rem 5%;
+                padding-bottom: 120px;
+            }
+
+            .bottom-progress-container {
+                left: 0;
+                padding: 0 1rem;
+            }
+
+            .progress-info {
+                width: auto;
+                max-width: 250px;
+            }
+
+            .progress-track {
+                margin: 0 1rem;
+            }
+        }
+
+        .mermaid {
+            background-color: var(--bg3);
+            padding: 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            display: flex;
+            justify-content: center;
+            margin: 1.5rem 0;
+            overflow-x: auto;
+        }
     </style>
 </head>
+
 <body>
+
+    <!-- MOBİL MENÜ BUTONU -->
+    <button id="mobileMenuBtn" class="mobile-menu-btn" aria-label="Menüyü Aç/Kapat">☰</button>
 
     <!-- YAN MENÜ -->
     <div class="sidebar">
@@ -527,7 +787,7 @@
         <div class="search-container">
             <input type="text" id="searchInput" class="search-input" placeholder="Rehberde arama yap...">
         </div>
-        
+
         <div class="toc" id="tocList">
             <!-- JS ile doldurulacak -->
         </div>
@@ -535,7 +795,7 @@
 
     <!-- ANA İÇERİK: 12 BÖLÜMLÜ İSKELET -->
     <main class="main-content" id="mainContent">
-        
+
         <style>
             .info-box {
                 background-color: rgba(56, 189, 248, 0.1);
@@ -546,52 +806,265 @@
                 font-size: 0.95rem;
                 line-height: 1.6;
             }
+
             .info-box.warning {
                 background-color: rgba(245, 158, 11, 0.1);
                 border-left-color: #f59e0b;
             }
+
             .info-box.danger {
                 background-color: rgba(239, 68, 68, 0.1);
                 border-left-color: #ef4444;
             }
-            .info-box strong { color: var(--text); font-weight: 600; display: block; margin-bottom: 0.5rem; font-family: var(--font-heading); }
-            .info-box.warning strong { color: #fcd34d; }
-            .info-box.danger strong { color: #fca5a5; }
-            .info-box.tip strong { color: var(--cyan); }
-        
-        /* KESKİN KOD RENKLERİ */
-        .token.comment, .token.prolog, .token.doctype, .token.cdata { color: var(--text-dim); font-style: italic; }
-        .token.punctuation { color: var(--border2); }
-        .token.namespace { opacity: .7; }
-        .token.property, .token.tag, .token.boolean, .token.number, .token.constant, .token.symbol, .token.deleted { color: #f43f5e; }
-        .token.selector, .token.attr-name, .token.string, .token.char, .token.builtin, .token.inserted { color: #10b981; }
-        .token.operator, .token.entity, .token.url, .language-css .token.string, .style .token.string { color: var(--cyan); }
-        .token.atrule, .token.attr-value, .token.keyword { color: var(--accent); font-weight: bold; }
-        .token.function, .token.class-name { color: #eab308; }
-        .token.regex, .token.important, .token.variable { color: #f59e0b; }
-        
-        .card {
-            opacity: 0;
-            transform: translateY(20px);
-            transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
-        }
-        .card.in-view {
-            opacity: 1;
-            transform: translateY(0);
-        }
 
-    </style>
+            .info-box strong {
+                color: var(--text);
+                font-weight: 600;
+                display: block;
+                margin-bottom: 0.5rem;
+                font-family: var(--font-heading);
+            }
 
-        <section class="section" id="s01" data-title="Veritabanı Paradigmalari: SQL vs. NoSQL">
-            <h2 class="section-title"><span class="num">01.</span> Veritabanı Paradigmalari: SQL vs. NoSQL</h2>
-            <p>Veri mimarisinin en temel karar noktası olan SQL ve NoSQL sistemlerinin felsefeleri ve veri işleme modelleri.</p>
-            
+            .info-box.warning strong {
+                color: #fcd34d;
+            }
+
+            .info-box.danger strong {
+                color: #fca5a5;
+            }
+
+            .info-box.tip strong {
+                color: var(--cyan);
+            }
+
+            /* KESKİN KOD RENKLERİ */
+            .token.comment,
+            .token.prolog,
+            .token.doctype,
+            .token.cdata {
+                color: var(--text-dim);
+                font-style: italic;
+            }
+
+            .token.punctuation {
+                color: var(--border2);
+            }
+
+            .token.namespace {
+                opacity: .7;
+            }
+
+            .token.property,
+            .token.tag,
+            .token.boolean,
+            .token.number,
+            .token.constant,
+            .token.symbol,
+            .token.deleted {
+                color: #f43f5e;
+            }
+
+            .token.selector,
+            .token.attr-name,
+            .token.string,
+            .token.char,
+            .token.builtin,
+            .token.inserted {
+                color: #10b981;
+            }
+
+            .token.operator,
+            .token.entity,
+            .token.url,
+            .language-css .token.string,
+            .style .token.string {
+                color: var(--cyan);
+            }
+
+            .token.atrule,
+            .token.attr-value,
+            .token.keyword {
+                color: var(--accent);
+                font-weight: bold;
+            }
+
+            .token.function,
+            .token.class-name {
+                color: #eab308;
+            }
+
+            .token.regex,
+            .token.important,
+            .token.variable {
+                color: #f59e0b;
+            }
+
+            .card {
+                opacity: 0;
+                transform: translateY(20px);
+                transition: opacity 0.6s cubic-bezier(0.4, 0, 0.2, 1), transform 0.6s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+            }
+
+            .card.in-view {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        </style>
+
+
+        <!-- NEW SECTIONS INJECTED -->
+        <section class="section" id="s01" data-title="İlişkisel Veritabanı Temelleri (PK, FK)">
+            <h2 class="section-title"><span class="num">01.</span> İlişkisel Veritabanı Temelleri (PK, FK)</h2>
+            <div class="card">
+                <p>İlişkisel veritabanları (RDBMS), verileri tablolar halinde tutar ve bu tablolar arasındaki
+                    bağlantıları matematiksel bir doğrulukla (Relational Algebra) yönetir. Doğru bir mimari kurmanın en
+                    temel taşı bu kısıtlamaları (constraints) anlamaktır.</p>
+                <h3 class="sub">Primary Key (PK) & Foreign Key (FK)</h3>
+                <p><strong>Primary Key (Birincil Anahtar):</strong> Bir tablodaki her kaydı tekil (unique) yapan
+                    benzersiz tanımlayıcıdır. Asla NULL olamaz.</p>
+                <p><strong>Foreign Key (Yabancı Anahtar):</strong> Başka bir tablonun PK'sine referans veren sütundur.
+                    Veri bütünlüğünü (Referential Integrity) sağlar; yani var olmayan bir kayda referans verilmesini
+                    engeller.</p>
+
+                <div class="code-container">
+                    <div class="code-header">SQL DDL Örneği (PostgreSQL)</div>
+                    <pre><code class="language-sql">CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE orders (
+    id SERIAL PRIMARY KEY,
+    user_id INT NOT NULL,
+    total DECIMAL(10,2) NOT NULL,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+);</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s02" data-title="Veri Modelleme ve SQL İlişkileri">
+            <h2 class="section-title"><span class="num">02.</span> Veri Modelleme ve SQL İlişkileri</h2>
+
+            <div class="card">
+                <h3 class="sub">One-to-One (1:1) İlişkiler</h3>
+                <p>Bir tablodaki bir kaydın, diğer tabloda sadece bir kaydı olduğu durumdur. Genellikle devasa tabloları
+                    (örneğin kullanıcı detaylarını) ana tablodan ayırmak için (Vertical Partitioning) kullanılır.</p>
+                <div class="code-container">
+                    <pre><code class="language-sql">CREATE TABLE user_profiles (
+    id SERIAL PRIMARY KEY,
+    user_id INT UNIQUE NOT NULL, -- UNIQUE kısıtlaması 1:1 ilişkiyi garanti eder!
+    bio TEXT,
+    FOREIGN KEY (user_id) REFERENCES users(id)
+);</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="sub">One-to-Many (1:N) İlişkiler</h3>
+                <p>En yaygın ilişki türüdür. Bir satır, başka tablodaki birçok satırla ilişkili olabilir (örneğin 1
+                    Kullanıcının N tane Siparişi olması gibi). FK her zaman "Many" olan (N) tabloya konur.</p>
+            </div>
+
+            <div class="card">
+                <h3 class="sub">Many-to-Many (N:M) İlişkiler</h3>
+                <p>Bir kitabın birden fazla yazarı olabileceği ve bir yazarın birden fazla kitabı olabileceği durumdur.
+                    SQL'de bu ilişki doğrudan kurulamaz; araya bir <strong>Junction (Pivot) Table</strong> konulması
+                    gerekir.</p>
+                <div class="code-container">
+                    <pre><code class="language-sql">CREATE TABLE book_authors (
+    book_id INT NOT NULL,
+    author_id INT NOT NULL,
+    PRIMARY KEY (book_id, author_id), -- Composite PK
+    FOREIGN KEY (book_id) REFERENCES books(id),
+    FOREIGN KEY (author_id) REFERENCES authors(id)
+);</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s03" data-title="ER Diyagramları ve Crow's Foot Notasyonu">
+            <h2 class="section-title"><span class="num">03.</span> ER Diyagramları ve Crow's Foot Notasyonu</h2>
+            <div class="card">
+                <p>Veritabanı tasarımını koda dökmeden önce görselleştirmek için ER (Entity-Relationship) diyagramları
+                    kullanılır. Endüstri standardı olan notasyon ise <strong>Crow's Foot (Karga Ayağı)</strong>
+                    notasyonudur.</p>
+
+                <div class="info-box">
+                    <strong>Sembollerin Anlamları:</strong><br>
+                    <strong>| |</strong> (İki Çizgi): Exactly One (Kesinlikle 1)<br>
+                    <strong>0 |</strong> (Sıfır ve Çizgi): Zero or One (0 veya 1)<br>
+                    <strong>> |</strong> (Karga Ayağı ve Çizgi): One or Many (1 veya Çok)<br>
+                    <strong>> 0</strong> (Karga Ayağı ve Sıfır): Zero or Many (0 veya Çok)
+                </div>
+
+                <div class="mermaid">
+                    erDiagram
+                    USERS ||--o{ ORDERS : "places"
+                    USERS {
+                    int id PK
+                    string email
+                    }
+                    ORDERS {
+                    int id PK
+                    int user_id FK
+                    decimal total
+                    }
+                    BOOKS ||--|{ BOOK_AUTHORS : "has"
+                    AUTHORS ||--|{ BOOK_AUTHORS : "writes"
+                    BOOK_AUTHORS {
+                    int book_id FK
+                    int author_id FK
+                    }
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s04" data-title="Modern Geliştirici Araçları">
+            <h2 class="section-title"><span class="num">04.</span> Modern Geliştirici Araçları</h2>
+            <div class="card">
+                <h3 class="sub">Görsel No-Code Araçlar</h3>
+                <p>Günümüzde tabloları SQL ile değil, <strong>dbdiagram.io</strong> veya <strong>DrawSQL</strong> gibi
+                    araçlarla görsel olarak (veya DBML kullanarak) tasarlamak çok yaygındır. Bu araçlar ER diyagramını
+                    çizer ve SQL DDL kodunu otomatik üretir.</p>
+
+                <h3 class="sub">Prisma ORM ile Deklaratif Modelleme</h3>
+                <p>Prisma gibi modern ORM'ler, SQL tablolarını nesnelere dönüştürür. <code>schema.prisma</code> dosyası
+                    kullanılarak ilişkiler çok daha okunabilir bir syntax ile yazılır.</p>
+                <div class="code-container">
+                    <div class="code-header">schema.prisma Örneği (1:N İlişki)</div>
+                    <pre><code class="language-javascript">model User {
+  id      Int      @id @default(autoincrement())
+  email   String   @unique
+  orders  Order[]  // Prisma ilişkisi (1:N)
+}
+
+model Order {
+  id      Int      @id @default(autoincrement())
+  total   Decimal
+  user    User     @relation(fields: [userId], references: [id])
+  userId  Int      // Yabancı Anahtar (FK)
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <section class="section" id="s05" data-title="Veritabanı Paradigmalari: SQL vs. NoSQL">
+            <h2 class="section-title"><span class="num">05.</span> Veritabanı Paradigmalari: SQL vs. NoSQL</h2>
+            <p>Veri mimarisinin en temel karar noktası olan SQL ve NoSQL sistemlerinin felsefeleri ve veri işleme
+                modelleri.</p>
+
             <div class="card">
                 <h3 class="sub">İlişkisel Model (SQL)</h3>
-                <p>Verileri önceden tanımlanmış katı bir şemada (schema) ve tablolar halinde saklar. ACID prensiplerini tam olarak destekleyerek veri bütünlüğünü garanti altına alır. Oracle, PostgreSQL ve MySQL endüstri standartlarıdır.</p>
+                <p>Verileri önceden tanımlanmış katı bir şemada (schema) ve tablolar halinde saklar. ACID prensiplerini
+                    tam olarak destekleyerek veri bütünlüğünü garanti altına alır. Oracle, PostgreSQL ve MySQL endüstri
+                    standartlarıdır.</p>
                 <div class="info-box tip">
                     <strong>ACID Anatomisi</strong>
-                    Atomicity (Ya hep ya hiç), Consistency (Geçerli veri), Isolation (İşlem yalıtımı), Durability (Kalıcılık). Bu dörtlü, finansal veya kritik sistemlerde verinin asla yarı yolda kalmamasını veya bozulmamasını güvence altına alır.
+                    Atomicity (Ya hep ya hiç), Consistency (Geçerli veri), Isolation (İşlem yalıtımı), Durability
+                    (Kalıcılık). Bu dörtlü, finansal veya kritik sistemlerde verinin asla yarı yolda kalmamasını veya
+                    bozulmamasını güvence altına alır.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -609,10 +1082,22 @@
 
             <div class="card">
                 <h3 class="sub">NoSQL Modelleri (Document, Key-Value, Graph)</h3>
-                <p>NoSQL sistemleri (MongoDB, Redis, Cassandra), yüksek ölçeklenebilirlik ve esnek şema gereksinimleri için tasarlanmıştır. BASE (Basically Available, Soft state, Eventual consistency) felsefesini benimser.</p>
+                <p>
+                    Başlangıçta "Non-Relational SQL" (İlişkisel Olmayan SQL) olarak ortaya çıksa da günümüzde yaygın
+                    olarak
+                    "Not Only SQL" (Sadece SQL Değil) şeklinde adlandırılan NoSQL; ilişkisel olmayan, esnek şemalı ve
+                    yatayda
+                    kolayca ölçeklenebilen veritabanı sistemlerini tanımlar. MongoDB, Redis ve Cassandra gibi öne çıkan
+                    NoSQL sistemleri,
+                    yüksek ölçeklenebilirlik ihtiyaçlarına yanıt vermek üzere tasarlanmış olup BASE (Basically
+                    Available, Soft state,
+                    Eventual consistency) felsefesini temel alır.
+                </p>
                 <div class="info-box warning">
                     <strong>CAP Teoremi Uyarısı</strong>
-                    Bir dağıtık sistem aynı anda hem Consistency (Tutarlılık), hem Availability (Erişilebilirlik) hem de Partition Tolerance (Bölünme Toleransı) sağlayamaz. NoSQL sistemleri yatay ölçeklenirken genellikle Consistency'den ödün verir (AP sistemler).
+                    Bir dağıtık sistem aynı anda hem Consistency (Tutarlılık), hem Availability (Erişilebilirlik) hem de
+                    Partition Tolerance (Bölünme Toleransı) sağlayamaz. NoSQL sistemleri yatay ölçeklenirken genellikle
+                    Consistency'den ödün verir (AP sistemler).
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -633,25 +1118,47 @@ db.orders.insertOne({
             </div>
         </section>
 
-        <section class="section" id="s02" data-title="İndeksleme Mekanizmaları & B-Tree Anatomisi">
-            <h2 class="section-title"><span class="num">02.</span> İndeksleme Mekanizmaları & B-Tree Anatomisi</h2>
+
+        <div class="card">
+            <h3 class="sub">Neo4j ve Grafik (Graph) Tabanlı NoSQL</h3>
+            <p>Veriler düğüm (node) ve kenar (edge/relationship) olarak modellenir. Kenarlar da özellikler (properties)
+                taşıyabilir. Grafik veritabanları, özellikle derinlemesine gezinme (traversal) sorgularında ilişkisel
+                veritabanlarını çok geride bırakır; çünkü JOIN yerine doğrudan işaretçi (pointer) takibi kullanır.</p>
+            <div class="info-box tip">
+                <strong>Ne zaman tercih edilmeli?</strong>
+                Sosyal ağlar, öneri motorları (recommendation engine), dolandırıcılık tespiti, erişim kontrol grafikleri
+                ve bilgi grafikleri (knowledge graph) gibi <em>ilişkilerin kendisinin</em> birinci sınıf veri olduğu
+                senaryolarda Neo4j rakipsizdir.
+            </div>
+        </div>
+
+        <section class="section" id="s06" data-title="İndeksleme Mekanizmaları & B-Tree Anatomisi">
+            <h2 class="section-title"><span class="num">06.</span> İndeksleme Mekanizmaları & B-Tree Anatomisi</h2>
             <p>Veritabanı performansının belkemiği olan indeks yapıları ve B-Tree algoritmalarının çalışma mantığı.</p>
 
             <div class="card">
                 <h3 class="sub">B-Tree ve B+Tree Ağaç Yapıları</h3>
-                <p>Modern veritabanları (PostgreSQL, MySQL InnoDB) indeksleri B-Tree veya B+Tree yapısında tutar. Veriler dengeli bir ağaçta (balanced tree) yaprak düğümlere (leaf nodes) kadar sıralı şekilde saklanarak milyonlarca satırda bile arama maliyeti O(log n)'e düşürülür.</p>
+                <p>Modern veritabanları (PostgreSQL, MySQL InnoDB) indeksleri B-Tree veya B+Tree yapısında tutar.
+                    Veriler dengeli bir ağaçta (balanced tree) yaprak düğümlere (leaf nodes) kadar sıralı şekilde
+                    saklanarak milyonlarca satırda bile arama maliyeti O(log n)'e düşürülür.</p>
                 <div class="info-box tip">
                     <strong>Clustered vs. Non-Clustered Index</strong>
-                    Clustered (Kümelenmiş) indeksler, verinin diskteki fiziksel dizilişini belirler. Bir tabloda sadece bir adet olabilir (genellikle Primary Key). Non-Clustered indeksler ise ayrı bir yapıda saklanıp verinin referansını (pointer) işaret eder.
+                    Clustered (Kümelenmiş) indeksler, verinin diskteki fiziksel dizilişini belirler. Bir tabloda sadece
+                    bir adet olabilir (genellikle Primary Key). Non-Clustered indeksler ise ayrı bir yapıda saklanıp
+                    verinin referansını (pointer) işaret eder.
                 </div>
             </div>
 
             <div class="card">
                 <h3 class="sub">Composite (Bileşik) İndeksler ve Tuzaklar</h3>
-                <p>Birden fazla sütunu kapsayan indekslerdir. İndeksin kullanılabilmesi için sorgunun "Left-to-Right" (Soldan Sağa) kuralına uyması gerekir.</p>
+                <p>Birden fazla sütunu kapsayan indekslerdir. İndeksin kullanılabilmesi için sorgunun "Left-to-Right"
+                    (Soldan Sağa) kuralına uyması gerekir.</p>
                 <div class="info-box danger">
                     <strong>Query Smell: "Left-to-Right" İhlali</strong>
-                    Eğer bir indeks (A, B, C) sütunları üzerindeyse, sadece B veya C ile yapılan WHERE sorguları bu indeksi kullanamaz (Full Table Scan yapar). Sorgu mutlaka A'dan başlamalıdır. Ayrıca istenen tüm sütunlar indekste varsa buna "Cover Index" denir ve tabloya hiç gidilmeden çok yüksek hızla cevap dönülür.
+                    Eğer bir indeks (A, B, C) sütunları üzerindeyse, sadece B veya C ile yapılan WHERE sorguları bu
+                    indeksi kullanamaz (Full Table Scan yapar). Sorgu mutlaka A'dan başlamalıdır. Ayrıca istenen tüm
+                    sütunlar indekste varsa buna "Cover Index" denir ve tabloya hiç gidilmeden çok yüksek hızla cevap
+                    dönülür.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -670,25 +1177,34 @@ SELECT id FROM users WHERE created_at > '2023-01-01';</code></pre>
             </div>
         </section>
 
-        <section class="section" id="s03" data-title="Sorgu Optimizasyonu & Execution Plan Okuma">
-            <h2 class="section-title"><span class="num">03.</span> Sorgu Optimizasyonu & Execution Plan Okuma</h2>
-            <p>SQL Optimizer kararlarını anlamak ve darboğazları tespit etmek için Execution Plan (Çalıştırma Planı) okuma teknikleri.</p>
+        <section class="section" id="s07" data-title="Sorgu Optimizasyonu & Execution Plan Okuma">
+            <h2 class="section-title"><span class="num">07.</span> Sorgu Optimizasyonu & Execution Plan Okuma</h2>
+            <p>SQL Optimizer kararlarını anlamak ve darboğazları tespit etmek için Execution Plan (Çalıştırma Planı)
+                okuma teknikleri.</p>
 
             <div class="card">
                 <h3 class="sub">Veritabanı Motoru Aşamalari</h3>
-                <p>Bir sorgu DB'ye ulaştığında sırasıyla: <strong>Parser</strong> (Sözdizimi kontrolü), <strong>Optimizer</strong> (En düşük maliyetli yolu bulma) ve <strong>Execution Engine</strong> (Fiziksel olarak veriyi getirme) adımlarından geçer.</p>
+                <p>Bir sorgu DB'ye ulaştığında sırasıyla: <strong>Parser</strong> (Sözdizimi kontrolü),
+                    <strong>Optimizer</strong> (En düşük maliyetli yolu bulma) ve <strong>Execution Engine</strong>
+                    (Fiziksel olarak veriyi getirme) adımlarından geçer.
+                </p>
                 <div class="info-box tip">
                     <strong>Performance Tip: Table Scan vs Index Scan</strong>
-                    Execution Plan'da <code>Seq Scan</code> (veya Table Scan) görmek tablonun diskte baştan sona okunduğunu gösterir. Milyonluk tablolarda bu bir felakettir. <code>Index Scan</code> veya <code>Index Only Scan</code> hedeflenmelidir.
+                    Execution Plan'da <code>Seq Scan</code> (veya Table Scan) görmek tablonun diskte baştan sona
+                    okunduğunu gösterir. Milyonluk tablolarda bu bir felakettir. <code>Index Scan</code> veya
+                    <code>Index Only Scan</code> hedeflenmelidir.
                 </div>
             </div>
 
             <div class="card">
                 <h3 class="sub">Anti-Pattern'ler ve EXPLAIN Analizi</h3>
-                <p>N+1 sorgu problemi, OR operatörünün indeks kullanımını iptal etmesi, yanlış JOIN hiyerarşileri en sık yapılan hatalardır.</p>
+                <p>N+1 sorgu problemi, OR operatörünün indeks kullanımını iptal etmesi, yanlış JOIN hiyerarşileri en sık
+                    yapılan hatalardır.</p>
                 <div class="info-box danger">
                     <strong>Query Smell: SELECT * Kullanımı</strong>
-                    Sadece ihtiyacınız olan sütunları çekin. "SELECT *" kullanımı, veritabanının "Index Only Scan" yapmasını engeller, ağ (network) üzerinde gereksiz bant genişliği harcar ve bellek (RAM) şişmesine neden olur.
+                    Sadece ihtiyacınız olan sütunları çekin. "SELECT *" kullanımı, veritabanının "Index Only Scan"
+                    yapmasını engeller, ağ (network) üzerinde gereksiz bant genişliği harcar ve bellek (RAM) şişmesine
+                    neden olur.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -711,32 +1227,44 @@ WHERE u.status = 'active';
             </div>
         </section>
 
-        <section class="section" id="s04" data-title="Eşzamanlılık Kontrolü, Kilitler & Deadlock">
-            <h2 class="section-title"><span class="num">04.</span> Eşzamanlılık Kontrolü, Kilitler & Deadlock</h2>
-            <p>Aynı anda çalışan yüzlerce transaction'ın birbirini ezmesini engelleyen kilit mekanizmaları ve izolasyon seviyeleri.</p>
+        <section class="section" id="s08" data-title="Eşzamanlılık Kontrolü, Kilitler & Deadlock">
+            <h2 class="section-title"><span class="num">08.</span> Eşzamanlılık Kontrolü, Kilitler & Deadlock</h2>
+            <p>Aynı anda çalışan yüzlerce transaction'ın birbirini ezmesini engelleyen kilit mekanizmaları ve izolasyon
+                seviyeleri.</p>
 
             <div class="card">
                 <h3 class="sub">İzolasyon Seviyeleri (Isolation Levels)</h3>
-                <p>ACID'deki "I" (Isolation) prensibinin dozunu ayarlar. Seviye arttıkça veri güvenliği artar fakat performans/eşzamanlılık düşer.</p>
+                <p>ACID'deki "I" (Isolation) prensibinin dozunu ayarlar. Seviye arttıkça veri güvenliği artar fakat
+                    performans/eşzamanlılık düşer.</p>
                 <ul style="margin-left: 1.5rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8;">
-                    <li><strong>Read Uncommitted:</strong> Dirty Read (Kirli okuma) yapabilir. Başka işlemin bitmemiş yazmasını okur. En hızlı ama en güvensiz.</li>
-                    <li><strong>Read Committed:</strong> Dirty Read engellenir. PostgreSQL ve Oracle'ın default seviyesidir.</li>
-                    <li><strong>Repeatable Read:</strong> Non-repeatable Read engellenir. Okunan veri transaction bitene kadar asla değişmez. MySQL InnoDB defaultudur.</li>
-                    <li><strong>Serializable:</strong> Phantom Read de engellenir. Tüm transaction'lar sıraya sokulur. En yavaş ama en güvenli seviyedir.</li>
+                    <li><strong>Read Uncommitted:</strong> Dirty Read (Kirli okuma) yapabilir. Başka işlemin bitmemiş
+                        yazmasını okur. En hızlı ama en güvensiz.</li>
+                    <li><strong>Read Committed:</strong> Dirty Read engellenir. PostgreSQL ve Oracle'ın default
+                        seviyesidir.</li>
+                    <li><strong>Repeatable Read:</strong> Non-repeatable Read engellenir. Okunan veri transaction bitene
+                        kadar asla değişmez. MySQL InnoDB defaultudur.</li>
+                    <li><strong>Serializable:</strong> Phantom Read de engellenir. Tüm transaction'lar sıraya sokulur.
+                        En yavaş ama en güvenli seviyedir.</li>
                 </ul>
                 <div class="info-box tip">
                     <strong>Lock (Kilit) Tipleri</strong>
-                    <strong>Shared Lock (S):</strong> Veriyi okumak için alınır. Başka okuyuculara izin verir, yazıcıları bekletir.<br>
-                    <strong>Exclusive Lock (X):</strong> Veriyi değiştirmek (UPDATE/DELETE) için alınır. Kimseyi yaklaştırmaz.
+                    <strong>Shared Lock (S):</strong> Veriyi okumak için alınır. Başka okuyuculara izin verir,
+                    yazıcıları bekletir.<br>
+                    <strong>Exclusive Lock (X):</strong> Veriyi değiştirmek (UPDATE/DELETE) için alınır. Kimseyi
+                    yaklaştırmaz.
                 </div>
             </div>
 
             <div class="card">
                 <h3 class="sub">Deadlock (Kilitlenme) Problemi</h3>
-                <p>İki işlemin birbirinin elindeki kilitli kaynağı (Row veya Table Lock) beklemesi sonucu oluşan sonsuz döngüdür. Veritabanı motoru deadlock durumunu saniyeler içinde algılar ve bir işlemi "kurban" (victim) seçerek işlemi iptal (rollback) eder.</p>
+                <p>İki işlemin birbirinin elindeki kilitli kaynağı (Row veya Table Lock) beklemesi sonucu oluşan sonsuz
+                    döngüdür. Veritabanı motoru deadlock durumunu saniyeler içinde algılar ve bir işlemi "kurban"
+                    (victim) seçerek işlemi iptal (rollback) eder.</p>
                 <div class="info-box danger">
                     <strong>Deadlock Önleme İpucu</strong>
-                    Tablolara ve satırlara her zaman aynı hiyerarşik sırayla (örneğin her zaman önce Users tablosuna, sonra Orders tablosuna lock atılmalı) erişecek şekilde transaction'larınızı tasarlayın. Tablo bazlı devasa kilitler yerine her zaman Satır bazlı (Row-level) işlemler yapın.
+                    Tablolara ve satırlara her zaman aynı hiyerarşik sırayla (örneğin her zaman önce Users tablosuna,
+                    sonra Orders tablosuna lock atılmalı) erişecek şekilde transaction'larınızı tasarlayın. Tablo bazlı
+                    devasa kilitler yerine her zaman Satır bazlı (Row-level) işlemler yapın.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -760,29 +1288,39 @@ UPDATE users SET balance = balance + 100 WHERE id = 1; -- (Satır 1'i istiyor)
             </div>
         </section>
 
-        <section class="section" id="s05" data-title="Büyük Ölçekli Veri Yönetimi: Replication & Sharding">
-            <h2 class="section-title"><span class="num">05.</span> Büyük Ölçekli Veri Yönetimi: Replication & Sharding</h2>
-            <p>Sistem trafiği artıp tek bir sunucunun kapasitesini aştığında devreye giren yatay ölçeklendirme (Horizontal Scaling) stratejileri.</p>
-            
+        <section class="section" id="s09" data-title="Büyük Ölçekli Veri Yönetimi: Replication & Sharding">
+            <h2 class="section-title"><span class="num">09.</span> Büyük Ölçekli Veri Yönetimi: Replication & Sharding
+            </h2>
+            <p>Sistem trafiği artıp tek bir sunucunun kapasitesini aştığında devreye giren yatay ölçeklendirme
+                (Horizontal Scaling) stratejileri.</p>
+
             <div class="card">
                 <h3 class="sub">Replication (Replikasyon) Mimarisi</h3>
-                <p>Verinin güvenliğini artırmak ve okuma (read) yükünü dağıtmak için veritabanının kopyalarının oluşturulması işlemidir.</p>
+                <p>Verinin güvenliğini artırmak ve okuma (read) yükünü dağıtmak için veritabanının kopyalarının
+                    oluşturulması işlemidir.</p>
                 <ul style="margin-left: 1.5rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8;">
-                    <li><strong>Master-Slave (Primary-Replica):</strong> Yazma işlemleri (INSERT/UPDATE) sadece Master'a yapılır. Okuma işlemleri (SELECT) Slave sunuculara dağıtılarak Read-Heavy (okuma ağırlıklı) sistemler rahatlatılır.</li>
-                    <li><strong>Multi-Master:</strong> Birden çok sunucuya yazma yapılabilir. Çatışma çözümü (Conflict Resolution) zordur fakat yüksek yazma erişilebilirliği sağlar.</li>
+                    <li><strong>Master-Slave (Primary-Replica):</strong> Yazma işlemleri (INSERT/UPDATE) sadece Master'a
+                        yapılır. Okuma işlemleri (SELECT) Slave sunuculara dağıtılarak Read-Heavy (okuma ağırlıklı)
+                        sistemler rahatlatılır.</li>
+                    <li><strong>Multi-Master:</strong> Birden çok sunucuya yazma yapılabilir. Çatışma çözümü (Conflict
+                        Resolution) zordur fakat yüksek yazma erişilebilirliği sağlar.</li>
                 </ul>
                 <div class="info-box warning">
                     <strong>Architecture Note: Senkron vs. Asenkron Replikasyon</strong>
-                    Senkron replikasyonda Master, Slave'den "veriyi yazdım" onayı almadan işlemi bitirmez (çok güvenli ama yavaş). Asenkron replikasyonda ise beklemez (çok hızlı ama Master çökerse veri kaybı riski var).
+                    Senkron replikasyonda Master, Slave'den "veriyi yazdım" onayı almadan işlemi bitirmez (çok güvenli
+                    ama yavaş). Asenkron replikasyonda ise beklemez (çok hızlı ama Master çökerse veri kaybı riski var).
                 </div>
             </div>
 
             <div class="card">
                 <h3 class="sub">Sharding (Yatay Bölümleme)</h3>
-                <p>Devasa bir veritabanının fiziksel olarak farklı sunuculara (Shard) parça parça dağıtılmasıdır. Sistem sonsuz ölçeklenebilir hale gelir.</p>
+                <p>Devasa bir veritabanının fiziksel olarak farklı sunuculara (Shard) parça parça dağıtılmasıdır. Sistem
+                    sonsuz ölçeklenebilir hale gelir.</p>
                 <div class="info-box danger">
                     <strong>Architecture Note: Sharding Key Seçimi ve Hotspot</strong>
-                    Eğer Shard Key olarak ardışık artan bir değer (örneğin timestamp veya auto-increment ID) seçerseniz, tüm yeni kayıtlar aynı sunucuya (Hotspot) gider ve diğer sunucular yatar. Hash-based (kriptografik dağıtım) genellikle en dengeli yük dağılımını sağlar.
+                    Eğer Shard Key olarak ardışık artan bir değer (örneğin timestamp veya auto-increment ID) seçerseniz,
+                    tüm yeni kayıtlar aynı sunucuya (Hotspot) gider ve diğer sunucular yatar. Hash-based (kriptografik
+                    dağıtım) genellikle en dengeli yük dağılımını sağlar.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -800,16 +1338,21 @@ function getShardForUser(userId) {
             </div>
         </section>
 
-        <section class="section" id="s06" data-title="PostgreSQL İleri Düzey Özellikleri">
-            <h2 class="section-title"><span class="num">06.</span> PostgreSQL İleri Düzey Özellikleri (JSONB & Partitioning)</h2>
-            <p>PostgreSQL'in sadece ilişkisel bir DB olmanın ötesine geçerek NoSQL yeteneklerini ve Big Data yönetimini sağlayan özellikleri.</p>
+        <section class="section" id="s10" data-title="PostgreSQL İleri Düzey Özellikleri">
+            <h2 class="section-title"><span class="num">10.</span> PostgreSQL İleri Düzey Özellikleri (JSONB &
+                Partitioning)</h2>
+            <p>PostgreSQL'in sadece ilişkisel bir DB olmanın ötesine geçerek NoSQL yeteneklerini ve Big Data yönetimini
+                sağlayan özellikleri.</p>
 
             <div class="card">
                 <h3 class="sub">Yarı-İlişkisel Güç: JSON vs JSONB</h3>
-                <p>PostgreSQL, JSON verileri metin (JSON) veya binary formatta (JSONB) saklayabilir. <code>JSONB</code> formatı ayrıştırılarak saklandığı için yazarken biraz yavaştır fakat okurken inanılmaz hızlıdır ve indekslenebilir (GIN Index).</p>
+                <p>PostgreSQL, JSON verileri metin (JSON) veya binary formatta (JSONB) saklayabilir. <code>JSONB</code>
+                    formatı ayrıştırılarak saklandığı için yazarken biraz yavaştır fakat okurken inanılmaz hızlıdır ve
+                    indekslenebilir (GIN Index).</p>
                 <div class="info-box tip">
                     <strong>Performance Tip: GIN Index ile JSON Araması</strong>
-                    JSON dokümanlarının içindeki key-value eşleşmelerini tam metin araması (Full-text) hızında bulmak için Generalized Inverted Index (GIN) kullanılır.
+                    JSON dokümanlarının içindeki key-value eşleşmelerini tam metin araması (Full-text) hızında bulmak
+                    için Generalized Inverted Index (GIN) kullanılır.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -831,10 +1374,13 @@ SELECT metadata->>'company' AS company_name FROM users;</code></pre>
 
             <div class="card">
                 <h3 class="sub">Table Partitioning (Tablo Bölümleme)</h3>
-                <p>Milyarlarca satırlık tek bir tabloyu mantıksal olarak alt tablolara (partition) bölme işlemidir. Range (tarihe göre), List (kategoriye göre) ve Hash partitioning türleri vardır.</p>
+                <p>Milyarlarca satırlık tek bir tabloyu mantıksal olarak alt tablolara (partition) bölme işlemidir.
+                    Range (tarihe göre), List (kategoriye göre) ve Hash partitioning türleri vardır.</p>
                 <div class="info-box tip">
                     <strong>Architecture Note: DROP PARTITION Avantajı</strong>
-                    Geçmiş verileri silmek (DELETE) işlemi, tabloda "Dead Tuple" yaratır ve tabloyu kilitler. Ancak partitioning kullanıldığında, eski aya ait tabloyu silmek (DROP TABLE) anında gerçekleşir ve performansa sıfır etki eder.
+                    Geçmiş verileri silmek (DELETE) işlemi, tabloda "Dead Tuple" yaratır ve tabloyu kilitler. Ancak
+                    partitioning kullanıldığında, eski aya ait tabloyu silmek (DROP TABLE) anında gerçekleşir ve
+                    performansa sıfır etki eder.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -855,25 +1401,32 @@ CREATE TABLE logs_2023_01 PARTITION OF logs
             </div>
         </section>
 
-        <section class="section" id="s07" data-title="MongoDB & Doküman Tabanlı Veri Modelleme">
-            <h2 class="section-title"><span class="num">07.</span> MongoDB & Doküman Tabanlı Veri Modelleme</h2>
-            <p>Esnek şema ve doküman tabanlı NoSQL veritabanı tasarım felsefesi ile ilişkisel dünyanın ötesindeki stratejiler.</p>
+        <section class="section" id="s11" data-title="MongoDB & Doküman Tabanlı Veri Modelleme">
+            <h2 class="section-title"><span class="num">11.</span> MongoDB & Doküman Tabanlı Veri Modelleme</h2>
+            <p>Esnek şema ve doküman tabanlı NoSQL veritabanı tasarım felsefesi ile ilişkisel dünyanın ötesindeki
+                stratejiler.</p>
 
             <div class="card">
                 <h3 class="sub">İlişki Modelleme: Embedding vs Referencing</h3>
-                <p>MongoDB'de JOIN işlemleri maliyetli olduğu için veriler genellikle iç içe (Embedded) tutulur. Ancak veri boyutuna ve büyüme hızına göre karar verilmelidir.</p>
+                <p>MongoDB'de JOIN işlemleri maliyetli olduğu için veriler genellikle iç içe (Embedded) tutulur. Ancak
+                    veri boyutuna ve büyüme hızına göre karar verilmelidir.</p>
                 <ul style="margin-left: 1.5rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8;">
-                    <li><strong>Embedding (Gömme):</strong> Adresler veya Telefon numaraları gibi ana dokümana sıkı sıkıya bağlı ve sınırlı sayıda olan veriler için idealdir.</li>
-                    <li><strong>Referencing (Referans Gösterme):</strong> Bir yazarın on binlerce kitabı olması gibi ilişkilerin sınırsız büyüyebileceği (Unbounded) durumlarda, ObjectID ile referans verilmelidir.</li>
+                    <li><strong>Embedding (Gömme):</strong> Adresler veya Telefon numaraları gibi ana dokümana sıkı
+                        sıkıya bağlı ve sınırlı sayıda olan veriler için idealdir.</li>
+                    <li><strong>Referencing (Referans Gösterme):</strong> Bir yazarın on binlerce kitabı olması gibi
+                        ilişkilerin sınırsız büyüyebileceği (Unbounded) durumlarda, ObjectID ile referans verilmelidir.
+                    </li>
                 </ul>
             </div>
 
             <div class="card">
                 <h3 class="sub">Aggregation Framework</h3>
-                <p>MongoDB'nin karmaşık veri analitiği ve raporlama işlemlerini arka arkaya bağlanan boru hatları (pipeline) ile çözmesini sağlayan güçlü motorudur.</p>
+                <p>MongoDB'nin karmaşık veri analitiği ve raporlama işlemlerini arka arkaya bağlanan boru hatları
+                    (pipeline) ile çözmesini sağlayan güçlü motorudur.</p>
                 <div class="info-box tip">
                     <strong>Performance Tip: Sıralama Önemlidir</strong>
-                    Aggregation pipeline'ında her zaman önce <code>$match</code> (WHERE karşılığı) kullanılmalıdır. Böylece sonraki aşamalara giden veri seti en başından küçültülmüş olur.
+                    Aggregation pipeline'ında her zaman önce <code>$match</code> (WHERE karşılığı) kullanılmalıdır.
+                    Böylece sonraki aşamalara giden veri seti en başından küçültülmüş olur.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -910,17 +1463,22 @@ db.users.aggregate([
             </div>
         </section>
 
-        <section class="section" id="s08" data-title="Redis & Önbellekleme (Caching) Stratejileri">
-            <h2 class="section-title"><span class="num">08.</span> Redis & Önbellekleme (Caching) Stratejileri</h2>
-            <p>Sistem yanıt sürelerini milisaniyelere düşüren In-Memory (bellek içi) veri yapısı sunucusu ve Caching mimarileri.</p>
+        <section class="section" id="s12" data-title="Redis & Önbellekleme (Caching) Stratejileri">
+            <h2 class="section-title"><span class="num">12.</span> Redis & Önbellekleme (Caching) Stratejileri</h2>
+            <p>Sistem yanıt sürelerini milisaniyelere düşüren In-Memory (bellek içi) veri yapısı sunucusu ve Caching
+                mimarileri.</p>
 
             <div class="card">
                 <h3 class="sub">Caching Patterns (Önbellek Kalıpları)</h3>
                 <p>Veritabanı yükünü hafifletmek için verinin RAM'de (Redis) tutulma stratejileri.</p>
                 <ul style="margin-left: 1.5rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8;">
-                    <li><strong>Cache-Aside (Lazy Loading):</strong> Uygulama önce Redis'e bakar. Yoksa veritabanına gider, veriyi alır, Redis'e yazar ve kullanıcıya döner. En yaygın modeldir.</li>
-                    <li><strong>Write-Through:</strong> Veri her zaman önce Cache'e yazılır, Cache anında veritabanına yazar. Veri her zaman günceldir ama yazma işlemi biraz yavaşlar.</li>
-                    <li><strong>Write-Behind (Write-Back):</strong> Veri sadece Cache'e yazılır ve kullanıcıya anında cevap dönülür. Cache, belirli aralıklarla (asenkron) veriyi veritabanına topluca kaydeder (Yüksek yazma hızı, yüksek veri kaybı riski).</li>
+                    <li><strong>Cache-Aside (Lazy Loading):</strong> Uygulama önce Redis'e bakar. Yoksa veritabanına
+                        gider, veriyi alır, Redis'e yazar ve kullanıcıya döner. En yaygın modeldir.</li>
+                    <li><strong>Write-Through:</strong> Veri her zaman önce Cache'e yazılır, Cache anında veritabanına
+                        yazar. Veri her zaman günceldir ama yazma işlemi biraz yavaşlar.</li>
+                    <li><strong>Write-Behind (Write-Back):</strong> Veri sadece Cache'e yazılır ve kullanıcıya anında
+                        cevap dönülür. Cache, belirli aralıklarla (asenkron) veriyi veritabanına topluca kaydeder
+                        (Yüksek yazma hızı, yüksek veri kaybı riski).</li>
                 </ul>
             </div>
 
@@ -929,8 +1487,12 @@ db.users.aggregate([
                 <p>Kötü tasarlanmış bir önbellek mimarisi sistemin tamamen çökmesine neden olabilir.</p>
                 <div class="info-box warning">
                     <strong>Architecture Note: Cache Avalanche & Penetration</strong>
-                    <br><br><strong>Cache Avalanche (Önbellek Çığı):</strong> Binlerce Cache anahtarının (Key) aynı anda süresinin dolması (TTL expire) sonucu veritabanına aniden devasa yük binmesidir. Çözüm: TTL sürelerine rastgele (random) saniyeler eklemektir.
-                    <br><br><strong>Cache Penetration:</strong> Veritabanında olmayan (örneğin id=-1) bir verinin sürekli sorgulanıp doğrudan veritabanına yük bindirmesidir. Çözüm: Olmayan verileri de Redis'te "NULL" olarak kısa süreliğine (örneğin 30sn) cache'lemektir.
+                    <br><br><strong>Cache Avalanche (Önbellek Çığı):</strong> Binlerce Cache anahtarının (Key) aynı anda
+                    süresinin dolması (TTL expire) sonucu veritabanına aniden devasa yük binmesidir. Çözüm: TTL
+                    sürelerine rastgele (random) saniyeler eklemektir.
+                    <br><br><strong>Cache Penetration:</strong> Veritabanında olmayan (örneğin id=-1) bir verinin
+                    sürekli sorgulanıp doğrudan veritabanına yük bindirmesidir. Çözüm: Olmayan verileri de Redis'te
+                    "NULL" olarak kısa süreliğine (örneğin 30sn) cache'lemektir.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -954,39 +1516,56 @@ ZREVRANGE gaming:leaderboard 0 9 WITHSCORES</code></pre>
             </div>
         </section>
 
-        <section class="section" id="s09" data-title="Veri Ambarı (Data Warehouse) & ClickHouse">
-            <h2 class="section-title"><span class="num">09.</span> Veri Ambarı (Data Warehouse) & Devasa Sütun Tabanlı Sistemler (ClickHouse)</h2>
-            <p>Terabaytlarca veriyi saniyeler içinde analiz etmemizi sağlayan analitik (OLAP) sistemlerin mimari farklılıkları.</p>
-            
+        <section class="section" id="s13" data-title="Veri Ambarı (Data Warehouse) & ClickHouse">
+            <h2 class="section-title"><span class="num">13.</span> Veri Ambarı (Data Warehouse) & Devasa Sütun Tabanlı
+                Sistemler (ClickHouse)</h2>
+            <p>Terabaytlarca veriyi saniyeler içinde analiz etmemizi sağlayan analitik (OLAP) sistemlerin mimari
+                farklılıkları.</p>
+
             <div class="card">
                 <h3 class="sub">OLTP vs. OLAP ve Sütun Tabanlı Mimari</h3>
-                <p>Geleneksel veritabanları (OLTP) veriyi satır satır (Row-oriented) yazar; bu "Insert" işlemleri için harikadır ama "Tüm kullanıcıların yaş ortalaması nedir?" gibi analitik (OLAP) sorgularda tüm tabloyu okuması gerekir. Sütun tabanlı (Column-oriented) veritabanları (ClickHouse, BigQuery) veriyi sütunlar halinde depolar. Böylece sadece "Yaş" sütunu diskten okunur ve olağanüstü performans (100x) elde edilir.</p>
+                <p>Geleneksel veritabanları (OLTP) veriyi satır satır (Row-oriented) yazar; bu "Insert" işlemleri için
+                    harikadır ama "Tüm kullanıcıların yaş ortalaması nedir?" gibi analitik (OLAP) sorgularda tüm tabloyu
+                    okuması gerekir. Sütun tabanlı (Column-oriented) veritabanları (ClickHouse, BigQuery) veriyi
+                    sütunlar halinde depolar. Böylece sadece "Yaş" sütunu diskten okunur ve olağanüstü performans (100x)
+                    elde edilir.</p>
                 <div class="info-box tip">
                     <strong>Production Note: Vektörel İcra ve Sıkıştırma</strong>
-                    Sütun tabanlı mimarilerde aynı tipte veriler (örneğin binlerce integer yaş verisi) arka arkaya durduğu için çok yüksek oranda sıkıştırılır. ClickHouse bu sıkıştırılmış veriyi işlemcide vektörel (SIMD) komut setleriyle paralel işleyerek hızı 1000x'e kadar çıkarır.
+                    Sütun tabanlı mimarilerde aynı tipte veriler (örneğin binlerce integer yaş verisi) arka arkaya
+                    durduğu için çok yüksek oranda sıkıştırılır. ClickHouse bu sıkıştırılmış veriyi işlemcide vektörel
+                    (SIMD) komut setleriyle paralel işleyerek hızı 1000x'e kadar çıkarır.
                 </div>
             </div>
 
             <div class="card">
                 <h3 class="sub">Veri Ambarı Modellemesi</h3>
-                <p>Analitik sistemlerde ilişkisel veritabanı kuralları (Normalizasyon) esnetilir. Milyarlarca satırlık FACT (Olay/Satış) tabloları ile bunları açıklayan DIMENSION (Müşteri/Ürün) tabloları tasarlanır.</p>
+                <p>Analitik sistemlerde ilişkisel veritabanı kuralları (Normalizasyon) esnetilir. Milyarlarca satırlık
+                    FACT (Olay/Satış) tabloları ile bunları açıklayan DIMENSION (Müşteri/Ürün) tabloları tasarlanır.</p>
                 <ul style="margin-left: 1.5rem; color: var(--text-dim); margin-bottom: 1rem; line-height: 1.8;">
-                    <li><strong>Star Schema (Yıldız Şema):</strong> Ortada devasa bir Fact tablosu, etrafında birincil Dimension tabloları. Join sayısı azdır, performanslıdır.</li>
-                    <li><strong>Snowflake Schema (Kar Tanesi Şema):</strong> Dimension tabloları kendi içlerinde tekrar normalize edilir. Join sayısı artar, sorgular yavaşlar fakat alan tasarrufu sağlar.</li>
+                    <li><strong>Star Schema (Yıldız Şema):</strong> Ortada devasa bir Fact tablosu, etrafında birincil
+                        Dimension tabloları. Join sayısı azdır, performanslıdır.</li>
+                    <li><strong>Snowflake Schema (Kar Tanesi Şema):</strong> Dimension tabloları kendi içlerinde tekrar
+                        normalize edilir. Join sayısı artar, sorgular yavaşlar fakat alan tasarrufu sağlar.</li>
                 </ul>
             </div>
         </section>
 
-        <section class="section" id="s10" data-title="Veritabanı Migration Yönetimi (Flyway/Liquibase)">
-            <h2 class="section-title"><span class="num">10.</span> Veritabanı Migration Yönetimi (Flyway/Liquibase)</h2>
-            <p>Yazılım kodunun Git ile versiyonlanması gibi, veritabanı şemasının da zaman içindeki değişimini (Schema Evolution) güvenle yönetme sanatı.</p>
+        <section class="section" id="s14" data-title="Veritabanı Migration Yönetimi (Flyway/Liquibase)">
+            <h2 class="section-title"><span class="num">14.</span> Veritabanı Migration Yönetimi (Flyway/Liquibase)</h2>
+            <p>Yazılım kodunun Git ile versiyonlanması gibi, veritabanı şemasının da zaman içindeki değişimini (Schema
+                Evolution) güvenle yönetme sanatı.</p>
 
             <div class="card">
                 <h3 class="sub">Otomatik Migration Mantığı</h3>
-                <p>"Kod Git'te, DB nerede?" sorunsalını çözmek için Flyway veya Liquibase kullanılır. Araç, veritabanında <code>schema_version</code> isimli bir tablo oluşturur ve hangi script'lerin (SQL dosyalarının) çalıştırıldığını takip eder.</p>
+                <p>"Kod Git'te, DB nerede?" sorunsalını çözmek için Flyway veya Liquibase kullanılır. Araç,
+                    veritabanında <code>schema_version</code> isimli bir tablo oluşturur ve hangi script'lerin (SQL
+                    dosyalarının) çalıştırıldığını takip eder.</p>
                 <div class="info-box danger">
                     <strong>DevOps Tip: Zero-Downtime Migration</strong>
-                    Canlı sistemde bir sütunun adını doğrudan değiştirmek (RENAME COLUMN) sistemi çökertir. Bunun yerine <strong>Expand/Contract (Genişlet/Daralt)</strong> kalıbı kullanılır: <br><br>1. Yeni sütunu ekle (Expand)<br>2. Kodu hem eskiye hem yeniye yazacak şekilde güncelle<br>3. Eski verileri yeni sütuna taşı<br>4. Kodu sadece yeni sütunu okuyacak şekilde güncelle<br>5. Eski sütunu sil (Contract)
+                    Canlı sistemde bir sütunun adını doğrudan değiştirmek (RENAME COLUMN) sistemi çökertir. Bunun yerine
+                    <strong>Expand/Contract (Genişlet/Daralt)</strong> kalıbı kullanılır: <br><br>1. Yeni sütunu ekle
+                    (Expand)<br>2. Kodu hem eskiye hem yeniye yazacak şekilde güncelle<br>3. Eski verileri yeni sütuna
+                    taşı<br>4. Kodu sadece yeni sütunu okuyacak şekilde güncelle<br>5. Eski sütunu sil (Contract)
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -1002,18 +1581,25 @@ CREATE INDEX idx_orders_delivery ON orders(delivery_status);</code></pre>
             </div>
         </section>
 
-        <section class="section" id="s11" data-title="Zaman Serisi (Time-Series) Veritabanları">
-            <h2 class="section-title"><span class="num">11.</span> Zaman Serisi (Time-Series) Veritabanları</h2>
-            <p>IoT sensör verileri, sunucu metrikleri ve finansal loglar gibi sürekli akan verilerin yüksek hızda yazılması ve analiz edilmesi.</p>
+        <section class="section" id="s15" data-title="Zaman Serisi (Time-Series) Veritabanları">
+            <h2 class="section-title"><span class="num">15.</span> Zaman Serisi (Time-Series) Veritabanları</h2>
+            <p>IoT sensör verileri, sunucu metrikleri ve finansal loglar gibi sürekli akan verilerin yüksek hızda
+                yazılması ve analiz edilmesi.</p>
 
             <div class="card">
                 <h3 class="sub">Zaman Serisi Doğası & TimescaleDB</h3>
-                <p>Zaman serisi verileri sadece eklenir (Append-Only), güncellenmez. PostgreSQL tabanlı <strong>TimescaleDB</strong> veya InfluxDB bu veriler için tasarlanmıştır. TimescaleDB, <code>Hypertable</code> adı verilen sanal bir tablo sunar; arka planda verileri zamana göre otomatik olarak küçük parçalara (chunk) böler (Partitioning).</p>
+                <p>Zaman serisi verileri sadece eklenir (Append-Only), güncellenmez. PostgreSQL tabanlı
+                    <strong>TimescaleDB</strong> veya InfluxDB bu veriler için tasarlanmıştır. TimescaleDB,
+                    <code>Hypertable</code> adı verilen sanal bir tablo sunar; arka planda verileri zamana göre otomatik
+                    olarak küçük parçalara (chunk) böler (Partitioning).
+                </p>
                 <div class="info-box tip">
                     <strong>Production Note: Retention & Downsampling</strong>
-                    Saniyede 10.000 metrik basan bir sistem diski hızla doldurur. Çözüm otomatik veri yaşam döngüsüdür:<br><br>
+                    Saniyede 10.000 metrik basan bir sistem diski hızla doldurur. Çözüm otomatik veri yaşam
+                    döngüsüdür:<br><br>
                     <strong>Retention Policy:</strong> "3 aydan eski ham verileri otomatik sil"<br>
-                    <strong>Downsampling:</strong> "Geçmiş aylara ait saniyelik verileri tutma, saatlik ortalamasını hesaplayıp (Rollup) onu sakla"
+                    <strong>Downsampling:</strong> "Geçmiş aylara ait saniyelik verileri tutma, saatlik ortalamasını
+                    hesaplayıp (Rollup) onu sakla"
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -1033,22 +1619,32 @@ SELECT create_hypertable('sensor_data', 'time');</code></pre>
             </div>
         </section>
 
-        <section class="section" id="s12" data-title="Bulut Veritabanları & Connection Pooling">
-            <h2 class="section-title"><span class="num">12.</span> Bulut Veritabanı Mimarileri & Connection Pooling (Bağlantı Havuzu)</h2>
-            <p>Modern DBaaS (Veritabanı Servisi) altyapıları ve uygulama ile veritabanı arasındaki darboğazların giderilmesi.</p>
+        <section class="section" id="s16" data-title="Bulut Veritabanları & Connection Pooling">
+            <h2 class="section-title"><span class="num">16.</span> Bulut Veritabanı Mimarileri & Connection Pooling
+                (Bağlantı Havuzu)</h2>
+            <p>Modern DBaaS (Veritabanı Servisi) altyapıları ve uygulama ile veritabanı arasındaki darboğazların
+                giderilmesi.</p>
 
             <div class="card">
                 <h3 class="sub">Cloud-Native Mimari (Aurora & Spanner)</h3>
-                <p>AWS Aurora, işlem motoru (Compute) ile depolama motorunu (Storage) fiziksel olarak ayırır. Böylece depolama kendi kendine sınırsız büyürken, okuma kopyaları (Read Replica) milisaniyeler içinde ayağa kalkar. Google Spanner ise atomik saatler (TrueTime API) kullanarak küresel (Global) ölçekte ACID tutarlılığı sunar.</p>
+                <p>AWS Aurora, işlem motoru (Compute) ile depolama motorunu (Storage) fiziksel olarak ayırır. Böylece
+                    depolama kendi kendine sınırsız büyürken, okuma kopyaları (Read Replica) milisaniyeler içinde ayağa
+                    kalkar. Google Spanner ise atomik saatler (TrueTime API) kullanarak küresel (Global) ölçekte ACID
+                    tutarlılığı sunar.</p>
             </div>
 
             <div class="card">
                 <h3 class="sub">Connection Pooling (Bağlantı Havuzu)</h3>
-                <p>Veritabanına açılan her yeni bağlantı (Connection), TCP el sıkışması ve kimlik doğrulama süreçleri nedeniyle çok maliyetlidir. Her istekte yeni bağlantı açmak (Connection Churn) veritabanını anında çökertir.</p>
+                <p>Veritabanına açılan her yeni bağlantı (Connection), TCP el sıkışması ve kimlik doğrulama süreçleri
+                    nedeniyle çok maliyetlidir. Her istekte yeni bağlantı açmak (Connection Churn) veritabanını anında
+                    çökertir.</p>
                 <div class="info-box danger">
                     <strong>DevOps Tip: Pool Konfigürasyonu (HikariCP / PgBouncer)</strong>
-                    Havuza 10.000 bağlantı koymak performansı artırmaz, aksine işlemci bağlam değişiminden (Context Switch) ötürü kilitler (Starvation). <br><br>
-                    <strong>Altın Formül (PostgreSQL):</strong> <code>Connections = ((Core Count * 2) + Etkili Disk (Spindle) Sayısı)</code>. Çoğu devasa sistem için 20-50 bağlantı boyutundaki bir havuz optimum performansı sağlar.
+                    Havuza 10.000 bağlantı koymak performansı artırmaz, aksine işlemci bağlam değişiminden (Context
+                    Switch) ötürü kilitler (Starvation). <br><br>
+                    <strong>Altın Formül (PostgreSQL):</strong>
+                    <code>Connections = ((Core Count * 2) + Etkili Disk (Spindle) Sayısı)</code>. Çoğu devasa sistem
+                    için 20-50 bağlantı boyutundaki bir havuz optimum performansı sağlar.
                 </div>
                 <div class="code-container">
                     <div class="code-header">
@@ -1064,6 +1660,160 @@ spring.datasource.hikari.idle-timeout=300000
 
 # Bir isteğin havuzdan bağlantı alabilmek için bekleyeceği maksimum süre
 spring.datasource.hikari.connection-timeout=20000</code></pre>
+                </div>
+            </div>
+        </section>
+
+
+        <section class="section" id="s17" data-title="Komutlar ve Kısaltma Sözlüğü">
+            <h2 class="section-title"><span class="num">17.</span> Komutlar ve Kısaltma Sözlüğü</h2>
+            <div class="card">
+                <p>Veritabanı dünyasında en sık karşılaşılan kısaltmalar ve anlamları:</p>
+
+                <h3 class="sub">Sorgu Dilleri</h3>
+                <p><strong>SQL (Structured Query Language):</strong> İlişkisel DB'lerde veri tanımlama, düzenleme ve
+                    sorgulama standart dili.</p>
+                <p><strong>Cypher (CQL):</strong> Neo4j'nin grafik yapılarını ASCII sanatıyla ifade eden
+                    (node)-[:EDGE]->(node) sorgu dili.</p>
+                <p><strong>DDL (Data Definition Language):</strong> Tablo ve şema komutları (CREATE, ALTER, DROP).</p>
+                <p><strong>DML (Data Manipulation Language):</strong> Veri işleme komutları (SELECT, INSERT, UPDATE,
+                    DELETE).</p>
+
+                <h3 class="sub">Sistem Mimarileri</h3>
+                <p><strong>DBMS (Database Management System):</strong> Veriyi yöneten ara yazılım katmanı (PostgreSQL,
+                    MongoDB vb.).</p>
+                <p><strong>ACID:</strong> İlişkisel DB'lerin transaction güvenliği (Atomicity, Consistency, Isolation,
+                    Durability).</p>
+                <p><strong>BASE:</strong> NoSQL sistemlerin (Nihai tutarlılık) benimsediği felsefe (Basically Available,
+                    Soft-state, Eventually consistent).</p>
+                <p><strong>TTL (Time To Live):</strong> Cache ve NoSQL'de anahtarın süresinin ne zaman dolacağını
+                    belirten süre.</p>
+
+                <h3 class="sub">CRUD Operasyonları Karşılaştırması</h3>
+                <table style="width:100%; border-collapse:collapse; margin-top:1rem; font-size:14px; text-align:left;">
+                    <tr style="border-bottom: 1px solid var(--border); background-color: var(--bg2);">
+                        <th style="padding:10px;">İşlem</th>
+                        <th style="padding:10px;">SQL</th>
+                        <th style="padding:10px;">MongoDB</th>
+                        <th style="padding:10px;">Redis</th>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:10px; color:var(--accent);">Create</td>
+                        <td style="padding:10px;">INSERT</td>
+                        <td style="padding:10px;">insertOne</td>
+                        <td style="padding:10px;">SET</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:10px; color:var(--accent);">Read</td>
+                        <td style="padding:10px;">SELECT</td>
+                        <td style="padding:10px;">find</td>
+                        <td style="padding:10px;">GET</td>
+                    </tr>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <td style="padding:10px; color:var(--accent);">Update</td>
+                        <td style="padding:10px;">UPDATE</td>
+                        <td style="padding:10px;">updateOne</td>
+                        <td style="padding:10px;">SET (üzerine yaz)</td>
+                    </tr>
+                    <tr>
+                        <td style="padding:10px; color:var(--accent);">Delete</td>
+                        <td style="padding:10px;">DELETE</td>
+                        <td style="padding:10px;">deleteOne</td>
+                        <td style="padding:10px;">DEL</td>
+                    </tr>
+                </table>
+            </div>
+        </section>
+
+        <section class="section" id="s18" data-title="Pratik Kullanım Komutları (Cheatsheet)">
+            <h2 class="section-title"><span class="num">18.</span> Pratik Kullanım Komutları (Cheatsheet)</h2>
+
+            <div class="card">
+                <h3 class="sub">🗄 SQL (PostgreSQL / MySQL)</h3>
+                <div class="code-container">
+                    <pre><code class="language-sql">-- Tablo Oluşturma (DDL)
+CREATE TABLE kullanicilar (
+    id SERIAL PRIMARY KEY,
+    ad VARCHAR(100) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    olusturulma TIMESTAMP DEFAULT NOW()
+);
+
+-- Veri Ekleme (DML)
+INSERT INTO kullanicilar (ad, email) VALUES ('Ahmet', 'ahmet@example.com');
+
+-- Aggregate ve Join
+SELECT k.ad, COUNT(s.id) as siparis_sayisi
+FROM kullanicilar k
+LEFT JOIN siparisler s ON s.kullanici_id = k.id
+GROUP BY k.id;
+
+-- Transaction
+BEGIN;
+  UPDATE hesaplar SET bakiye = bakiye - 100 WHERE id = 1;
+  UPDATE hesaplar SET bakiye = bakiye + 100 WHERE id = 2;
+COMMIT;</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="sub">📄 MongoDB (Document)</h3>
+                <div class="code-container">
+                    <pre><code class="language-javascript">// Yeni Doküman Ekleme
+db.kullanicilar.insertOne({
+    ad: "Fatma", email: "fatma@example.com",
+    roller: ["admin", "editor"],
+    adres: { sehir: "İstanbul", posta: "34000" }
+});
+
+// Filtreli Sorgulama
+db.kullanicilar.find({ "adres.sehir": "İstanbul" }).limit(5);
+
+// Aggregation Pipeline
+db.kullanicilar.aggregate([
+    { $match: { "aktif": true } },
+    { $group: { _id: "$adres.sehir", sayi: { $sum: 1 } } }
+]);
+
+// Güncelleme
+db.kullanicilar.updateOne({ email: "fatma@example.com" }, { $set: { "adres.sehir": "Ankara" } });</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="sub">⚡ Redis (Key-Value & In-Memory)</h3>
+                <div class="code-container">
+                    <pre><code class="language-bash"># String - Session/Cache (TTL 3600 sn)
+SET oturum:123 "kullanici_id_42" EX 3600
+GET oturum:123
+
+# Sayaç (Counter)
+INCR sayfa:anasayfa:goruntulemeler
+
+# Hash (Nesne Saklama)
+HSET kullanici:1 ad "Ahmet" yas 28
+HGETALL kullanici:1
+
+# Sorted Set (Leaderboard)
+ZADD liderlik 7800 "fatma"
+ZREVRANGE liderlik 0 2 WITHSCORES # En yüksek 3</code></pre>
+                </div>
+            </div>
+
+            <div class="card">
+                <h3 class="sub">🕸 Neo4j (Graph / Cypher)</h3>
+                <div class="code-container">
+                    <pre><code class="language-sql">// Düğüm (Node) ve İlişki Oluşturma
+CREATE (a:Kisi { ad: 'Ahmet' })
+CREATE (f:Kisi { ad: 'Fatma' })
+CREATE (a)-[:TANIYOR { yil: 2018 }]->(f)
+
+// Derinlik-2 Arama (Arkadaşın Arkadaşı)
+MATCH (a:Kisi { ad: 'Ahmet' })-[:TANIYOR*2]->(uzak)
+RETURN DISTINCT uzak.ad
+
+// Düğüm silerken ilişkileri de koparmak zorunludur!
+MATCH (k:Kisi { ad: 'Ahmet' }) DETACH DELETE k</code></pre>
                 </div>
             </div>
         </section>
@@ -1085,7 +1835,8 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
     <!-- SCROLL TOP BUTONU -->
     <div class="scroll-top" id="scrollTopBtn" title="Yukarı Çık">
         <div class="scroll-ring" id="scrollRing"></div>
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+            stroke-linecap="round" stroke-linejoin="round">
             <line x1="12" y1="19" x2="12" y2="5"></line>
             <polyline points="5 12 12 5 19 12"></polyline>
         </svg>
@@ -1093,15 +1844,15 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            
+
             /* 1. DİNAMİK YAN MENÜ OLUŞTURMA */
             const sections = document.querySelectorAll('.section');
             const tocList = document.getElementById('tocList');
-            
+
             sections.forEach((sec, index) => {
                 const num = String(index + 1).padStart(2, '0');
                 const title = sec.getAttribute('data-title');
-                
+
                 const li = document.createElement('a');
                 li.href = `#${sec.id}`;
                 li.className = 'toc-item';
@@ -1111,12 +1862,12 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                     <span class="text">${title}</span>
                     <div class="toc-dot"></div>
                 `;
-                
+
                 li.addEventListener('click', (e) => {
                     e.preventDefault();
                     document.getElementById(sec.id).scrollIntoView({ behavior: 'smooth' });
                 });
-                
+
                 tocList.appendChild(li);
             });
 
@@ -1149,7 +1900,7 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                 el.innerHTML = html;
             });
 
-            
+
             /* KOD BLOĞU DİL ATAMASI */
             document.querySelectorAll('.code-container').forEach(container => {
                 const span = container.querySelector('.code-header span');
@@ -1182,11 +1933,11 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                 });
             });
 
-            
+
             /* 6. GELİŞMİŞ ARAMA MOTORU */
             const searchInput = document.getElementById('searchInput');
             let originalContentMap = new Map();
-            
+
             document.querySelectorAll('.section').forEach(sec => {
                 originalContentMap.set(sec.id, sec.innerHTML);
             });
@@ -1196,43 +1947,43 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
             function highlightTextNodes(element, query) {
                 if (!query) return;
                 const safeQuery = escapeRegExp(query);
-                
+
                 const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT, null, false);
                 const textNodes = [];
                 while (walker.nextNode()) textNodes.push(walker.currentNode);
-                
+
                 textNodes.forEach(node => {
                     const parent = node.parentNode;
                     if (parent && (parent.tagName === 'SCRIPT' || parent.tagName === 'STYLE' || parent.classList.contains('search-highlight'))) return;
-                    
+
                     const text = node.nodeValue;
                     // Her node için regex state sıfırdan başlar
                     const regex = new RegExp(safeQuery, 'gi');
                     let match;
                     let lastIdx = 0;
                     let hasMatch = false;
-                    
+
                     const fragment = document.createDocumentFragment();
-                    
+
                     while ((match = regex.exec(text)) !== null) {
                         hasMatch = true;
                         // Eşleşme öncesi metni ekle
                         fragment.appendChild(document.createTextNode(text.slice(lastIdx, match.index)));
-                        
+
                         // Eşleşen kısmı span içine al
                         const span = document.createElement('span');
                         span.className = 'search-highlight';
                         span.textContent = match[0];
                         fragment.appendChild(span);
-                        
+
                         lastIdx = match.index + match[0].length;
-                        
+
                         // Sonsuz döngü koruması (regex.exec bazen boş eşleşmelerde ilerlemez)
                         if (match[0].length === 0) {
                             regex.lastIndex++;
                         }
                     }
-                    
+
                     // Kalan kısmı ekle ve DOM'u güncelle
                     if (hasMatch) {
                         fragment.appendChild(document.createTextNode(text.slice(lastIdx)));
@@ -1244,12 +1995,12 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
             searchInput.addEventListener('input', (e) => {
                 const query = e.target.value.trim().toLowerCase();
                 let firstMatch = null;
-                
+
                 document.querySelectorAll('.section').forEach(sec => {
                     // Orijinal HTML'e dön
                     sec.innerHTML = originalContentMap.get(sec.id);
                     sec.style.display = 'block';
-                    
+
                     // DOM yenilendiği için IntersectionObserver'ın kancası kopuyor ve kartlar opacity: 0 kalıyor.
                     // Bu yüzden arama yapıldığında tüm kartları anında görünür (in-view) yapıyoruz.
                     sec.querySelectorAll('.card').forEach(card => card.classList.add('in-view'));
@@ -1264,11 +2015,11 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                         }
                     }
                 });
-                
+
                 if (firstMatch) {
                     firstMatch.scrollIntoView({ behavior: 'smooth', block: 'start' });
                 }
-                
+
                 document.querySelectorAll('.copy-btn').forEach(btn => {
                     btn.addEventListener('click', () => {
                         const pre = btn.parentElement.nextElementSibling;
@@ -1286,7 +2037,7 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                         });
                     });
                 });
-                
+
                 if (window.Prism) Prism.highlightAll();
             });
 
@@ -1298,7 +2049,7 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
             const progFill = document.getElementById('progFill');
             const scrollTopBtn = document.getElementById('scrollTopBtn');
             let currentSecIndex = 0;
-            
+
             // Card Animasyonları
             const cardObserver = new IntersectionObserver(entries => {
                 entries.forEach(entry => {
@@ -1330,7 +2081,7 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                     const index = currentSecIndex;
                     const num = String(index + 1).padStart(2, '0');
                     const title = currentSec.getAttribute('data-title');
-                    
+
                     tocItems.forEach(item => {
                         if (item.getAttribute('data-target') === secId) {
                             if (!item.classList.contains('active')) {
@@ -1345,18 +2096,18 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
 
                     progNum.innerText = num;
                     progTitle.innerText = title;
-                    
+
                     const rect = currentSec.getBoundingClientRect();
                     const totalSecHeight = rect.height;
                     const scrolledInSec = (windowHeight / 2) - rect.top;
                     let pct = Math.round((scrolledInSec / totalSecHeight) * 100);
-                    
+
                     // 100% bug fix
                     const scrollPos = scrollY + windowHeight;
                     if (scrollPos >= document.documentElement.scrollHeight - 10) {
                         pct = 100;
                     }
-                    
+
                     pct = Math.max(0, Math.min(100, pct));
 
                     progPct.innerText = `%${pct}`;
@@ -1377,7 +2128,23 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
                     }
                 }
             });
-// Sayfa yüklendiğinde ilk durumu ayarla
+
+            // Mobil Menü Toggle İşlemi
+            const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+            const sidebar = document.querySelector('.sidebar');
+
+            mobileMenuBtn.addEventListener('click', () => {
+                sidebar.classList.toggle('open');
+            });
+
+            // TOC öğesine tıklandığında mobilde menüyü otomatik kapat
+            tocList.addEventListener('click', (e) => {
+                if (e.target.closest('.toc-item') && window.innerWidth <= 1024) {
+                    sidebar.classList.remove('open');
+                }
+            });
+
+            // Sayfa yüklendiğinde ilk durumu ayarla
             window.dispatchEvent(new Event('scroll'));
         });
     </script>
@@ -1386,6 +2153,12 @@ spring.datasource.hikari.connection-timeout=20000</code></pre>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-sql.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-javascript.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/prism-bash.min.js"></script>
+
+    <!-- Mermaid.js for ER Diagrams -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+    </script>
 </body>
 
 </html>
