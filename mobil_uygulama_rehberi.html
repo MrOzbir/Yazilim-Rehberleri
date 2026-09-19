@@ -58,6 +58,10 @@
             border-radius: 4px;
         }
 
+        html {
+            font-size: clamp(11px, 1.2vw, 14px);
+        }
+
         body {
             font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
             background-color: var(--bg);
@@ -162,34 +166,34 @@
         }
 
         .section-header h2 {
-            font-size: 3.5rem;
+            font-size: 2.8rem;
             color: #fff;
-            margin-bottom: 1.5rem;
+            margin-bottom: 1rem;
             font-weight: 900;
-            letter-spacing: -1.5px;
+            letter-spacing: -1px;
             line-height: 1.1;
         }
 
         .section-header p {
             color: var(--text-muted);
-            font-size: 1.25rem;
+            font-size: 1.15rem;
             max-width: 900px;
             font-weight: 400;
         }
 
         .content-block {
-            margin-bottom: 8rem;
+            margin-bottom: 5rem;
         }
 
         /* Content Box */
         .content-box {
             background-color: var(--bg2);
             border: 1px solid var(--border);
-            border-radius: 24px;
-            padding: 4rem;
+            border-radius: 20px;
+            padding: 2.5rem 3rem;
             position: relative;
             overflow: hidden;
-            margin-bottom: 4rem;
+            margin-bottom: 3rem;
             transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275), border-color 0.5s ease;
         }
 
@@ -248,17 +252,17 @@
         .badge.native { background-color: var(--bg3); color: var(--green); border: 1px solid var(--border); }
 
         .content-box h3 {
-            font-size: 2.2rem;
-            margin-bottom: 2rem;
+            font-size: 1.8rem;
+            margin-bottom: 1.5rem;
             color: #fff;
             font-weight: 800;
             letter-spacing: -0.5px;
         }
 
         .content-box h4 {
-            font-size: 1.5rem;
-            margin-top: 3rem;
-            margin-bottom: 1.5rem;
+            font-size: 1.3rem;
+            margin-top: 2rem;
+            margin-bottom: 1rem;
             color: #fff;
             display: flex;
             align-items: center;
@@ -420,19 +424,97 @@
             border-top-color: var(--border-hover);
         }
 
+        /* Menu Toggle Button */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(14, 14, 14, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-main);
+            border: 1px solid var(--border-hover);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg3);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(255, 87, 34, 0.2);
+            color: var(--accent);
+        }
+
+        /* Sidebar Overlay */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-active .sidebar-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         /* Responsive */
         @media (max-width: 1400px) {
             .main-content { padding: 4rem; }
         }
 
         @media (max-width: 1000px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; width: 100%; }
+            .menu-toggle { display: flex; }
+            .sidebar { 
+                transform: translateX(-100%); 
+                transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            }
+            .sidebar-active .sidebar { 
+                transform: translateX(0); 
+            }
+            .main-content { 
+                margin-left: 0; 
+                width: 100%; 
+                padding: 2rem 1rem;
+            }
             .progress-container { left: 0; width: 100%; }
+            .content-box { padding: 1.5rem 1rem; margin-bottom: 2rem; }
+            .content-box h3 { font-size: 1.6rem; margin-bottom: 1rem; }
+            .content-box p { font-size: 1rem; margin-bottom: 1.2rem; }
+            .section-header { margin-bottom: 3rem; }
+            .section-header h2 { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body class="line-numbers">
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        Menü
+    </button>
 
     <!-- Sidebar -->
     <nav class="sidebar">
@@ -992,6 +1074,32 @@ jobs:
 
         // Trigger scroll event on load to highlight correct menu item
         window.dispatchEvent(new Event('scroll'));
+
+        // Mobile Menu Toggle Logic
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const body = document.body;
+
+        function toggleMenu() {
+            body.classList.toggle('sidebar-active');
+            if(body.classList.contains('sidebar-active')) {
+                menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Kapat';
+            } else {
+                menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg> Menü';
+            }
+        }
+
+        menuToggle.addEventListener('click', toggleMenu);
+        sidebarOverlay.addEventListener('click', toggleMenu);
+
+        // Close menu when clicking a link on mobile
+        document.querySelectorAll('.nav-link').forEach(anchor => {
+            anchor.addEventListener('click', () => {
+                if(window.innerWidth <= 1000 && body.classList.contains('sidebar-active')) {
+                    toggleMenu();
+                }
+            });
+        });
     </script>
 </body>
 </html>

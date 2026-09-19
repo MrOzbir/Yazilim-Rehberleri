@@ -61,6 +61,11 @@
             padding: 0;
             box-sizing: border-box;
         }
+        
+        html {
+            font-size: clamp(10px, 1vw, 13px);
+            scroll-behavior: smooth;
+        }
 
         body {
             font-family: var(--font-main);
@@ -165,7 +170,7 @@
             background: var(--bg3);
             border: 1px solid var(--border);
             color: var(--text);
-            width: 40px;
+            width: 100%;
             height: 40px;
             border-radius: 8px;
             display: flex;
@@ -173,6 +178,9 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
+            font-size: 0.95rem;
+            font-weight: 600;
+            gap: 8px;
         }
 
         .btn-icon:hover {
@@ -548,32 +556,88 @@
             z-index: 1;
         }
 
+        /* Menu Toggle Button & Overlay */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: rgba(14, 14, 14, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg3);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            color: var(--accent);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-active .sidebar-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         /* Responsive */
         @media (max-width: 1024px) {
-            :root {
-                --sidebar-width: 260px;
+            :root { --sidebar-width: 280px; }
+            .menu-toggle { display: flex; }
+            .sidebar {
+                transform: translateX(-100%);
+                transition: transform 0.4s ease;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+                z-index: 100;
+                position: fixed;
             }
+            .sidebar-active .sidebar {
+                transform: translateX(0);
+            }
+            .main-content { margin-left: 0; padding: 2rem 1.5rem 6rem 1.5rem; max-width: 100%; }
+            .footer-progress { left: 0; padding: 0 1.5rem; }
             .hero h1 { font-size: 3rem; }
             .grid-2 { grid-template-columns: 1fr; }
         }
-
+        
         @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-            }
-            .main-content {
-                margin-left: 0;
-                padding: 2rem;
-            }
-            .footer-progress {
-                left: 0;
-                padding: 0 2rem;
-            }
+            .hero h1 { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        Menü
+    </button>
     <!-- Sidebar -->
     <aside class="sidebar">
         <div class="brand">
@@ -581,20 +645,20 @@
             Dev Reference
         </div>
         
-        <div class="search-box">
-            <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
-            <input type="text" id="searchInput" placeholder="Rehberde ara...">
+        <div class="controls" style="flex-direction: column; gap: 10px;">
+            <div class="search-box" style="width: 100%;">
+                <svg viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke="currentColor" stroke-width="2" stroke-linecap="round" fill="none"/></svg>
+                <input type="text" id="searchInput" placeholder="Rehberde ara...">
+            </div>
+            <button class="btn-icon" id="themeToggle" title="Temayı Değiştir" style="width: 100%;">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                Temayı Değiştir
+            </button>
         </div>
 
         <nav class="toc-list" id="toc">
             <!-- Dynamically populated -->
         </nav>
-
-        <div class="controls">
-            <button class="btn-icon" id="themeToggle" title="Temayı Değiştir">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
-            </button>
-        </div>
     </aside>
 
     <!-- Main Content -->
@@ -1012,6 +1076,36 @@ SYSTEM """Kıdemli DevOps mühendisisin."""</code></pre>
             
             // Trigger initial scroll to set correct states
             window.dispatchEvent(new Event('scroll'));
+
+            // Mobile Menu Toggle Logic
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const bodyRef = document.body;
+
+            function toggleMenu() {
+                bodyRef.classList.toggle('sidebar-active');
+                if(bodyRef.classList.contains('sidebar-active')) {
+                    menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Kapat';
+                } else {
+                    menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg> Menü';
+                }
+            }
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleMenu);
+            }
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleMenu);
+            }
+            
+            // Auto-close menu on small screens when clicking a link
+            tocLinks.forEach(link => {
+                link.addEventListener('click', () => {
+                    if(window.innerWidth <= 1024 && bodyRef.classList.contains('sidebar-active')) {
+                        toggleMenu();
+                    }
+                });
+            });
         });
     </script>
 </body>

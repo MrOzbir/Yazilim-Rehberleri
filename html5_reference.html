@@ -76,7 +76,7 @@
         header {
             position: fixed;
             top: 0;
-            left: 280px;
+            left: 200px;
             right: 0;
             height: 70px;
             background: rgba(15, 15, 15, 0.85);
@@ -93,6 +93,28 @@
 
         body.light-mode header {
             background: rgba(248, 249, 250, 0.85);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: 1px solid transparent;
+            color: var(--text-main);
+            margin-right: 16px;
+            cursor: pointer;
+            padding: 6px;
+            border-radius: var(--radius-sm);
+            transition: var(--transition);
+        }
+        
+        .menu-toggle:hover {
+            background: var(--bg3);
+            border-color: var(--border);
         }
 
         .header-left .search-btn {
@@ -143,14 +165,14 @@
 
         /* 4. DİNAMİK YAN MENÜ (Sidebar / TOC) */
         .sidebar {
-            width: 280px;
+            width: 200px;
             position: fixed;
             top: 0;
             left: 0;
             height: 100vh;
             background-color: var(--bg2);
             border-right: 1px solid var(--border);
-            padding: 30px 20px;
+            padding: 30px 0; /* Monitör kenarındaki pay tamamen sıfırlandı */
             overflow-y: auto;
             z-index: 101;
             transition: background-color 0.3s;
@@ -158,13 +180,14 @@
 
         .sidebar-brand {
             font-family: var(--font-heading);
-            font-size: 20px;
+            font-size: 18px; /* Sığması için hafif küçültüldü */
             font-weight: 800;
             color: var(--text-main);
-            margin-bottom: 40px;
+            margin-bottom: 30px;
+            padding-left: 8px; /* Yazının okunabilirliği için minimum pay */
             display: flex;
             align-items: center;
-            gap: 12px;
+            gap: 8px;
         }
         
         .sidebar-brand span {
@@ -175,34 +198,33 @@
             list-style: none;
             display: flex;
             flex-direction: column;
-            gap: 8px;
+            gap: 6px;
         }
 
         .toc-item {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 10px 16px;
+            padding: 10px 6px; /* Ekran kenarına maksimum yaklaşıldı */
             border-radius: var(--radius-sm);
             color: var(--text-muted);
             text-decoration: none;
             font-weight: 500;
             transition: var(--transition);
-            font-size: 14px;
+            font-size: 13px; /* Yazıların tek satıra sığması için küçültüldü */
         }
 
         .toc-item .toc-num {
             font-family: var(--font-mono);
             font-size: 12px;
             opacity: 0.6;
-            margin-right: 12px;
+            margin-right: 6px;
         }
         
         .toc-item .toc-text {
             flex: 1;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            line-height: 1.3;
+            /* Yazı çok uzunsa yanlardan kesilmek yerine alt satıra geçer, ekrana sığar */
         }
 
         .toc-item .toc-dot {
@@ -241,32 +263,41 @@
 
         /* Ana İçerik Alanı */
         .main-content {
-            margin-left: 280px;
-            padding: 120px 60px 140px 60px; /* Alttan boşluk arttırıldı, progress bar kapanmasın diye */
-            width: calc(100% - 280px);
-            max-width: 1100px;
+            margin-left: 200px;
+            padding: 90px max(40px, calc(50% - 500px)) 110px max(40px, calc(50% - 500px)); /* Yazıları merkeze almak için dinamik padding */
+            width: calc(100% - 200px);
+            /* max-width kaldırıldı, padding ile içerik genişliği kontrol ediliyor */
+        }
+
+        html {
+            font-size: clamp(12px, 0.8vw + 8px, 14px); /* Yazılar biraz daha küçültüldü */
         }
 
         h1, h2, h3, h4 {
             font-family: var(--font-heading);
             color: var(--text-main);
-            margin-bottom: 20px;
+            margin-bottom: 16px;
+            line-height: 1.3;
         }
 
         h2 {
-            font-size: 32px;
-            margin-bottom: 24px;
+            font-size: clamp(20px, 3vw, 26px);
+            margin-bottom: 16px;
             border-bottom: 1px solid var(--border);
-            padding-bottom: 12px;
+            padding-bottom: 10px;
+        }
+        
+        h3 {
+            font-size: clamp(16px, 2vw, 20px);
         }
 
         p {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             color: var(--text-muted);
         }
 
         ul {
-            margin-bottom: 20px;
+            margin-bottom: 16px;
             padding-left: 20px;
             color: var(--text-muted);
         }
@@ -410,7 +441,7 @@
         #progressBar {
             position: fixed;
             bottom: 0;
-            left: 280px;
+            left: 200px;
             right: 0;
             height: 52px;
             background: var(--bg2);
@@ -604,10 +635,40 @@
             transform: translateY(0);
         }
         
+        /* Overlay for Sidebar */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
         /* Responsive */
         @media (max-width: 768px) {
-            .sidebar { transform: translateX(-100%); }
+            .sidebar { 
+                transform: translateX(-100%); 
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            }
+            .sidebar.open { transform: translateX(0); }
             header, .main-content, #progressBar { left: 0; margin-left: 0; width: 100%; }
+            .menu-toggle { display: block; }
+            header { padding: 0 20px; }
+            .main-content { padding: 80px 16px 110px 16px; }
+            .header-left .search-btn span {
+                display: none;
+            }
+            .header-left .search-btn {
+                padding: 8px;
+            }
         }
 
     </style>
@@ -683,12 +744,18 @@
         </ul>
     </aside>
 
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
     <!-- Üst Bilgi Alanı -->
     <header>
         <div class="header-left">
+            <button class="menu-toggle" id="menuToggle" aria-label="Menüyü Aç">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+            </button>
             <button class="search-btn" id="searchBtn">
                 <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
-                Arama yap... (Cmd/Ctrl + K)
+                <span>Arama yap... (Cmd/Ctrl + K)</span>
             </button>
         </div>
         <div class="header-right">
@@ -1161,6 +1228,19 @@
             themeToggle.textContent = isLight ? '🌙' : '☀️';
         });
 
+        /* Mobil Menü (Hamburger) Yönetimi */
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+        const toggleSidebar = () => {
+            sidebar.classList.toggle('open');
+            sidebarOverlay.classList.toggle('active');
+        };
+
+        menuToggle.addEventListener('click', toggleSidebar);
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+
 
 
         /* 5. Sözlük & Tooltip Sistemi */
@@ -1219,9 +1299,9 @@
             const scrollTop = window.scrollY;
             const docHeight = document.body.scrollHeight - window.innerHeight;
             
-            // Sayfa Geneli İlerleme (Yukarı Çık SVG Halka Barı)
-            const scrollPercent = docHeight > 0 ? Math.min((scrollTop / docHeight), 1) : 0;
-            circle.style.strokeDashoffset = circumference - scrollPercent * circumference;
+            // Sayfa Geneli İlerleme (Artık kullanılmıyor, Halka progress bar bölüm ilerlemesini gösteriyor)
+            // const scrollPercent = docHeight > 0 ? Math.min((scrollTop / docHeight), 1) : 0;
+            // circle.style.strokeDashoffset = circumference - scrollPercent * circumference;
 
             // Yukarı Çık Butonunun Görünürlüğü
             const scrollTopBtn = document.getElementById('scrollTop');
@@ -1275,6 +1355,9 @@
             progText.innerHTML = `<span class="accent">${secNum}</span> ${secTitle}`;
             progPercent.textContent = `%${Math.round(secProgress)}`;
             
+            // Yeni: Yukarı Çık (Halka) progress bar bölüm ilerlemesini göstersin
+            circle.style.strokeDashoffset = circumference - (secProgress / 100) * circumference;
+            
             // %0 ve %100 değilse hareketli parlama animasyonu at
             if (secProgress > 0 && secProgress < 100) {
                 progFill.classList.add('moving');
@@ -1287,7 +1370,7 @@
         window.addEventListener('resize', updateScroll);
         setTimeout(updateScroll, 100);
 
-        // Sidebar link tıklandığında kaydırma
+        // Sidebar link tıklandığında kaydırma ve mobilde menüyü kapatma
         tocItems.forEach(item => {
             item.addEventListener('click', e => {
                 e.preventDefault();
@@ -1297,6 +1380,12 @@
                     top: targetEl.offsetTop - 80,
                     behavior: 'smooth'
                 });
+                
+                // Mobilde menüyü kapat
+                if (window.innerWidth <= 768) {
+                    sidebar.classList.remove('open');
+                    sidebarOverlay.classList.remove('active');
+                }
             });
         });
 

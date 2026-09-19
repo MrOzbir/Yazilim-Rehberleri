@@ -66,7 +66,7 @@
       background: var(--bg);
       color: var(--text);
       font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-      font-size: 15px;
+      font-size: clamp(13px, 1vw + 10px, 14.5px);
       line-height: 1.7;
       min-height: 100vh;
     }
@@ -104,7 +104,7 @@
     }
 
     .header-logo span {
-      font-size: 15px;
+      font-size: clamp(13px, 1vw + 10px, 14.5px);
       font-weight: 700;
       color: var(--text);
       letter-spacing: -0.02em;
@@ -124,7 +124,7 @@
       border-radius: var(--radius);
       color: var(--text);
       font-family: 'JetBrains Mono', monospace;
-      font-size: 13px;
+      font-size: clamp(11.5px, 1vw + 8.5px, 12.5px);
       padding: 8px 12px 8px 36px;
       outline: none;
       transition: border-color 0.2s;
@@ -344,7 +344,7 @@
     }
 
     .hero h1 {
-      font-size: clamp(32px, 5vw, 52px);
+      font-size: clamp(26px, 4vw, 44px);
       font-weight: 800;
       line-height: 1.05;
       letter-spacing: -0.03em;
@@ -358,7 +358,7 @@
 
     .hero p {
       color: var(--text2);
-      font-size: 15px;
+      font-size: clamp(13px, 1vw + 10px, 14.5px);
       max-width: 560px;
     }
 
@@ -428,7 +428,7 @@
     }
 
     .section-title {
-      font-size: 20px;
+      font-size: clamp(16px, 1.5vw + 12px, 19px);
       font-weight: 800;
       letter-spacing: -0.02em;
       color: var(--text);
@@ -494,7 +494,7 @@
     table {
       width: 100%;
       border-collapse: collapse;
-      font-size: 13px;
+      font-size: clamp(11.5px, 1vw + 8.5px, 12.5px);
     }
 
     thead th {
@@ -516,7 +516,7 @@
       color: var(--text);
       vertical-align: top;
       font-family: 'Plus Jakarta Sans', 'Inter', sans-serif;
-      font-size: 13.5px;
+      font-size: clamp(12px, 1vw + 9px, 13px);
     }
 
     tbody tr:last-child td {
@@ -573,7 +573,7 @@
       border-radius: var(--radius);
       margin: 12px 0;
       overflow: hidden;
-      font-size: 13px;
+      font-size: clamp(11.5px, 1vw + 8.5px, 12.5px);
       position: relative;
     }
 
@@ -704,7 +704,7 @@
       display: flex;
       gap: 12px;
       align-items: flex-start;
-      font-size: 13.5px;
+      font-size: clamp(12px, 1vw + 9px, 13px);
     }
 
     .info-box .icon {
@@ -755,7 +755,7 @@
 
     .cs-text {
       color: var(--text3);
-      font-size: 13.5px;
+      font-size: clamp(12px, 1vw + 9px, 13px);
     }
 
     .cs-text span {
@@ -940,11 +940,47 @@
     }
 
     .card p {
-      font-size: 13px;
+      font-size: clamp(11.5px, 1vw + 8.5px, 12.5px);
       color: var(--text2);
     }
 
     /* ── RESPONSIVE ── */
+
+    .menu-btn {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border);
+      color: var(--text);
+      cursor: pointer;
+      padding: 4px 6px;
+      border-radius: var(--radius2);
+      transition: all 0.2s ease;
+      align-items: center;
+      justify-content: center;
+    }
+    .menu-btn:hover {
+      background: var(--bg3);
+      color: var(--accent);
+      border-color: var(--accent);
+    }
+    .sidebar-overlay {
+      display: none;
+      position: fixed;
+      top: 60px;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.6);
+      backdrop-filter: blur(3px);
+      z-index: 150;
+      opacity: 0;
+      transition: opacity 0.35s ease;
+    }
+    .sidebar-overlay.active {
+      display: block;
+      opacity: 1;
+    }
+
     /* ── TOOLTIPS ── */
     .tooltip {
       position: relative;
@@ -983,15 +1019,29 @@
     }
 
     @media (max-width: 900px) {
+      .menu-btn {
+        display: flex;
+      }
       .layout {
         grid-template-columns: 1fr;
       }
 
       aside {
-        position: static;
-        height: auto;
-        border-right: none;
-        border-bottom: 1px solid var(--border);
+        position: fixed;
+        top: 60px;
+        left: -280px;
+        width: 260px;
+        height: calc(100vh - 60px);
+        background: var(--bg2);
+        border-right: 1px solid var(--border);
+        border-bottom: none;
+        z-index: 200;
+        transition: transform 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 4px 0 20px rgba(0,0,0,0.5);
+      }
+      
+      aside.open {
+        transform: translateX(280px);
       }
 
       main {
@@ -1037,6 +1087,7 @@
   <!-- HEADER -->
   <header>
     <div class="header-logo">
+      <button id="mobileMenuBtn" class="menu-btn" title="Menü" aria-label="Menü"><svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg></button>
       <span class="java-badge">JAVA</span>
       <span>Kapsamlı Rehber</span>
     </div>
@@ -1052,6 +1103,8 @@
 
   <!-- LAYOUT -->
   <div class="layout">
+
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
     <!-- SIDEBAR / TOC -->
     <aside id="sidebar">
@@ -6939,7 +6992,40 @@ public class DosyaKopyalayici {
       searchTimeout = setTimeout(() => addHighlights(q), 300);
     });
 
-    // ── PROGRESS BAR & ACTIVE TOC ──────────────────────
+    
+    // ── MOBILE MENU ────────────────────────────────────
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+    function toggleMenu() {
+      const isOpen = sidebar.classList.contains('open');
+      if (isOpen) {
+        sidebar.classList.remove('open');
+        sidebarOverlay.classList.remove('active');
+        setTimeout(() => { if (!sidebar.classList.contains('open')) sidebarOverlay.style.display = 'none'; }, 350);
+      } else {
+        sidebarOverlay.style.display = 'block';
+        setTimeout(() => {
+          sidebar.classList.add('open');
+          sidebarOverlay.classList.add('active');
+        }, 10);
+      }
+    }
+
+    if (mobileMenuBtn) mobileMenuBtn.addEventListener('click', toggleMenu);
+    if (sidebarOverlay) sidebarOverlay.addEventListener('click', toggleMenu);
+    
+    // Close sidebar on toc item click on mobile
+    tocItems.forEach(item => {
+      item.addEventListener('click', () => {
+        if (window.innerWidth <= 900 && sidebar.classList.contains('open')) {
+          toggleMenu();
+        }
+      });
+    });
+
+// ── PROGRESS BAR & ACTIVE TOC ──────────────────────
     const sections = document.querySelectorAll('section.section');
     const progNum = document.getElementById('progNum');
     const progName = document.getElementById('progName');

@@ -58,6 +58,7 @@
     ::-moz-selection { background: rgba(0, 229, 255, 0.3); color: #fff; }
     
     html {
+      font-size: clamp(10px, 1vw, 13px);
       scroll-behavior: smooth;
     }
     
@@ -134,14 +135,16 @@
       background: var(--bg3);
       border: 1px solid var(--border);
       color: var(--text);
-      width: 40px;
+      width: 100%;
       height: 40px;
       border-radius: 6px;
       cursor: pointer;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 1.1rem;
+      font-size: 0.95rem;
+      font-weight: 600;
+      gap: 8px;
       transition: all 0.2s ease;
     }
     
@@ -721,13 +724,68 @@
     /* Utilities */
     .hidden { display: none !important; }
     
+    /* Menu Toggle Button & Overlay */
+    .menu-toggle {
+        display: none;
+        position: fixed;
+        bottom: 5rem;
+        right: 2rem;
+        background: rgba(14, 14, 14, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        color: var(--text);
+        border: 1px solid var(--border);
+        padding: 0.8rem 1.5rem;
+        border-radius: 50px;
+        font-size: 1rem;
+        font-weight: 700;
+        z-index: 1000;
+        cursor: pointer;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .menu-toggle:hover {
+        background: var(--bg3);
+        border-color: var(--accent);
+        transform: translateY(-3px);
+        color: var(--accent);
+    }
+
+    .sidebar-overlay {
+        position: fixed;
+        top: 0; left: 0; right: 0; bottom: 0;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(5px);
+        -webkit-backdrop-filter: blur(5px);
+        z-index: 90;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+    }
+
+    .sidebar-active .sidebar-overlay {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
     /* Responsive Adjustments */
     @media (max-width: 992px) {
+      .menu-toggle { display: flex; }
       .sidebar {
         width: 280px;
+        transform: translateX(-100%);
+        transition: transform 0.4s ease;
+        position: fixed;
+        z-index: 100;
+      }
+      .sidebar-active .sidebar {
+        transform: translateX(0);
       }
       .bottom-progress {
-        left: 280px;
+        left: 0;
         padding: 0 1.5rem;
       }
       .main-content {
@@ -736,16 +794,8 @@
     }
     
     @media (max-width: 768px) {
-      .sidebar {
-        position: fixed;
-        transform: translateX(-100%);
-      }
-      .bottom-progress {
-        left: 0;
-      }
-      .main-content {
-        padding: 2rem 1.25rem 6rem 1.25rem;
-      }
+      .bottom-progress { left: 0; }
+      .main-content { padding: 2rem 1.25rem 6rem 1.25rem; }
     }
   </style>
   
@@ -768,15 +818,23 @@
 </head>
 <body>
 
+  <!-- Sidebar Overlay -->
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+  <!-- Menu Toggle Button -->
+  <button class="menu-toggle" id="menuToggle">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+      Menü
+  </button>
   <!-- ==========================================
        SIDEBAR (TOC)
        ========================================== -->
   <aside class="sidebar" id="sidebar">
     <div class="sidebar-header">
       <h1 class="sidebar-title">TypeScript<br>Reference</h1>
-      <div class="controls">
-        <input type="text" id="searchInput" class="search-box" placeholder="Arama yap..." autocomplete="off">
-        <button id="themeToggle" class="theme-toggle" aria-label="Temayı Değiştir">🌙</button>
+      <div class="controls" style="flex-direction: column; gap: 10px; margin-top: 1.25rem;">
+        <input type="text" id="searchInput" class="search-box" style="width: 100%;" placeholder="Arama yap..." autocomplete="off">
+        <button id="themeToggle" class="theme-toggle" aria-label="Temayı Değiştir">🌙 Temayı Değiştir</button>
       </div>
     </div>
     <ul class="toc" id="toc">
@@ -1873,6 +1931,34 @@ export {};</code></pre>
         });
       });
 
+      // Mobile Menu Toggle Logic
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebarOverlay = document.getElementById('sidebarOverlay');
+
+      function toggleMenu() {
+          body.classList.toggle('sidebar-active');
+          if(body.classList.contains('sidebar-active')) {
+              menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Kapat';
+          } else {
+              menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg> Menü';
+          }
+      }
+
+      if (menuToggle) {
+          menuToggle.addEventListener('click', toggleMenu);
+      }
+      if (sidebarOverlay) {
+          sidebarOverlay.addEventListener('click', toggleMenu);
+      }
+      
+      // Auto-close menu on small screens when clicking a link
+      document.querySelectorAll('.toc-item').forEach(anchor => {
+          anchor.addEventListener('click', () => {
+              if(window.innerWidth <= 992 && body.classList.contains('sidebar-active')) {
+                  toggleMenu();
+              }
+          });
+      });
     });
   </script>
 </body>

@@ -51,6 +51,8 @@
             padding: 0;
         }
 
+        html { font-size: clamp(11px, 1.2vw, 14px); }
+
         body {
             font-family: 'Inter', sans-serif;
             background-color: var(--bg);
@@ -241,22 +243,11 @@
             max-width: 1100px;
         }
         
-        .header-actions {
-            display: flex;
-            justify-content: flex-end;
-            align-items: center;
-            margin-bottom: 2rem;
-            position: relative;
-            z-index: 10;
-        }
-
-
-
         .theme-toggle {
             background: var(--bg3);
             border: 1px solid var(--border);
             color: var(--text-main);
-            width: 36px;
+            width: 100%;
             height: 36px;
             border-radius: 8px;
             display: flex;
@@ -264,13 +255,15 @@
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s;
-            font-size: 1.1rem;
+            font-size: 0.95rem;
+            font-weight: 600;
+            gap: 8px;
+            margin-bottom: 1rem;
         }
 
         .theme-toggle:hover {
             background-color: var(--bg4);
             border-color: var(--accent);
-            transform: rotate(15deg) scale(1.05);
             box-shadow: 0 4px 12px rgba(36, 150, 237, 0.2);
         }
 
@@ -692,14 +685,80 @@
             z-index: 2;
         }
         
+        /* Menu Toggle Button & Overlay */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            background: rgba(14, 14, 14, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg3);
+            border-color: var(--accent);
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(36, 150, 237, 0.2);
+            color: var(--accent);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-active .sidebar-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         @media (max-width: 1024px) {
-            .sidebar { transform: translateX(-100%); }
-            .main-content { margin-left: 0; padding: 2rem; max-width: 100%; }
+            .menu-toggle { display: flex; }
+            .sidebar { 
+                transform: translateX(-100%);
+                transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+                z-index: 100;
+            }
+            .sidebar-active .sidebar {
+                transform: translateX(0);
+            }
+            .main-content { margin-left: 0; padding: 2rem 1.5rem 80px 1.5rem; max-width: 100%; }
             #progressBar { left: 0; }
         }
     </style>
 </head>
 <body>
+
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        Menü
+    </button>
 
     <div class="app-container">
         
@@ -712,6 +771,7 @@
                     <input type="text" id="searchInput" class="search-input" placeholder="Ara...">
                     <span class="search-shortcut">⌘K</span>
                 </div>
+                <button class="theme-toggle" id="themeToggle" title="Tema Değiştir">☀️ Temayı Değiştir</button>
             </div>
             
             <ul class="toc-list" id="tocList">
@@ -732,10 +792,6 @@
 
         <!-- ANA İÇERİK -->
         <main class="main-content">
-            <div class="header-actions">
-                <button class="theme-toggle" id="themeToggle" title="Tema Değiştir">☀️</button>
-            </div>
-
             <section class="section" id="s01">
                 <h2 class="section-title"><span class="section-num">01.</span> Konteyner Teknolojisi & Docker Anatomisi</h2>
                 
@@ -1703,6 +1759,36 @@ helm rollback my-webapp 1</code></pre>
                 observer.observe(el);
             });
         });
+        // Mobile Menu Toggle Logic
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const body = document.body;
+
+        function toggleMenu() {
+            body.classList.toggle('sidebar-active');
+            if(body.classList.contains('sidebar-active')) {
+                menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Kapat';
+            } else {
+                menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg> Menü';
+            }
+        }
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', toggleMenu);
+        }
+        
+        // Auto-close menu on small screens when clicking a link
+        document.querySelectorAll('.toc-item').forEach(anchor => {
+            anchor.addEventListener('click', () => {
+                if(window.innerWidth <= 1024 && body.classList.contains('sidebar-active')) {
+                    toggleMenu();
+                }
+            });
+        });
+
     </script>
 </body>
 </html>

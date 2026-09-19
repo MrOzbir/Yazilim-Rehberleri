@@ -68,6 +68,19 @@
         /* Temel Reset */
         * { box-sizing: border-box; margin: 0; padding: 0; }
         
+        html {
+            /* Akışkan tipografi (Fluid Typography) - Temel Boyut
+               Ekrana maksimum içerik sığması için font boyutları minimuma indirildi. */
+            font-size: clamp(11px, 0.3vw + 9px, 13px);
+        }
+
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+            html {
+                /* Yüksek piksel yoğunluklu (Retina) ekranlar */
+                font-size: clamp(12px, 0.3vw + 10px, 14px);
+            }
+        }
+
         body {
             font-family: var(--font-body);
             background-color: var(--bg);
@@ -313,6 +326,15 @@
             overflow: hidden;
             display: flex;
             flex-direction: column;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), box-shadow 0.3s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+            border-color: var(--border2);
+        }
+        body.light-mode .card:hover {
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.08);
         }
         .card-header {
             background: rgba(38, 77, 228, 0.05);
@@ -387,7 +409,7 @@
             font-family: var(--font-body);
         }
         .copy-btn:hover { background: rgba(255, 255, 255, 0.2); }
-        .copy-btn.copied { background: var(--tip); border-color: var(--tip); }
+        .copy-btn.copied { background: var(--tip); border-color: var(--tip); color: #000; font-weight: 600; box-shadow: 0 0 15px rgba(0, 245, 212, 0.4); }
 
         /* 5. GELİŞMİŞ JS MOTORLARI - CSS */
         mark.search-hl {
@@ -539,18 +561,62 @@
             100% { box-shadow: 0 0 0 0 rgba(38, 77, 228, 0); }
         }
 
+        /* MOBİL MENÜ & OVERLAY */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.5);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 95;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+        .mobile-toggle-btn {
+            display: none;
+            background: var(--bg3);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            cursor: pointer;
+            padding: 0.4rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s;
+        }
+        .mobile-toggle-btn:hover { background: var(--border); transform: scale(1.05); }
+
         /* Medya Sorguları */
         @media (max-width: 992px) {
-            .sidebar { transform: translateX(-100%); position: fixed; }
+            .sidebar { 
+                transform: translateX(-100%); 
+                position: fixed; 
+                transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            }
+            .sidebar.open { transform: translateX(0); }
+            .sidebar-overlay.show { display: block; opacity: 1; }
             .main-content { padding-left: 0; }
             #progressBar { left: 0; }
+            .mobile-toggle-btn { display: flex; align-items: center; justify-content: center; }
+            .top-header { padding: 1rem 1.5rem; }
+            .hero { padding: 3rem 1.5rem 2.5rem; }
+            .section { padding: 2rem 1.5rem; }
+            .search-box { width: 100%; max-width: 250px; }
+            
+            /* Mobilde hero fontları çok büyümesin */
+            .hero h1 { font-size: 2.2rem; }
         }
     </style>
 </head>
 <body>
 
     <!-- 4. YAN MENÜ -->
-    <aside class="sidebar">
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
         <div class="sidebar-header">
             <h2>CSS3 Reference</h2>
         </div>
@@ -573,9 +639,14 @@
     <main class="main-content">
         <!-- HEADER -->
         <header class="top-header">
-            <div class="search-box">
-                <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-                <input type="text" id="searchInput" placeholder="İçerikte ara... (Cmd+K)">
+            <div class="header-left">
+                <button id="sidebarToggle" class="mobile-toggle-btn" aria-label="Menüyü Aç/Kapat">
+                    <svg viewBox="0 0 24 24" width="22" height="22"><path fill="currentColor" d="M3 6h18v2H3V6m0 5h18v2H3v-2m0 5h18v2H3v-2z"/></svg>
+                </button>
+                <div class="search-box">
+                    <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
+                    <input type="text" id="searchInput" placeholder="İçerikte ara... (Cmd+K)">
+                </div>
             </div>
             <div class="header-actions">
                 <button id="themeToggle" class="theme-btn" title="Tema Değiştir">☀️</button>
@@ -1298,11 +1369,34 @@ li:nth-child(even) { background: #eee; }
     <script>
         document.addEventListener('DOMContentLoaded', () => {
 
-            // 1. TEMA DEĞİŞTİRİCİ
+            // 1. TEMA DEĞİŞTİRİCİ VE SİDEBAR KONTROLÜ
             const themeBtn = document.getElementById('themeToggle');
+            const sidebar = document.getElementById('sidebar');
+            const sidebarBtn = document.getElementById('sidebarToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+
             themeBtn.addEventListener('click', () => {
                 document.body.classList.toggle('light-mode');
                 themeBtn.innerText = document.body.classList.contains('light-mode') ? '🌙' : '☀️';
+            });
+
+            // Mobil menü (Sidebar) aç/kapa
+            const toggleSidebar = () => {
+                sidebar.classList.toggle('open');
+                sidebarOverlay.classList.toggle('show');
+            };
+
+            sidebarBtn.addEventListener('click', toggleSidebar);
+            sidebarOverlay.addEventListener('click', toggleSidebar);
+            
+            // Menü içinden bir linke tıklanınca menüyü otomatik kapat
+            document.querySelectorAll('.toc-item').forEach(item => {
+                item.addEventListener('click', () => {
+                    if (window.innerWidth <= 992) {
+                        sidebar.classList.remove('open');
+                        sidebarOverlay.classList.remove('show');
+                    }
+                });
             });
 
             // 3. KOPYALA BUTONLARI

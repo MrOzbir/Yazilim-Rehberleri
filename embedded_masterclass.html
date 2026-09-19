@@ -24,32 +24,57 @@
             --text-main: #E2E8F0; --text-muted: #94A3B8;
         }
 
+        [data-theme="light"] {
+            --bg: #F8FAFC; --bg2: #FFFFFF; --bg3: #F1F5F9;
+            --border: #E2E8F0;
+            --accent: #059669; --cyan: #0891B2; --red: #E11D48; --purple: #7E22CE; --yellow: #D97706;
+            --text-main: #0F172A; --text-muted: #64748B;
+        }
+
         * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: clamp(10px, 1vw, 13px); }
         body { background-color: var(--bg); color: var(--text-main); font-family: 'Inter', sans-serif; line-height: 1.7; overflow-x: hidden; width: 100vw; }
         h1, h2, h3, h4, h5, h6 { font-family: 'Plus Jakarta Sans', sans-serif; margin-top: 2rem; margin-bottom: 1rem; }
         p { margin-bottom: 1rem; color: var(--text-muted); }
 
-        /* Top Header */
-        .top-header {
-            position: sticky; top: 0; z-index: 100; background: rgba(10, 10, 12, 0.9); backdrop-filter: blur(16px);
-            border-bottom: 1px solid var(--border); padding: 1rem 2rem; display: flex; justify-content: space-between; align-items: center; height: 65px;
-        }
-        .header-brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.2rem; color: var(--accent); display: flex; align-items: center; gap: 10px; white-space: nowrap; }
-        .header-brand::before { content: ''; display: inline-block; width: 10px; height: 10px; background: var(--accent); box-shadow: 0 0 12px var(--accent); border-radius: 2px; animation: pulse 2s infinite; }
+        .header-brand { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 1.2rem; color: var(--accent); display: flex; align-items: center; gap: 10px; white-space: normal; line-height: 1.3; }
+        .header-brand::before { content: ''; display: inline-block; width: 10px; height: 10px; background: var(--accent); box-shadow: 0 0 12px var(--accent); border-radius: 2px; animation: pulse 2s infinite; flex-shrink: 0; }
         @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(16, 185, 129, 0); } 100% { box-shadow: 0 0 0 0 rgba(16, 185, 129, 0); } }
 
-        /* Search Bar */
-        .search-container { position: relative; margin: 0 2rem; flex-grow: 1; max-width: 450px; }
+        /* Search Bar & Theme Toggle */
+        .search-container { position: relative; width: 100%; margin-bottom: 20px; }
         #searchInput { width: 100%; padding: 0.5rem 1rem 0.5rem 2.5rem; border-radius: 6px; border: 1px solid var(--border); background: var(--bg2); color: var(--text-main); font-family: 'Inter', sans-serif; font-size: 0.9rem; outline: none; transition: all 0.3s; }
         #searchInput:focus { border-color: var(--cyan); box-shadow: 0 0 10px rgba(0, 229, 255, 0.15); background: var(--bg3); }
         .search-icon { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); font-size: 14px; }
+
+        .theme-toggle {
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border);
+            color: var(--text-main);
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+        .theme-toggle:hover {
+            border-color: var(--cyan);
+            background-color: var(--bg3);
+            color: var(--cyan);
+        }
         mark.highlight { background-color: var(--cyan); color: var(--bg); padding: 0 3px; border-radius: 3px; font-weight: 600; }
 
         /* Layout */
         .layout { display: flex; align-items: stretch; width: 100%; }
 
         /* Sidebar */
-        .sidebar { width: 340px; background: var(--bg2); border-right: 1px solid var(--border); padding: 2rem 1rem; position: sticky; top: 65px; height: calc(100vh - 65px); overflow-y: auto; flex-shrink: 0; }
+        .sidebar { width: 340px; background: var(--bg2); border-right: 1px solid var(--border); padding: 2rem 1rem; position: sticky; top: 0; height: 100vh; overflow-y: auto; flex-shrink: 0; }
         .sidebar::-webkit-scrollbar { width: 6px; }
         .sidebar::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
         
@@ -109,30 +134,104 @@
         ul.hardware-list li::before { content: '>'; position: absolute; left: 0; color: var(--cyan); font-family: 'JetBrains Mono', monospace; font-weight: bold; }
         ul.hardware-list li strong { color: var(--text-main); }
 
+        /* Menu Toggle Button & Overlay */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-main);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-toggle:hover {
+            background: var(--bg3);
+            border-color: var(--cyan);
+            transform: translateY(-3px);
+            color: var(--cyan);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-active .sidebar-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         @media (max-width: 900px) {
-            .layout { flex-direction: column; }
-            .sidebar { width: 100%; height: auto; position: static; padding: 1rem; }
+            .menu-toggle { display: flex; }
+            .sidebar {
+                width: 320px;
+                position: fixed;
+                left: 0;
+                top: 0;
+                height: 100vh;
+                transform: translateX(-100%);
+                transition: transform 0.4s ease;
+                z-index: 100;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5); 
+            }
+            .sidebar-active .sidebar {
+                transform: translateX(0);
+            }
             .main-content { padding: 2rem 1.5rem 5rem 1.5rem; }
-            .search-container { max-width: 200px; }
         }
     </style>
 </head>
 <body>
 
-    <header class="top-header">
-        <div class="header-brand">EMBEDDED_MASTERCLASS</div>
-        <div class="search-container">
-            <span class="search-icon">🔍</span>
-            <input type="text" id="searchInput" placeholder="Rehberde kelime ara (Örn: MOSFET, PWM)..." autocomplete="off">
-        </div>
-        <div style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-muted);">
-            SYS_STATUS: <span style="color: var(--accent);">ONLINE</span>
-        </div>
-    </header>
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        Menü
+    </button>
 
     <div class="layout">
         <!-- Sidebar Navigation -->
         <nav class="sidebar">
+            <div class="header-brand" style="margin-bottom: 20px;">EMBEDDED_MASTERCLASS</div>
+            
+            <div class="search-container" style="display: flex; flex-direction: column; gap: 10px;">
+                <div style="position: relative; width: 100%;">
+                    <span class="search-icon">🔍</span>
+                    <input type="text" id="searchInput" placeholder="Rehberde kelime ara..." autocomplete="off">
+                </div>
+                <button class="theme-toggle" id="themeToggle" title="Temayı Değiştir">
+                    <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path></svg>
+                    Tema Değiştir
+                </button>
+            </div>
+
+            <div style="font-family: 'JetBrains Mono'; font-size: 0.85rem; color: var(--text-muted); margin-bottom: 20px;">
+                SYS_STATUS: <span style="color: var(--accent);">ONLINE</span>
+            </div>
+
             <h4 style="color: var(--text-main); font-size: 0.85rem; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 1rem; padding-left: 1rem;">Ansiklopedik İndeks</h4>
             
             <a href="#sec-01" class="toc-item active" data-target="sec-01"><div class="status-icon"></div><span>01. MCU ve Donanım Mimarisi</span></a>
@@ -457,6 +556,50 @@ while(1) {
                 });
             }, 300);
         });
+
+        // Mobile Menu Toggle Logic
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        const bodyRef = document.body;
+
+        function toggleMenu() {
+            bodyRef.classList.toggle('sidebar-active');
+            if(bodyRef.classList.contains('sidebar-active')) {
+                menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Kapat';
+            } else {
+                menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg> Menü';
+            }
+        }
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', toggleMenu);
+        }
+        if (sidebarOverlay) {
+            sidebarOverlay.addEventListener('click', toggleMenu);
+        }
+        
+        // Auto-close menu on small screens when clicking a link
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                if(window.innerWidth <= 900 && bodyRef.classList.contains('sidebar-active')) {
+                    toggleMenu();
+                }
+            });
+        });
+
+        // Theme Toggle Logic
+        const themeBtn = document.getElementById('themeToggle');
+        if(themeBtn) {
+            themeBtn.addEventListener('click', () => {
+                const htmlTag = document.documentElement;
+                if(htmlTag.getAttribute('data-theme') === 'light') {
+                    htmlTag.removeAttribute('data-theme');
+                } else {
+                    htmlTag.setAttribute('data-theme', 'light');
+                }
+            });
+        }
+
     </script>
 </body>
 </html>

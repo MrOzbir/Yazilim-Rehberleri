@@ -84,6 +84,11 @@
             padding: 0;
         }
 
+        html {
+            font-size: clamp(10px, 1vw, 13px);
+            scroll-behavior: smooth;
+        }
+
         body {
             font-family: var(--font-body);
             background-color: var(--bg-color);
@@ -162,16 +167,25 @@
         }
 
         #themeToggle {
-            background: none;
-            border: none;
+            background: rgba(0,0,0,0.2);
+            border: 1px solid var(--border-color);
+            color: var(--text-main);
+            width: 100%;
+            padding: 10px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 1.3rem;
-            transition: transform 0.2s ease, filter 0.2s;
-            filter: grayscale(0.5);
+            font-size: 0.95rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
         }
         #themeToggle:hover {
-            transform: scale(1.1) rotate(15deg);
-            filter: grayscale(0);
+            border-color: var(--accent-cyan);
+            background-color: var(--surface-color-hover);
+            color: var(--accent-cyan);
         }
 
         .search-container {
@@ -528,6 +542,53 @@
             stroke-linecap: round;
         }
 
+        /* Menu Toggle Button & Overlay */
+        .menu-toggle {
+            display: none;
+            position: fixed;
+            bottom: 6rem;
+            right: 2rem;
+            background: rgba(20, 20, 20, 0.9);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            color: var(--text-main);
+            border: 1px solid var(--border-color);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            font-size: 1rem;
+            font-weight: 700;
+            z-index: 1000;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .menu-toggle:hover {
+            background: var(--surface-color);
+            border-color: var(--accent-cyan);
+            transform: translateY(-3px);
+            color: var(--accent-cyan);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            z-index: 90;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease;
+        }
+
+        .sidebar-active .sidebar-overlay {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
         /* Responsive Breakpoints */
         @media (max-width: 1024px) {
             #main-content {
@@ -535,43 +596,47 @@
             }
         }
         @media (max-width: 768px) {
+            .menu-toggle { display: flex; }
             #sidebar {
                 transform: translateX(-100%);
-                transition: transform 0.3s ease;
+                transition: transform 0.4s ease;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+            }
+            .sidebar-active #sidebar {
+                transform: translateX(0);
             }
             #main-content {
                 margin-left: 0;
                 padding: 24px;
                 padding-bottom: calc(var(--bottom-bar-height) + 24px);
             }
-            #progressBar {
-                padding: 0 20px;
-            }
-            .progress-track {
-                margin: 0 20px;
-            }
-            #scrollTopBtn {
-                right: 20px;
-            }
-            .progress-info {
-                min-width: auto;
-            }
-            #progName {
-                display: none;
-            }
+            #progressBar { padding: 0 20px; }
+            .progress-track { margin: 0 20px; }
+            #scrollTopBtn { right: 20px; }
+            .progress-info { min-width: auto; }
+            #progName { display: none; }
         }
     </style>
 </head>
 <body>
 
+    <!-- Sidebar Overlay -->
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <!-- Menu Toggle Button -->
+    <button class="menu-toggle" id="menuToggle">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        Menü
+    </button>
+    
     <!-- SIDEBAR: Dynamic TOC & Search -->
     <aside id="sidebar">
         <div class="sidebar-header">
             <h2>Algo Rehberi</h2>
-            <button id="themeToggle" aria-label="Tema Değiştir">🌙</button>
         </div>
-        <div class="search-container">
+        <div class="search-container" style="display: flex; flex-direction: column; gap: 10px;">
             <input type="text" id="searchInput" placeholder="İçerik veya başlık ara...">
+            <button id="themeToggle" aria-label="Tema Değiştir">🌙 Tema Değiştir</button>
         </div>
         <nav id="toc">
             <ul class="toc-list" id="tocList">
@@ -1396,6 +1461,36 @@ class LRUCache:
                 bindCopyButtons();
                 if(window.MathJax) MathJax.typesetPromise();
                 handleScroll();
+            });
+
+            // Mobile Menu Toggle Logic
+            const menuToggle = document.getElementById('menuToggle');
+            const sidebarOverlay = document.getElementById('sidebarOverlay');
+            const bodyRef = document.body;
+
+            function toggleMenu() {
+                bodyRef.classList.toggle('sidebar-active');
+                if(bodyRef.classList.contains('sidebar-active')) {
+                    menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg> Kapat';
+                } else {
+                    menuToggle.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg> Menü';
+                }
+            }
+
+            if (menuToggle) {
+                menuToggle.addEventListener('click', toggleMenu);
+            }
+            if (sidebarOverlay) {
+                sidebarOverlay.addEventListener('click', toggleMenu);
+            }
+            
+            // Auto-close menu on small screens when clicking a link
+            document.querySelectorAll('.toc-item').forEach(anchor => {
+                anchor.addEventListener('click', () => {
+                    if(window.innerWidth <= 768 && bodyRef.classList.contains('sidebar-active')) {
+                        toggleMenu();
+                    }
+                });
             });
 
         });
